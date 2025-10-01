@@ -1,6 +1,8 @@
 require_relative '../../lib/low_type.rb'
 
 class LowHello
+  prepend LowType
+
   def initialize(greeting = String | 'Hello')
     @greeting = greeting
   end
@@ -14,6 +16,4 @@ class LowHello
       puts goodbye
     end
   end
-
-  include LowType
 end

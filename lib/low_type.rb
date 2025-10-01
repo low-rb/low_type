@@ -6,7 +6,7 @@ module LowType
     klass.public_instance_methods(false) + klass.protected_instance_methods(false) + klass.private_instance_methods(false)
   end
 
-  def self.included(base)
+  def self.prepended(base)
     class << base
       def saved_methods
         @saved_methods ||= {}
@@ -19,10 +19,11 @@ module LowType
     end
 
     base.save_method(:initialize)
+  end
 
-    base.send(:define_method, :initialize) do |*args|
-      binding.pry
-    end
+  send(:define_method, :initialize) do |args|
+    binding.pry
+    super(*args)
   end
 end
 
