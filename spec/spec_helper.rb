@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'pry'
+require 'pry-nav'
 require 'low_type'
 
 RSpec.configure do |config|
