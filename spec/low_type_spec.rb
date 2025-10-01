@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'fixtures/hello_world.rb'
+require_relative 'fixtures/low_hello.rb'
 
-RSpec.describe HelloWorld do
+RSpec.describe LowHello do
   it 'instantiates a class with types' do
-    described_class.new(greeting: 'Hi')
-
-    expect { described_class }.not_to raise_error
+    expect { described_class.new(greeting: 'Hi') }.not_to raise_error
   end
 end
