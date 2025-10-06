@@ -3,8 +3,9 @@ require_relative '../../lib/low_type.rb'
 class LowHello
   prepend LowType
 
-  def initialize(greeting = String | 'Hello')
+  def initialize(greeting, name:)
     @greeting = greeting
+    @name = name
   end
 
   def say_hello(greeting = String | 'Hello')

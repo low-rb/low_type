@@ -4,10 +4,10 @@ LowType introduces the concept of "type expressions" in method arguments. When a
 
 ```ruby
 class MyClass
-  include LowType
+  prepend LowType
 
   def say_hello(greeting: String)
-    # Raises exception at runtime if greeting is not a String
+    # Raises exception at runtime if greeting is not a String.
   end
 end
 ```
@@ -47,14 +47,14 @@ end
 
 Place your class inside square brackets (`[]`) just after an `Array` or `Hash` or any enumerable class like so:
 ```ruby
-def say_hello(greetings: Array[String])
+def say_hello(greetings: String[])
   puts greetings
 end
 ```
 
 The default value for this type would look like:
 ```ruby
-def say_hello(greetings: Array[String] | ['Hello', 'Howdy', 'Hi'])
+def say_hello(greetings: String[] | ['Hello', 'Howdy', 'Hi'])
   puts greetings
 end
 ```
@@ -63,7 +63,7 @@ end
 
 Wrap all of your method arguments inside a `Lambda` function to define a return value type:
 ```ruby
-def say_hello((greetings: Array[String]) -> { String })
+def say_hello((greetings: String[]) -> { String })
   puts greetings
   # Raises an exception if the returned value is not a String
 end
@@ -71,7 +71,7 @@ end
 
 Return values can also be defined as `nil`able:
 ```ruby
-def say_hello((greetings: Array[String]) -> { String | nil })
+def say_hello((greetings: String[]) -> { String | nil })
   puts greetings
 end
 ```
