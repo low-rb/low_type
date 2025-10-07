@@ -3,9 +3,9 @@ require_relative '../../lib/low_type.rb'
 class LowHello
   prepend LowType
 
-  def initialize(default_value = nil, casual_greeting = String, generic_name: String)
-    @casual_greeting = casual_greeting
-    @generic_name = generic_name
+  def initialize(greeting = String, name: String)
+    @greeting = greeting
+    @name = name
   end
 
   def say_hello(greeting = String | 'Hello')

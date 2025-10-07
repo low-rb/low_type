@@ -3,11 +3,34 @@
 require_relative 'fixtures/low_hello.rb'
 
 RSpec.describe LowHello do
-  it 'instantiates a class with types' do
-    expect { described_class.new('POSITIONAL_ARG', 'Hey', generic_name: 'Mate') }.not_to raise_error
+  subject(:hello) { described_class.new(greeting, name:) }
+
+  let(:greeting) { 'Hey' }
+  let(:name) { 'Mate' }
+
+  describe '#initialize' do
+    it 'instantiates a typed class' do
+      expect { hello }.not_to raise_error
+    end
+
+    context 'when the arg type is incorrect' do
+      let(:greeting) { 123 }
+
+      it 'raises an invalid type error' do
+        expect { hello }.to raise_error(LowType::InvalidType)
+      end
+    end
   end
 
-  it 'raises an error with incorrect types' do
-    expect { described_class.new('POSITIONAL_ARG', 123, generic_name: 'Mate') }.to raise_error(LowType::InvalidType)
+  describe '#say_hello' do
+    it 'handles a type expression with a default value' do
+      expect(hello.say_hello('Hi')).to eq('Hi')
+    end
+
+    context 'when no arg provided' do
+      it 'provides a default value' do
+        expect(hello.say_hello).to eq('Hello')
+      end
+    end
   end
 end

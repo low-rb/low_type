@@ -104,7 +104,7 @@ module LowType
   end
 
   class TypeExpression
-    attr_reader :type
+    attr_reader :type, :default_value
 
     def initialize(type:)
       @type = type
@@ -132,8 +132,10 @@ end
 class Object
   class << self
     # "|" is not defined on Object class and this is the most compute-efficient way to achieve our goal (world peace).
+    # "|" bitwise operator on Integer is not called when the receiver is the Integer class (instead of an "instance" like "123").
     def |(default_value)
-      default_value
+      type_expression = ::LowType::TypeExpression.new(type: self)
+      type_expression | default_value
     end
   end
 end
