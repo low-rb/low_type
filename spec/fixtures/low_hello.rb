@@ -1,7 +1,7 @@
 require_relative '../../lib/low_type.rb'
 
 class LowHello
-  prepend LowType
+  include LowType
 
   def initialize(greeting = String, name: String)
     @greeting = greeting
