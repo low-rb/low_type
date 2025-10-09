@@ -63,7 +63,7 @@ end
 
 Wrap all of your method arguments inside a `Lambda` function to define a return value type:
 ```ruby
-def say_hello((greetings: String[]) -> { String })
+def say_hello(-> (greetings: String[]) { String })
   puts greetings
   # Raises an exception if the returned value is not a String
 end
@@ -71,7 +71,7 @@ end
 
 Return values can also be defined as `nil`able:
 ```ruby
-def say_hello((greetings: String[]) -> { String | nil })
+def say_hello(-> (greetings: String[]) { String | nil })
   puts greetings
 end
 ```
