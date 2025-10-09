@@ -23,31 +23,27 @@ module LowType
 
         method_name, args = method_line.delete_prefix('def ').split(/[()]/)
         method_name = method_name.to_sym
-        method_name = :new if method_name == :initialize # TODO: Override the private initialize method instead.
 
         proxy_method = eval("-> (#{args}) {}")
         required_args, required_kwargs = LowType.required_args(proxy_method)
 
         klass.low_params[method_name] = LowType.type_expressions_from_params(proxy_method, args, required_args, required_kwargs)
         
-        LowType.redefine_method(klass:, method_name:)
+        define_method(method_name) do |*args, **kwargs|
+          klass.low_params[method_name].each do |param_proxy|
+            arg = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
+            arg = param_proxy.type_expression.default_value if arg.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
+            param_proxy.type_expression.validate!(arg:, name: param_proxy.name)
+            param_proxy.position ? args[param_proxy.position] = arg : kwargs[param_proxy.name] = arg
+          end
+
+          super(*args, **kwargs)
+        end
       end
     end
   end
 
   class << self
-    def redefine_method(klass:, method_name:)
-      method_type = method_name == :new ? :define_singleton_method : :define_method
-      klass.send(method_type, method_name) do |*args, **kwargs|
-        low_params[method_name].each do |param_proxy|
-          arg = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
-          param_proxy.type_expression.validate!(arg:, name: param_proxy.name)
-        end
-
-        super(*args, **kwargs)
-      end
-    end
-
     def methods(klass)
       klass.public_instance_methods(false) + klass.protected_instance_methods(false) + klass.private_instance_methods(false)
     end
