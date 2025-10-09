@@ -9,12 +9,12 @@ class LowHello
   end
 
   def say_hello(greeting = String | 'Hello')
-    puts greeting
+    greeting
   end
 
   class << self
     def say_goodbye(goodbye = String | 'Goodbye')
-      puts goodbye
+      goodbye
     end
   end
 end
