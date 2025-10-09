@@ -9,6 +9,11 @@ module LowType
       def low_params
         @low_params ||= {}
       end
+
+      def type(var_proxy)
+        # TODO: Runtime type expression for the supplied variable.
+      end
+      alias_method :low_type, :type
     end
 
     base.prepend LowType.redefine_methods(file_path: LowType.file_path(klass: base), klass: base)
