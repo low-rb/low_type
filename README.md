@@ -76,21 +76,17 @@ def say_hello(greetings: String[]) -> { String | nil }
 end
 ```
 
-## Technical Considerations
+## Syntax
 
-### `[]` Enumerable Syntax
+### `[]` Enumerables
 
-The `[]` class methods for `Array`, `Hash` and other enumerable classes are redefined in the context of type expressions to no longer return an enumerable instance. This 🍰 *syntactic sugar* 🍭 is only for this context. If you want to create an `Array` or `Hash` instance inside a type expression then use `Array.new()` or `Hash.new()` or the Array literal `[]` or Hash literal `{}` syntax.
+The `[]` class method is redefined in the context of type expressions to represent an array of that object type. Luckily in the wild a `[]` class method is usually used rarely for "factory" or "utility" classes that don't overlap with enumerable classes.
 
-### `|` Default Value Syntax
+### `|` Default Value / Multiple Types
 
-The pipe symbol (`|`) is treated as the default value operator (it's technically a method) in the context of type expressions. 
-The `Integer` class bitwise operator (`|`) is redefined in the context of type expressions (and only in this context) to use the default value operator. 
-If you have custom classes that define a `|` class method and you'd like to use a default value for them in a type expression, then let LowType know:
-
-```ruby
-LowType.redefine([:custom_class_name])
-```
+The pipe symbol (`|`) is used in the context of type expressions to support multiple types and the default value:
+- Separate multiple allowed types with pipes: `my_variable = TypeOne | TypeTwo`
+- The last *value* defined becomes the default value: `my_variable = TypeOne | TypeTwo | nil`
 
 # Philosophy
 
