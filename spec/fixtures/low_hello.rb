@@ -8,7 +8,11 @@ class LowHello
     @name = name
   end
 
-  def say_hello(greeting = String | 'Hello')
+  def with_required_type(greeting = String)
+    greeting
+  end
+
+  def with_default_type(greeting = String | 'Hello')
     greeting
   end
 

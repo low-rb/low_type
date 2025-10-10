@@ -17,19 +17,31 @@ RSpec.describe LowHello do
       let(:greeting) { 123 }
 
       it 'raises an invalid type error' do
-        expect { hello }.to raise_error(LowType::InvalidType)
+        expect { hello }.to raise_error(LowType::InvalidTypeError)
       end
     end
   end
 
-  describe '#say_hello' do
-    it 'handles a type expression with a default value' do
-      expect(hello.say_hello('Hi')).to eq('Hi')
+  describe '#with_required_type' do
+    it 'passes through the argument' do
+      expect(hello.with_required_type('Hi')).to eq('Hi')
     end
 
     context 'when no arg provided' do
-      it 'provides a default value' do
-        expect(hello.say_hello).to eq('Hello')
+      it 'raises a required type error' do
+        expect { hello.with_required_type }.to raise_error(LowType::RequiredTypeError)
+      end
+    end
+  end
+
+  describe '#with_default_type' do
+    it 'passes through the argument' do
+      expect(hello.with_default_type('Hi')).to eq('Hi')
+    end
+
+    context 'when no arg provided' do
+      it 'provides the default value' do
+        expect(hello.with_default_type).to eq('Hello')
       end
     end
   end

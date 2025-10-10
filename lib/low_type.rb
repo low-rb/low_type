@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module LowType
-  class InvalidType < StandardError; end;
+  class InvalidTypeError < StandardError; end;
+  class RequiredTypeError < StandardError; end;
 
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
   def self.included(base)
@@ -133,7 +134,11 @@ module LowType
     end
 
     def validate!(arg:, name:)
-      raise ::LowType::InvalidType, "Invalid type '#{arg.class}' for '#{name}'" unless arg.class == @type
+      if arg.nil? && required?
+        raise ::LowType::RequiredTypeError, "Missing value of required type '#{@type}' for '#{name}'"
+      end
+
+      raise ::LowType::InvalidTypeError, "Invalid type '#{arg.class}' for '#{name}'" unless arg.class == @type
     end
   end
 
