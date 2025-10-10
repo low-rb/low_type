@@ -29,19 +29,32 @@ RSpec.describe LowHello do
 
     context 'when no arg provided' do
       it 'raises a required type error' do
-        expect { hello.with_required_type }.to raise_error(LowType::RequiredTypeError)
+        expect { hello.with_required_type }.to raise_error(LowType::RequiredValueError)
       end
     end
   end
 
   describe '#with_default_type' do
     it 'passes through the argument' do
-      expect(hello.with_default_type('Hi')).to eq('Hi')
+      expect(hello.with_default_type('Howdy')).to eq('Howdy')
     end
 
     context 'when no arg provided' do
       it 'provides the default value' do
         expect(hello.with_default_type).to eq('Hello')
+      end
+    end
+  end
+
+  describe '#with_multiple_types' do
+    it 'accepts both arguments types' do
+      expect(hello.with_multiple_types('Shalom')).to eq('Shalom')
+      expect(hello.with_multiple_types(123)).to eq(123)
+    end
+
+    context 'when no arg provided' do
+      it 'provides the default value' do
+        expect(hello.with_multiple_types).to eq('Salutations')
       end
     end
   end

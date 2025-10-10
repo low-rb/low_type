@@ -16,6 +16,10 @@ class LowHello
     greeting
   end
 
+  def with_multiple_types(greeting = String | Integer | 'Salutations')
+    greeting
+  end
+
   class << self
     def say_goodbye(goodbye = String | 'Goodbye')
       goodbye

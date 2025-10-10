@@ -2,7 +2,7 @@
 
 module LowType
   class InvalidTypeError < StandardError; end;
-  class RequiredTypeError < StandardError; end;
+  class RequiredValueError < StandardError; end;
 
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
   def self.included(base)
@@ -11,10 +11,15 @@ module LowType
         @low_params ||= {}
       end
 
-      def type(var_proxy)
+      def type(expression)
         # TODO: Runtime type expression for the supplied variable.
       end
       alias_method :low_type, :type
+
+      def value(expression)
+        # TODO: Cancel out a type expression.
+      end
+      alias_method :low_value, :value
     end
 
     base.prepend LowType.redefine_methods(file_path: LowType.file_path(klass: base), klass: base)
@@ -58,6 +63,14 @@ module LowType
       caller.find { |callee| callee.end_with?("<class:#{klass}>'") }.split(':').first
     end
 
+    def type?(expression)
+      expression.respond_to?(:new) || expression == Integer
+    end
+
+    def value?(expression)
+      !expression.respond_to?(:new) && expression != Integer
+    end
+
     def required_args(proxy_method)
       required_args = []
       required_kwargs = {}
@@ -90,7 +103,7 @@ module LowType
 
               if expression.class == TypeExpression
                 param_proxies << ParamProxy.new(type_expression: expression, name:, type:, position:)
-              elsif expression.respond_to?(:new)
+              elsif ::LowType.type?(expression)
                 param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: expression), name:, type:, position:)
               end
             end
@@ -120,12 +133,20 @@ module LowType
     attr_reader :type, :default_value
 
     def initialize(type:)
-      @type = type
+      @types = [type]
       @default_value = :LOW_TYPE_UNDEFINED
     end
 
-    def |(default_value)
-      @default_value = default_value
+    def |(expression)
+      if expression.class == ::LowType::TypeExpression
+        @types = @types + expression.types
+        @default_value = expression.default_value
+      elsif ::LowType.value?(expression)
+        @default_value = expression
+      else
+        @types << expression
+      end
+
       self
     end
 
@@ -135,12 +156,14 @@ module LowType
 
     def validate!(arg:, name:)
       if arg.nil? && required?
-        raise ::LowType::RequiredTypeError, "Missing value of required type '#{@type}' for '#{name}'"
+        raise ::LowType::RequiredValueError, "Missing value of required type [#{@types.join(',')}] for '#{name}'"
       end
 
-      raise ::LowType::InvalidTypeError, "Invalid type '#{arg.class}' for '#{name}'" unless arg.class == @type
+      raise ::LowType::InvalidTypeError, "Invalid type '#{arg.class}' for '#{name}'" unless @types.include?(arg.class)
     end
   end
+
+  class ValueExpression; end
 
   class Boolean; end
   class KeyValue; end
@@ -149,10 +172,15 @@ end
 class Object
   class << self
     # "|" is not defined on Object class and this is the most compute-efficient way to achieve our goal (world peace).
-    # "|" bitwise operator on Integer is not called when the receiver is the Integer class (instead of a value like "123").
-    def |(default_value)
-      type_expression = ::LowType::TypeExpression.new(type: self)
-      type_expression | default_value
+    # "|" bitwise operator on Integer is not defined when the receiver is an Integer class, so we are not in conflict.
+    def |(expression)
+      if expression.class == ::LowType::TypeExpression
+        expression | self
+        expression
+      else
+        type_expression = ::LowType::TypeExpression.new(type: self)
+        type_expression | expression        
+      end
     end
   end
 end
