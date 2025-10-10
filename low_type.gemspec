@@ -8,14 +8,13 @@ Gem::Specification.new do |spec|
   spec.authors = ['maedi']
   spec.email = ['maediprichard@gmail.com']
 
-  spec.summary = 'A simple way to type check in Ruby'
-  spec.description = 'A simple way to define types in Ruby, only when you need them.'
+  spec.summary = 'An elegant way to define types in Ruby'
+  spec.description = 'An elegant and simple way to define types in Ruby, only when you need them.'
   spec.homepage = 'https://codeberg.org/low_ruby/low_type'
-  spec.required_ruby_version = '>= 3.0.0'
+  spec.required_ruby_version = '>= 3.2.0'
 
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://codeberg.org/low_ruby/low_type/src/branch/main'
-  spec.metadata['changelog_uri'] = 'https://codeberg.org/low_ruby/low_type/src/branch/main/CHANGELOG.md'
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
@@ -24,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.files = [
     'lib/version.rb',
     'lib/low_type.rb',
+    'lib/type_expression.rb',
   ]
 
   spec.bindir = 'exe'
