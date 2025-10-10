@@ -4,7 +4,7 @@ LowType introduces the concept of "type expressions" in method arguments. When a
 
 ```ruby
 class MyClass
-  prepend LowType
+  include LowType
 
   def say_hello(greeting: String)
     # Raises exception at runtime if greeting is not a String.
