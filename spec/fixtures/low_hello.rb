@@ -8,15 +8,19 @@ class LowHello
     @name = name
   end
 
-  def with_required_type(greeting = String)
+  def with_type(greeting = String)
     greeting
   end
 
-  def with_default_type(greeting = String | 'Hello')
+  def with_type_and_default_value(greeting = String | 'Hello')
     greeting
   end
 
-  def with_multiple_types(greeting = String | Integer | 'Salutations')
+  def with_multiple_types(greeting = String | Integer)
+    greeting
+  end
+
+  def with_multiple_types_and_default_value(greeting = String | Integer | 'Salutations')
     greeting
   end
 

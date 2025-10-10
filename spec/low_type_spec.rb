@@ -22,26 +22,26 @@ RSpec.describe LowHello do
     end
   end
 
-  describe '#with_required_type' do
+  describe '#with_type' do
     it 'passes through the argument' do
-      expect(hello.with_required_type('Hi')).to eq('Hi')
+      expect(hello.with_type('Hi')).to eq('Hi')
     end
 
     context 'when no arg provided' do
       it 'raises a required type error' do
-        expect { hello.with_required_type }.to raise_error(LowType::RequiredValueError)
+        expect { hello.with_type }.to raise_error(LowType::RequiredValueError)
       end
     end
   end
 
-  describe '#with_default_type' do
+  describe '#with_type_and_default_value' do
     it 'passes through the argument' do
-      expect(hello.with_default_type('Howdy')).to eq('Howdy')
+      expect(hello.with_type_and_default_value('Howdy')).to eq('Howdy')
     end
 
     context 'when no arg provided' do
       it 'provides the default value' do
-        expect(hello.with_default_type).to eq('Hello')
+        expect(hello.with_type_and_default_value).to eq('Hello')
       end
     end
   end
@@ -53,8 +53,21 @@ RSpec.describe LowHello do
     end
 
     context 'when no arg provided' do
+      it 'raises a required type error' do
+        expect { hello.with_multiple_types }.to raise_error(LowType::RequiredValueError)
+      end
+    end
+  end
+
+  describe '#with_multiple_types_and_default_value' do
+    it 'accepts both arguments types' do
+      expect(hello.with_multiple_types_and_default_value('Shalom')).to eq('Shalom')
+      expect(hello.with_multiple_types_and_default_value(123)).to eq(123)
+    end
+
+    context 'when no arg provided' do
       it 'provides the default value' do
-        expect(hello.with_multiple_types).to eq('Salutations')
+        expect(hello.with_multiple_types_and_default_value).to eq('Salutations')
       end
     end
   end
