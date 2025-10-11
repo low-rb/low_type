@@ -8,19 +8,35 @@ class LowHello
     @name = name
   end
 
-  def with_type(greeting = String)
+  def typed_arg(greeting = String)
     greeting
   end
 
-  def with_type_and_default_value(greeting = String | 'Hello')
+  def typed_kwarg(greeting: String)
     greeting
   end
 
-  def with_multiple_types(greeting = String | Integer)
+  def typed_arg_and_default_value(greeting = String | 'Hello')
     greeting
   end
 
-  def with_multiple_types_and_default_value(greeting = String | Integer | 'Salutations')
+  def typed_kwarg_and_default_value(greeting: String | 'Hello')
+    greeting
+  end
+
+  def multiple_typed_args(greeting = String | Integer)
+    greeting
+  end
+
+  def multiple_typed_kwargs(greeting: String | Integer)
+    greeting
+  end
+
+  def multiple_typed_args_and_default_value(greeting = String | Integer | 'Salutations')
+    greeting
+  end
+
+  def multiple_typed_kwargs_and_default_value(greeting: String | Integer | 'Salutations')
     greeting
   end
 

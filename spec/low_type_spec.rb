@@ -22,52 +22,76 @@ RSpec.describe LowHello do
     end
   end
 
-  describe '#with_type' do
+  describe '#typed_arg' do
     it 'passes through the argument' do
-      expect(hello.with_type('Hi')).to eq('Hi')
+      expect(hello.typed_arg('Hi')).to eq('Hi')
+      expect(hello.typed_kwarg(greeting: 'Hi')).to eq('Hi')
     end
 
     context 'when no arg provided' do
       it 'raises a required type error' do
-        expect { hello.with_type }.to raise_error(LowType::RequiredValueError)
+        expect { hello.typed_arg }.to raise_error(LowType::RequiredArgError)
+        expect { hello.typed_kwarg }.to raise_error(LowType::RequiredArgError)
       end
     end
   end
 
-  describe '#with_type_and_default_value' do
+  describe '#typed_arg_and_default_value' do
     it 'passes through the argument' do
-      expect(hello.with_type_and_default_value('Howdy')).to eq('Howdy')
+      expect(hello.typed_arg_and_default_value('Howdy')).to eq('Howdy')
+      expect(hello.typed_kwarg_and_default_value(greeting: 'Howdy')).to eq('Howdy')
     end
 
     context 'when no arg provided' do
       it 'provides the default value' do
-        expect(hello.with_type_and_default_value).to eq('Hello')
+        expect(hello.typed_arg_and_default_value).to eq('Hello')
+        expect(hello.typed_kwarg_and_default_value).to eq('Hello')
       end
     end
   end
 
-  describe '#with_multiple_types' do
+  describe '#multiple_typed_args' do
     it 'accepts both arguments types' do
-      expect(hello.with_multiple_types('Shalom')).to eq('Shalom')
-      expect(hello.with_multiple_types(123)).to eq(123)
+      expect(hello.multiple_typed_args('Shalom')).to eq('Shalom')
+      expect(hello.multiple_typed_args(123)).to eq(123)
+      expect(hello.multiple_typed_kwargs(greeting: 'Shalom')).to eq('Shalom')
+      expect(hello.multiple_typed_kwargs(greeting: 123)).to eq(123)
     end
 
-    context 'when no arg provided' do
+    context 'when args are wrong types' do
+      it 'raises an invalid type error' do
+        expect { hello.multiple_typed_args(true) }.to raise_error(LowType::InvalidTypeError)
+        expect { hello.multiple_typed_kwargs(greeting: true) }.to raise_error(LowType::InvalidTypeError)
+      end
+    end
+
+    context 'when no arg is provided' do
       it 'raises a required type error' do
-        expect { hello.with_multiple_types }.to raise_error(LowType::RequiredValueError)
+        expect { hello.multiple_typed_args }.to raise_error(LowType::RequiredArgError)
+        expect { hello.multiple_typed_kwargs }.to raise_error(LowType::RequiredArgError)
       end
     end
   end
 
-  describe '#with_multiple_types_and_default_value' do
+  describe '#multiple_typed_args_and_default_value' do
     it 'accepts both arguments types' do
-      expect(hello.with_multiple_types_and_default_value('Shalom')).to eq('Shalom')
-      expect(hello.with_multiple_types_and_default_value(123)).to eq(123)
+      expect(hello.multiple_typed_args_and_default_value('Shalom')).to eq('Shalom')
+      expect(hello.multiple_typed_args_and_default_value(123)).to eq(123)
+      expect(hello.multiple_typed_kwargs_and_default_value(greeting: 'Shalom')).to eq('Shalom')
+      expect(hello.multiple_typed_kwargs_and_default_value(greeting: 123)).to eq(123)
     end
 
-    context 'when no arg provided' do
+    context 'when args are wrong types' do
+      it 'raises an invalid type error' do
+        expect { hello.multiple_typed_args_and_default_value(true) }.to raise_error(LowType::InvalidTypeError)
+        expect { hello.multiple_typed_kwargs_and_default_value(greeting: true) }.to raise_error(LowType::InvalidTypeError)
+      end
+    end
+
+    context 'when no arg is provided' do
       it 'provides the default value' do
-        expect(hello.with_multiple_types_and_default_value).to eq('Salutations')
+        expect(hello.multiple_typed_args_and_default_value).to eq('Salutations')
+        expect(hello.multiple_typed_kwargs_and_default_value).to eq('Salutations')
       end
     end
   end
