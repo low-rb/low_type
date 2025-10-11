@@ -26,10 +26,10 @@ module LowType
 
     def validate!(arg:, name:)
       if arg.nil? && required?
-        raise ::LowType::RequiredArgError, "Missing value of required type [#{@types.join(',')}] for '#{name}'"
+        raise ArgumentError, "Missing required argument of type '#{@types.join(', ')}' for '#{name}'"
       end
 
-      raise ::LowType::InvalidTypeError, "Invalid type '#{arg.class}' for '#{name}'" unless @types.include?(arg.class)
+      raise TypeError, "Invalid type '#{arg.class}' for '#{name}'" unless @types.include?(arg.class)
     end
   end
 end

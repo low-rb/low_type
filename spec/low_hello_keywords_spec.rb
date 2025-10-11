@@ -17,7 +17,7 @@ RSpec.describe LowHelloKeywords do
       let(:greeting) { 123 }
 
       it 'raises an invalid type error' do
-        expect { hello }.to raise_error(LowType::InvalidTypeError)
+        expect { hello }.to raise_error(TypeError)
       end
     end
   end
@@ -29,7 +29,7 @@ RSpec.describe LowHelloKeywords do
 
     context 'when no arg provided' do
       it 'raises a required type error' do
-        expect { hello.typed_arg }.to raise_error(LowType::RequiredArgError)
+        expect { hello.typed_arg }.to raise_error(ArgumentError)
       end
     end
   end
@@ -54,13 +54,13 @@ RSpec.describe LowHelloKeywords do
 
     context 'when args are wrong types' do
       it 'raises an invalid type error' do
-        expect { hello.multiple_typed_args(greeting: true) }.to raise_error(LowType::InvalidTypeError)
+        expect { hello.multiple_typed_args(greeting: true) }.to raise_error(TypeError)
       end
     end
 
     context 'when no arg is provided' do
       it 'raises a required type error' do
-        expect { hello.multiple_typed_args }.to raise_error(LowType::RequiredArgError)
+        expect { hello.multiple_typed_args }.to raise_error(ArgumentError)
       end
     end
   end
@@ -73,7 +73,7 @@ RSpec.describe LowHelloKeywords do
 
     context 'when args are wrong types' do
       it 'raises an invalid type error' do
-        expect { hello.multiple_typed_args_and_default_value(greeting: true) }.to raise_error(LowType::InvalidTypeError)
+        expect { hello.multiple_typed_args_and_default_value(greeting: true) }.to raise_error(TypeError)
       end
     end
 

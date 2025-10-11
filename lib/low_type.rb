@@ -4,9 +4,6 @@ require_relative 'parser'
 require_relative 'type_expression'
 
 module LowType
-  class InvalidTypeError < StandardError; end;
-  class RequiredArgError < StandardError; end;
-
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
   def self.included(base)
     class << base
