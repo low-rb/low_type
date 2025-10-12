@@ -45,17 +45,17 @@ end
 
 ## Enumerables
 
-Place your class inside square brackets (`[]`) just after an `Array` or `Hash` or any enumerable class like so:
+Add square brackets (`[]`) after your class to make it an enumerable collection of that class:
 ```ruby
 def say_hello(greetings: String[])
-  puts greetings
+  greetings # => ['Hello', 'Howdy', 'Hey']
 end
 ```
 
-The default value for this type would look like:
+Represent a `Hash` with the `KeyValue` utility class:
 ```ruby
-def say_hello(greetings: String[] | ['Hello', 'Howdy', 'Hi'])
-  puts greetings
+def say_hello(greetings: KeyValue[String => Integer])
+  greetings # => {'Hello' => 123, 'Howdy' => 456, 'Hey' => '789'})
 end
 ```
 
@@ -80,14 +80,16 @@ end
 
 ### `[]` Enumerables
 
-The `[]` class method is redefined in the context of type expressions to represent an array of that object type. Luckily in the wild a `[]` class method is usually used rarely for "factory" or "utility" classes that don't overlap with enumerable classes.
+The `[]` class method is used in the context of type expressions to represent an enummerable collection (`Array`/`Hash`) of that object type. Anyone can define a `[]` class method on their class but luckily for us it's usually on a "factory" or "utility" class and not an enumerbale class so there's not much overlap.
 
-### `|` Default Value / Multiple Types
+### `|` Union Types / Default Value
 
-The pipe symbol (`|`) is used in the context of type expressions to support multiple types and the default value:
-- Separate multiple allowed types with pipes: `my_variable = TypeOne | TypeTwo`
+The pipe symbol (`|`) is used in the context of type expressions to define multiple types as well as provide the default value:
+- To allow multiple types separate them between pipes: `my_variable = TypeOne | TypeTwo`
 - The last *value* defined becomes the default value: `my_variable = TypeOne | TypeTwo | nil`
+
+If no default value is defined then the argument will be required.
 
 # Philosophy
 
-Ruby is an amazing language **BECAUSE** it's not typed. I don't believe Ruby should ever be fully typed, this is just a module to include in some areas of your codebase where you'd like a little extra assurance that the right values are coming in/out.
+Ruby is an amazing language **BECAUSE** it's not typed. I don't believe Ruby should ever be fully typed, this is just a module to include in some areas of your codebase where you'd like self-documentation and a little extra assurance that the right values are coming in/out.

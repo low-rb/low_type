@@ -44,6 +44,7 @@ module LowType
   end
 
   class ValueExpression; end
-  class Boolean; end
-  class KeyValue; end
+  class Boolean; end # TrueClass or FalseClass
+  class KeyValue; end # KeyValue[String => Hash]
+  class MixedTypes; end # MixedTypes[String | Integer]
 end
