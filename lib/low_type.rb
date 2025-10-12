@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'parser'
+require_relative 'redefiner'
 require_relative 'type_expression'
 
 module LowType
@@ -22,7 +22,7 @@ module LowType
       alias_method :low_value, :value
     end
 
-    base.prepend LowType::Parser.redefine_methods(file_path: LowType.file_path(klass: base), klass: base)
+    base.prepend LowType::Redefiner.redefine_methods(file_path: LowType.file_path(klass: base), klass: base)
   end
 
   class << self
