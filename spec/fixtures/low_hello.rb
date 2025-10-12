@@ -25,7 +25,11 @@ class LowHello
   end
 
   class << self
-    def say_goodbye(goodbye = String | 'Goodbye')
+    def class_typed_arg(goodbye = String)
+      goodbye
+    end
+
+    def class_typed_arg_and_default_value(goodbye = String | 'Bye')
       goodbye
     end
   end

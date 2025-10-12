@@ -22,7 +22,10 @@ module LowType
       alias_method :low_value, :value
     end
 
-    base.prepend LowType::Redefiner.redefine_methods(file_path: LowType.file_path(klass: base), klass: base)
+    parser = Parser.new(file_path: LowType.file_path(klass: base))
+
+    base.extend LowType::Redefiner.redefine_class_methods(parser:, klass: base)
+    base.prepend LowType::Redefiner.redefine_methods(parser:, klass: base)
   end
 
   class << self

@@ -83,4 +83,16 @@ RSpec.describe LowHello do
       end
     end
   end
+
+  describe '.class_typed_arg' do
+    it 'passes through the argument' do
+      expect(described_class.class_typed_arg('Hi')).to eq('Hi')
+    end
+
+    context 'when no arg provided' do
+      it 'raises a required type error' do
+        expect { described_class.class_typed_arg }.to raise_error(ArgumentError)
+      end
+    end
+  end
 end
