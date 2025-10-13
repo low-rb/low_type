@@ -2,7 +2,7 @@ require 'prism'
 
 module LowType
   class Parser
-    attr_reader :parent_map, :method_defs
+    attr_reader :parent_map, :instance_methods, :class_methods
 
     def initialize(file_path:)
       root_node = Prism.parse_file(file_path).value
@@ -11,32 +11,44 @@ module LowType
       parent_mapper.visit(root_node)
       @parent_map = parent_mapper.parent_map
 
-      method_visitor = MethodVisitor.new
+      method_visitor = MethodVisitor.new(@parent_map)
       root_node.accept(method_visitor)
-      @method_defs = method_visitor.method_defs
+      @instance_methods = method_visitor.instance_methods
+      @class_methods = method_visitor.class_methods
+    end
+  end
+
+  class MethodVisitor < Prism::Visitor
+    attr_reader :class_methods, :instance_methods
+
+    def initialize(parent_map)
+      @parent_map = parent_map
+
+      @instance_methods = []
+      @class_methods = []
     end
 
+    def visit_def_node(node)
+      if class_method?(node)
+        @class_methods << node
+      else
+        @instance_methods << node
+      end
+
+      super # Continue walking the tree.
+    end
+
+    private
+
     def class_method?(node)
-      return true if node.is_a?(::Prism::SingletonClassNode)
+      return true if node.is_a?(::Prism::DefNode) && node.receiver.class == Prism::SelfNode # self.method_name
+      return true if node.is_a?(::Prism::SingletonClassNode) # class << self
 
       if (parent_node = @parent_map[node])
         return class_method?(parent_node)
       end
 
       false
-    end
-  end
-
-  class MethodVisitor < Prism::Visitor
-    attr_reader :method_defs
-
-    def initialize
-      @method_defs = []
-    end
-
-    def visit_def_node(node)
-      @method_defs << node
-      super # Continue walking the tree.
     end
   end
 

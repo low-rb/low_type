@@ -47,7 +47,7 @@ RSpec.describe LowHello do
   end
 
   describe '#multiple_typed_args' do
-    it 'accepts both arguments types' do
+    it 'passes through both arguments types' do
       expect(hello.multiple_typed_args('Shalom')).to eq('Shalom')
       expect(hello.multiple_typed_args(123)).to eq(123)
     end
@@ -66,7 +66,7 @@ RSpec.describe LowHello do
   end
 
   describe '#multiple_typed_args_and_default_value' do
-    it 'accepts both arguments types' do
+    it 'passes through both arguments types' do
       expect(hello.multiple_typed_args_and_default_value('Shalom')).to eq('Shalom')
       expect(hello.multiple_typed_args_and_default_value(123)).to eq(123)
     end
@@ -84,6 +84,18 @@ RSpec.describe LowHello do
     end
   end
 
+  describe '.inline_class_typed_arg' do
+    it 'passes through the argument' do
+      expect(described_class.inline_class_typed_arg('Hi')).to eq('Hi')
+    end
+
+    context 'when no arg provided' do
+      it 'raises a required type error' do
+        expect { described_class.inline_class_typed_arg }.to raise_error(ArgumentError)
+      end
+    end
+  end
+
   describe '.class_typed_arg' do
     it 'passes through the argument' do
       expect(described_class.class_typed_arg('Hi')).to eq('Hi')
@@ -93,6 +105,18 @@ RSpec.describe LowHello do
       it 'raises a required type error' do
         expect { described_class.class_typed_arg }.to raise_error(ArgumentError)
       end
+    end
+  end
+
+  describe '.class_typed_arg_and_default_value' do
+    it 'passes through the argument' do
+      expect(described_class.class_typed_arg_and_default_value('Goodbye')).to eq('Goodbye')
+    end
+
+    context 'when no arg provided' do
+    it 'provides the default value' do
+      expect(described_class.class_typed_arg_and_default_value).to eq('Bye')
+    end
     end
   end
 end

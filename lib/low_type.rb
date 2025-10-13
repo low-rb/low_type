@@ -23,16 +23,11 @@ module LowType
     end
 
     parser = Parser.new(file_path: LowType.file_path(klass: base))
-
-    base.extend LowType::Redefiner.redefine_class_methods(parser:, klass: base)
-    base.prepend LowType::Redefiner.redefine_methods(parser:, klass: base)
+    base.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, klass: base)
+    base.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, klass: base)
   end
 
   class << self
-    def methods(klass)
-      klass.public_instance_methods(false) + klass.protected_instance_methods(false) + klass.private_instance_methods(false)
-    end
-
     def file_path(klass:)
       caller.find { |callee| callee.end_with?("<class:#{klass}>'") }.split(':').first
     end

@@ -24,6 +24,10 @@ class LowHello
     greeting
   end
 
+  def self.inline_class_typed_arg(goodbye = String)
+    goodbye
+  end
+
   class << self
     def class_typed_arg(goodbye = String)
       goodbye
