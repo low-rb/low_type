@@ -1,0 +1,20 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## 0.2.0
+
+### Added
+
+- Support for class methods
+- Support for private methods
+
+### Changed
+
+- Reuse core Ruby error types
+- Ignore untyped methods for better performance
+- Use an abstract syntax tree for more accurate method metadata
+- Use Ruby's Prism parser

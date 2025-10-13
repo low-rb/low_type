@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = 'An elegant way to define types in Ruby'
   spec.description = 'An elegant and simple way to define types in Ruby, only when you need them.'
   spec.homepage = 'https://codeberg.org/low_ruby/low_type'
-  spec.required_ruby_version = '>= 3.2.0'
+  spec.required_ruby_version = '>= 3.3.0'
 
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://codeberg.org/low_ruby/low_type/src/branch/main'

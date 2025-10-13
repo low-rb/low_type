@@ -1,6 +1,6 @@
 # LowType
 
-LowType introduces the concept of "type expressions" in method arguments. When an argument's default value resolves to a class instead of an instance then it's treated as a type expression. Now you can have types in Ruby in the simplest syntax possible, only adding them as needed:
+LowType introduces the concept of "type expressions" in method arguments. When an argument's default value resolves to a type instead of a value then it's treated as a type expression. Now you can have types in Ruby in the simplest syntax possible, only adding them as needed:
 
 ```ruby
 class MyClass
@@ -28,17 +28,16 @@ def say_hello(greeting: String | 'Hello')
 end
 ```
 
-If you want to populate the argument from a variable by another name, you can use `||` like usual:
-
+If you want to populate the argument from a variable by another name:
 ```ruby
-def say_hello(greeting = String | @saved_greeting || 'Hello')
+def say_hello(greeting: String | @saved_greeting)
   puts greeting
 end
 ```
 
-Or with keyword arguments:
+Don't forget that these are just Ruby expressions and you can do more conditional logic as long as it evaluates to a value:
 ```ruby
-def say_hello(greeting: String | @saved_greeting || 'Hello')
+def say_hello(greeting: String | (@saved_greeting || 'Hello'))
   puts greeting
 end
 ```
@@ -64,15 +63,14 @@ end
 After your method's parameters add `-> { MyType }` to define a return value:
 ```ruby
 def say_hello(greetings: String[]) -> { String }
-  puts greetings
-  # Raises an exception if the returned value is not a String
+  greetings # Raises exception if the returned value is not a String.
 end
 ```
 
 Return values can also be defined as `nil`able:
 ```ruby
 def say_hello(greetings: String[]) -> { String | nil }
-  puts greetings
+  greetings
 end
 ```
 
@@ -90,6 +88,10 @@ The pipe symbol (`|`) is used in the context of type expressions to define multi
 
 If no default value is defined then the argument will be required.
 
-# Philosophy
+## Performance
+
+LowType evaluates type expressions on class load (just once) to be efficient and thread-safe. Then the defined types are checked per method call.
+
+## Philosophy
 
 Ruby is an amazing language **BECAUSE** it's not typed. I don't believe Ruby should ever be fully typed, this is just a module to include in some areas of your codebase where you'd like self-documentation and a little extra assurance that the right values are coming in/out.
