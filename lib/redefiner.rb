@@ -5,7 +5,7 @@ require_relative 'type_expression'
 module LowType
   class Redefiner
     class << self
-      def redefine_methods(method_nodes:, klass:)
+      def redefine_methods(method_nodes:, private_start_line:, klass:)
         Module.new do
           method_nodes.each do |method_node|
             args = method_node.parameters.slice
@@ -24,6 +24,10 @@ module LowType
               end
 
               super(*args, **kwargs)
+            end
+
+            if private_start_line && method_node.start_line > private_start_line
+              private method_node.name
             end
           end
         end

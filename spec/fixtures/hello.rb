@@ -21,4 +21,10 @@ class Hello
       goodbye
     end
   end
+
+  private
+
+  def private_arg(greeting)
+    greeting
+  end
 end

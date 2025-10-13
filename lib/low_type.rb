@@ -5,8 +5,8 @@ require_relative 'type_expression'
 
 module LowType
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
-  def self.included(base)
-    class << base
+  def self.included(klass)
+    class << klass
       def low_params
         @low_params ||= {}
       end
@@ -22,9 +22,10 @@ module LowType
       alias_method :low_value, :value
     end
 
-    parser = Parser.new(file_path: LowType.file_path(klass: base))
-    base.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, klass: base)
-    base.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, klass: base)
+    parser = Parser.new(file_path: LowType.file_path(klass:))
+    private_start_line = parser.private_start_line
+    klass.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, private_start_line:, klass:)
+    klass.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, private_start_line:, klass:)
   end
 
   class << self

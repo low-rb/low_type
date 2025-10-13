@@ -37,4 +37,10 @@ class LowHello
       goodbye
     end
   end
+
+  private
+
+  def private_typed_arg(greeting = String)
+    greeting
+  end
 end

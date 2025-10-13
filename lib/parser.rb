@@ -2,7 +2,7 @@ require 'prism'
 
 module LowType
   class Parser
-    attr_reader :parent_map, :instance_methods, :class_methods
+    attr_reader :parent_map, :instance_methods, :class_methods, :private_start_line
 
     def initialize(file_path:)
       root_node = Prism.parse_file(file_path).value
@@ -13,19 +13,22 @@ module LowType
 
       method_visitor = MethodVisitor.new(@parent_map)
       root_node.accept(method_visitor)
+
       @instance_methods = method_visitor.instance_methods
       @class_methods = method_visitor.class_methods
+      @private_start_line = method_visitor.private_start_line
     end
   end
 
   class MethodVisitor < Prism::Visitor
-    attr_reader :class_methods, :instance_methods
+    attr_reader :class_methods, :instance_methods, :private_start_line
 
     def initialize(parent_map)
       @parent_map = parent_map
 
       @instance_methods = []
       @class_methods = []
+      @private_start_line = nil
     end
 
     def visit_def_node(node)
@@ -36,6 +39,10 @@ module LowType
       end
 
       super # Continue walking the tree.
+    end
+
+    def visit_call_node(node)
+      @private_start_line = node.start_line if node.name == :private
     end
 
     private
