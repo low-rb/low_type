@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
     'lib/low_type.rb',
     'lib/param_proxy.rb',
     'lib/parser.rb',
+    'lib/redefiner.rb',
     'lib/type_expression.rb',
   ]
 
