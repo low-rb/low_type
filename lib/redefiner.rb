@@ -14,6 +14,7 @@ module LowType
             required_args, required_kwargs = Redefiner.required_args(proxy_method)
 
             klass.low_params[method_node.name] = Redefiner.type_expressions_from_params(proxy_method, args, required_args, required_kwargs)
+            next if klass.low_params[method_node.name].empty?
 
             define_method(method_node.name) do |*args, **kwargs|
               klass.low_params[method_node.name].each do |param_proxy|
