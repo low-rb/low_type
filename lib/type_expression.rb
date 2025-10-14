@@ -29,7 +29,16 @@ module LowType
         raise ArgumentError, "Missing required argument of type '#{@types.join(', ')}' for '#{name}'"
       end
 
-      raise TypeError, "Invalid type '#{arg.class}' for '#{name}'" unless @types.include?(arg.class)
+      @types.each do |type|
+        return true if LowType.type?(type) && type == arg.class 
+        # TODO: Shallow validation of enumerables could be made deeper with user config.
+        return true if type.class == Array && arg.class == Array && type.first == arg.first.class
+        if type.class == Hash && arg.class == Hash && type.keys[0] == arg.keys[0].class && type.values[0] == arg.values[0].class
+          return true
+        end
+      end
+
+      raise TypeError, "Invalid type '#{arg.class}' for '#{name}'"
     end
   end
 end

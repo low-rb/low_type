@@ -71,8 +71,8 @@ RSpec.describe LowHello do
       expect(hello.multiple_typed_args_and_default_value(123)).to eq(123)
     end
 
-    context 'when args are wrong types' do
-      it 'raises an invalid type error' do
+    context 'when args are wrong type' do
+      it 'raises a type error' do
         expect { hello.multiple_typed_args_and_default_value(true) }.to raise_error(TypeError)
       end
     end
@@ -80,6 +80,48 @@ RSpec.describe LowHello do
     context 'when no arg is provided' do
       it 'provides the default value' do
         expect(hello.multiple_typed_args_and_default_value).to eq('Salutations')
+      end
+    end
+  end
+
+  describe '#typed_array_arg' do
+    it 'passes through the argument' do
+      expect(hello.typed_array_arg(['Hi', 'Hey', 'Howdy'])).to eq(['Hi', 'Hey', 'Howdy'])
+    end
+
+    context 'when no arg provided' do
+      it 'raises a required type error' do
+        expect { hello.typed_array_arg }.to raise_error(ArgumentError)
+      end
+    end
+  end
+
+  describe '#typed_hash_arg' do
+    it 'passes through the argument' do
+      expect(hello.typed_hash_arg({'Hello' => 'Goodbye'})).to eq({'Hello' => 'Goodbye'})
+    end
+
+    context 'when args are wrong type' do
+      it 'raises a type error' do
+        expect { hello.typed_hash_arg({123 => 456}) }.to raise_error(TypeError)
+      end
+    end
+
+    context 'when no arg provided' do
+      it 'raises a required type error' do
+        expect { hello.typed_hash_arg }.to raise_error(ArgumentError)
+      end
+    end
+  end
+
+  describe '#typed_hash_arg_and_default_value' do
+    it 'passes through the argument' do
+      expect(hello.typed_hash_arg_and_default_value({'Hello' => 'Goodbye'})).to eq({'Hello' => 'Goodbye'})
+    end
+
+    context 'when no arg provided' do
+      it 'provides the default value' do
+        expect(hello.typed_hash_arg_and_default_value).to eq({'Hola' => 'Adios'})
       end
     end
   end

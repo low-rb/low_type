@@ -35,7 +35,7 @@ def say_hello(greeting: String | @saved_greeting)
 end
 ```
 
-Don't forget that these are just Ruby expressions and you can do more conditional logic as long as it evaluates to a value:
+Don't forget that these are just Ruby expressions and you can do more conditional logic as long as the last expression evaluates to a value:
 ```ruby
 def say_hello(greeting: String | (@saved_greeting || 'Hello'))
   puts greeting
@@ -44,17 +44,17 @@ end
 
 ## Enumerables
 
-Add square brackets (`[]`) after your class to make it an enumerable collection of that class:
+Wrap your type in an `Array[T]` or `Hash[T]` enumerable type. An `Array` of `String`s looks like:
 ```ruby
-def say_hello(greetings: String[])
+def say_hello(greetings: Array[String])
   greetings # => ['Hello', 'Howdy', 'Hey']
 end
 ```
 
-Represent a `Hash` with the `KeyValue` utility class:
+Represent a `Hash` with `key => value` syntax:
 ```ruby
-def say_hello(greetings: KeyValue[String => Integer])
-  greetings # => {'Hello' => 123, 'Howdy' => 456, 'Hey' => '789'})
+def say_hello(greetings: Hash[String => Integer])
+  greetings # => {'Hello' => 123, 'Howdy' => 456, 'Hey' => 789})
 end
 ```
 
@@ -62,14 +62,14 @@ end
 
 After your method's parameters add `-> { MyType }` to define a return value:
 ```ruby
-def say_hello(greetings: String[]) -> { String }
+def say_hello(greetings: Array[String]) -> { String }
   greetings # Raises exception if the returned value is not a String.
 end
 ```
 
 Return values can also be defined as `nil`able:
 ```ruby
-def say_hello(greetings: String[]) -> { String | nil }
+def say_hello(greetings: Array[String]) -> { String | nil }
   greetings
 end
 ```
@@ -78,7 +78,7 @@ end
 
 ### `[]` Enumerables
 
-The `[]` class method is used in the context of type expressions to represent an enummerable collection (`Array`/`Hash`) of that object type. Anyone can define a `[]` class method on their class but luckily for us it's usually on a "factory" or "utility" class and not an enumerbale class so there's not much overlap.
+`Array[]` and `Hash[]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new`/`Hash.new` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have runtime types in Ruby. Additionally [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) suggests `{}` over `Hash[]` syntax for creating hashes.
 
 ### `|` Union Types / Default Value
 

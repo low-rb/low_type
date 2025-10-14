@@ -24,6 +24,18 @@ class LowHello
     greeting
   end
 
+  def typed_array_arg(greetings = Array[String])
+    greetings
+  end
+
+  def typed_hash_arg(greetings = Hash[String => String])
+    greetings
+  end
+
+  def typed_hash_arg_and_default_value(greetings = Hash[String => String] | {'Hola' => 'Adios'} )
+    greetings
+  end
+
   def self.inline_class_typed_arg(goodbye = String)
     goodbye
   end

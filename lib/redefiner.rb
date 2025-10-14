@@ -59,6 +59,10 @@ module LowType
 
         # Call method with only its required args to evaluate type expressions (which are stored as default values).
         typed_method.call(*required_args, **required_kwargs)
+
+      # TODO: Write spec for this.
+      rescue ArgumentError => e
+        raise ArgumentError, "Incorrect param syntax"
       end
 
       def required_args(proxy_method)
