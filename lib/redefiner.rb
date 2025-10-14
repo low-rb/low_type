@@ -8,12 +8,7 @@ module LowType
       def redefine_methods(method_nodes:, private_start_line:, klass:)
         Module.new do
           method_nodes.each do |method_node|
-            args = method_node.parameters.slice
-
-            proxy_method = eval("-> (#{args}) {}")
-            required_args, required_kwargs = Redefiner.required_args(proxy_method)
-
-            klass.low_params[method_node.name] = Redefiner.type_expressions_from_params(proxy_method, args, required_args, required_kwargs)
+            klass.low_params[method_node.name] = Redefiner.param_proxy_with_type_expressions(method_node)
             next if klass.low_params[method_node.name].empty?
 
             define_method(method_node.name) do |*args, **kwargs|
@@ -34,28 +29,14 @@ module LowType
         end
       end
 
-      def required_args(proxy_method)
-        required_args = []
-        required_kwargs = {}
+      def param_proxy_with_type_expressions(method_node)
+        params = method_node.parameters.slice
+        proxy_method = eval("-> (#{params}) {}")
+        required_args, required_kwargs = Redefiner.required_args(proxy_method)
 
-        proxy_method.parameters.each do |param|
-          param_type, param_name = param
-
-          case param_type
-          when :req
-            required_args << nil
-          when :keyreq
-            required_kwargs[param_name] = nil
-          end
-        end
-
-        [required_args, required_kwargs]
-      end
-
-      def type_expressions_from_params(proxy_method, args, required_args, required_kwargs)
         typed_method = eval(
           <<~RUBY
-            -> (#{args}) {
+            -> (#{params}) {
               param_proxies = []
 
               proxy_method.parameters.each_with_index do |param, position|
@@ -78,6 +59,24 @@ module LowType
 
         # Call method with only its required args to evaluate type expressions (which are stored as default values).
         typed_method.call(*required_args, **required_kwargs)
+      end
+
+      def required_args(proxy_method)
+        required_args = []
+        required_kwargs = {}
+
+        proxy_method.parameters.each do |param|
+          param_type, param_name = param
+
+          case param_type
+          when :req
+            required_args << nil
+          when :keyreq
+            required_kwargs[param_name] = nil
+          end
+        end
+
+        [required_args, required_kwargs]
       end
     end
   end
