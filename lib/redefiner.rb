@@ -4,6 +4,8 @@ require_relative 'parser'
 require_relative 'type_expression'
 
 module LowType
+  class ReturnError < StandardError; end
+
   class Redefiner
     class << self
       def redefine_methods(method_nodes:, private_start_line:, klass:)
@@ -19,13 +21,13 @@ module LowType
               klass.low_methods[name].params.each do |param_proxy|
                 value = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
                 value = param_proxy.type_expression.default_value if value.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
-                param_proxy.type_expression.validate!(value:, name: param_proxy.name)
+                param_proxy.type_expression.validate!(value:, name: param_proxy.name, error_type: ArgumentError, error_keyword: 'required')
                 param_proxy.position ? args[param_proxy.position] = value : kwargs[param_proxy.name] = value
               end
 
               if return_expression
                 return_value = super(*args, **kwargs)
-                return_expression.validate!(value: return_value, name:)
+                return_expression.validate!(value: return_value, name:, error_type: ReturnError, error_keyword: 'return')
                 return return_value
               end
 

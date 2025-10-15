@@ -24,10 +24,10 @@ module LowType
       @default_value == :LOW_TYPE_UNDEFINED
     end
 
-    def validate!(value:, name:)
+    def validate!(value:, name:, error_type:, error_keyword:)
       if value.nil?
         return true if @default_value.nil?
-        raise ArgumentError, "Missing required argument of type '#{@types.join(', ')}' for '#{name}'" if required?
+        raise error_type, "Missing #{error_keyword} value of type '#{@types.join(', ')}' for '#{name}'" if required?
       end
 
       @types.each do |type|

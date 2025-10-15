@@ -151,8 +151,7 @@ RSpec.describe LowHello do
 
     context 'when the return value is nil' do
       it 'raises a type error' do
-        # TODO: This type expression error is actually coming from the return_expression but it doesn't know that. Make return type specific error.
-        expect { hello.arg_and_return_value(nil) }.to raise_error(ArgumentError)
+        expect { hello.arg_and_return_value(nil) }.to raise_error(::LowType::ReturnError)
       end
     end
 
