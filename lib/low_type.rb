@@ -16,6 +16,14 @@ module LowType
     # Hash[] class method returns a type expression only for the duration of this "included" hook.
     hash_class_method = Hash.method('[]').unbind
     Hash.define_singleton_method('[]') do |expression|
+      # Support Pry which uses Hash[].
+      unless LowType.type?(expression)
+        Hash.define_singleton_method('[]', hash_class_method)
+        result = Hash[expression]
+        Hash.method('[]').unbind
+        return result
+      end
+
       TypeExpression.new(type: expression)
     end
 
