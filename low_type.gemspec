@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
     'lib/parser.rb',
     'lib/redefiner.rb',
     'lib/type_expression.rb',
+    'lib/value_expression.rb',
   ]
 
   spec.bindir = 'exe'

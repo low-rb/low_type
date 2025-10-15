@@ -2,6 +2,7 @@
 
 require_relative 'redefiner'
 require_relative 'type_expression'
+require_relative 'value_expression'
 
 module LowType
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
@@ -38,7 +39,7 @@ module LowType
       alias_method :low_type, :type
 
       def value(expression)
-        # TODO: Cancel out a type expression.
+        ValueExpression.new(value: expression)
       end
       alias_method :low_value, :value
     end
@@ -67,6 +68,5 @@ module LowType
     end
   end
 
-  class ValueExpression; end
   class Boolean; end # TrueClass or FalseClass
 end
