@@ -70,14 +70,14 @@ end
 Return values can also be defined as `nil`able:
 ```ruby
 def say_hello(greetings: Array[String]) -> { String | nil }
-  greetings
+  return nil if greetings.first == 'Goodbye'
 end
 ```
 
 A method that takes no arguments must include empty parameters `()` for the `-> { MyType }` syntax to be valid:
 ```ruby
-def say_hello() -> { String | 'Hello' }
-  greetings
+def say_hello() -> { String }
+  'Hello'
 end
 ```
 
@@ -85,10 +85,10 @@ If you need a multi-line return type/value then I’ll even let you put the `-> 
 ```ruby
 def say_farewell_with_a_long_method_name(farewell: String)
   -> do
-    ::Long::Name::Space::CustomString | get_default_value_with_a_long_method_name()
+    ::Long::Name::Space::CustomClassOne | ::Long::Name::Space::CustomClassTwo | ::Long::Name::Space::CustomClassThree
   end
 
-  farewell
+  # Code that returns an instance of one of the above types.
 end
 ```
 
