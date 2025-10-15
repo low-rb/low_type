@@ -24,22 +24,22 @@ module LowType
       @default_value == :LOW_TYPE_UNDEFINED
     end
 
-    def validate!(arg:, name:)
-      if arg.nil?
+    def validate!(value:, name:)
+      if value.nil?
         return true if @default_value.nil?
         raise ArgumentError, "Missing required argument of type '#{@types.join(', ')}' for '#{name}'" if required?
       end
 
       @types.each do |type|
-        return true if LowType.type?(type) && type == arg.class 
+        return true if LowType.type?(type) && type == value.class 
         # TODO: Shallow validation of enumerables could be made deeper with user config.
-        return true if type.class == Array && arg.class == Array && type.first == arg.first.class
-        if type.class == Hash && arg.class == Hash && type.keys[0] == arg.keys[0].class && type.values[0] == arg.values[0].class
+        return true if type.class == Array && value.class == Array && type.first == value.first.class
+        if type.class == Hash && value.class == Hash && type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
           return true
         end
       end
 
-      raise TypeError, "Invalid type '#{arg.class}' for '#{name}'"
+      raise TypeError, "Invalid type '#{value.class}' for '#{name}'"
     end
   end
 end

@@ -17,11 +17,11 @@ module LowType
 
             define_method(name) do |*args, **kwargs|
               klass.low_methods[name].params.each do |param_proxy|
-                binding.pry
-                arg = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
-                arg = param_proxy.type_expression.default_value if arg.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
-                param_proxy.type_expression.validate!(arg:, name: param_proxy.name)
-                param_proxy.position ? args[param_proxy.position] = arg : kwargs[param_proxy.name] = arg
+                value = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
+                value = param_proxy.type_expression.default_value if value.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
+                param_proxy.type_expression.validate!(value:, name: param_proxy.name)
+                param_proxy.position ? args[param_proxy.position] = value : kwargs[param_proxy.name] = value
+              end
               end
 
               super(*args, **kwargs)
