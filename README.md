@@ -58,7 +58,7 @@ def say_hello(greetings: Hash[String => Integer])
 end
 ```
 
-## Return values
+## Return values [UNRELEASED]
 
 After your method's parameters add `-> { MyType }` to define a return value:
 ```ruby
@@ -85,7 +85,7 @@ def say_farewell_with_a_long_method_name(farewell: String)
 end
 ```
 
-## Type Access methods [CONCEPT ONLY]
+## Type Access methods [UNRELEASED]
 
 Replace `attr_[reader, writer, accessor]` methods with `type_[reader, writer, accessor]` to also define types:
 
@@ -112,7 +112,7 @@ name = 'Tim' # Set the value with type checking
 type_accessor :name, String | 'Cher' # Get/set the value of @name with a default value if it's `nil`
 ```
 
-## Type Assignment method [CONCEPT ONLY]
+## Type Assignment method [UNRELEASED]
 
 To define instance/local variable types at runtime use the `type()` method like so:
 ```ruby
