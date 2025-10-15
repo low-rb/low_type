@@ -25,8 +25,9 @@ module LowType
     end
 
     def validate!(arg:, name:)
-      if arg.nil? && required?
-        raise ArgumentError, "Missing required argument of type '#{@types.join(', ')}' for '#{name}'"
+      if arg.nil?
+        return true if @default_value.nil?
+        raise ArgumentError, "Missing required argument of type '#{@types.join(', ')}' for '#{name}'" if required?
       end
 
       @types.each do |type|
