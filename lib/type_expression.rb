@@ -2,9 +2,9 @@ module LowType
   class TypeExpression
     attr_reader :type, :default_value
 
-    def initialize(type:)
+    def initialize(type:, default_value: :LOW_TYPE_UNDEFINED)
       @types = [type]
-      @default_value = :LOW_TYPE_UNDEFINED
+      @default_value = default_value
     end
 
     def |(expression)
