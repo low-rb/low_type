@@ -1,6 +1,6 @@
 module LowType
   class TypeExpression
-    attr_reader :type, :default_value
+    attr_reader :types, :default_value
 
     def initialize(type:, default_value: :LOW_TYPE_UNDEFINED)
       @types = [type]
