@@ -74,6 +74,57 @@ def say_hello(greetings: Array[String]) -> { String | nil }
 end
 ```
 
+If you need a multi-line return type/value then I’ll even let you put the `-> {}` on multiple lines, okay? I won't judge. You are a unique flower 🌸 with your own style, your own needs. You have purpose in this world and though you may never find it, your loved ones will cherish knowing you and wish you were never gone:
+```ruby
+def say_farewell_with_a_long_method_name(farewell: String)
+  -> do
+    ::Long::Name::Space::CustomString | get_default_value_with_a_long_method_name()
+  end
+
+  farewell
+end
+```
+
+## Type Access methods [CONCEPT ONLY]
+
+Replace `attr_[reader, writer, accessor]` methods with `type_[reader, writer, accessor]` to also define types:
+
+### Type Reader
+
+```ruby
+type_reader :name, String # Creates a public method called `name` that gets the value of @name
+type_reader :name, String | 'Cher' # Gets the value of @name with a default value if it's `nil`
+```
+
+### Type Writer
+
+```ruby
+type_writer :name, String # Creates a public method called `name=(arg)` that sets the value of @name
+```
+
+### Type Accessor
+
+```ruby
+type_accessor :name, String # Creates public methods to get or set the value of @name
+name # Get the value with type checking
+name = 'Tim' # Set the value with type checking
+
+type_accessor :name, String | 'Cher' # Get/set the value of @name with a default value if it's `nil`
+```
+
+## Type Assignment method [CONCEPT ONLY]
+
+To define instance/local variable types at runtime use the `type()` method like so:
+```ruby
+my_var = type MyType | nil
+```
+
+`my_var` will be type checked when assigned to from now on:
+
+```ruby
+my_var = AnotherType.new # Raises InvalidType error.
+```
+
 ## Syntax
 
 ### `[]` Enumerables
@@ -94,4 +145,6 @@ LowType evaluates type expressions on class load (just once) to be efficient and
 
 ## Philosophy
 
-Ruby is an amazing language **BECAUSE** it's not typed. I don't believe Ruby should ever be fully typed, this is just a module to include in some areas of your codebase where you'd like self-documentation and a little extra assurance that the right values are coming in/out.
+**Duck typing is beautiful.** Ruby is an amazing language **BECAUSE** it's not typed. I don't believe Ruby should ever be fully typed, this is just a module to include in some areas of your codebase where you'd like self-documentation and a little extra assurance that the right values are coming in/out.
+
+**No DSL. Just types**. As much as possible LowType looks just like Ruby if it had types. There’s no special method calls for the base functionality, and defining types at runtime simply uses a `type()` method which almost looks like a `type` keyword, had Ruby implemented types.
