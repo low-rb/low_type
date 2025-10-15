@@ -58,7 +58,7 @@ def say_hello(greetings: Hash[String => Integer])
 end
 ```
 
-## Return values [UNRELEASED]
+## Return values
 
 After your method's parameters add `-> { MyType }` to define a return value:
 ```ruby
@@ -70,6 +70,13 @@ end
 Return values can also be defined as `nil`able:
 ```ruby
 def say_hello(greetings: Array[String]) -> { String | nil }
+  greetings
+end
+```
+
+A method that takes no arguments must include empty parameters `()` for the `-> { MyType }` syntax to be valid:
+```ruby
+def say_hello() -> { String | 'Hello' }
   greetings
 end
 ```

@@ -18,6 +18,15 @@ module LowType
       @class_methods = method_visitor.class_methods
       @private_start_line = method_visitor.private_start_line
     end
+
+    def self.return_node(method_node:)
+      # Only a lambda defined immediately after a method's parameters is considered a return type expression.
+      node = method_node.compact_child_nodes.find { |node| node.is_a?(Prism::StatementsNode) }.body.first
+
+      return node if node.is_a?(Prism::LambdaNode)
+
+      nil
+    end
   end
 
   class MethodVisitor < Prism::Visitor

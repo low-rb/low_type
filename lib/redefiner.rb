@@ -9,11 +9,11 @@ module LowType
       def redefine_methods(method_nodes:, private_start_line:, klass:)
         Module.new do
           method_nodes.each do |method_node|
-            params = Redefiner.params_with_type_expressions(method_node)
-            next if params.empty?
-
             name = method_node.name
-            klass.low_methods[name] = MethodProxy.new(name:, params:)
+            params = Redefiner.params_with_type_expressions(method_node:)
+            return_expression = Redefiner.return_type_expression(method_node:)
+
+            klass.low_methods[name] = MethodProxy.new(name:, params:, return_expression:)
 
             define_method(name) do |*args, **kwargs|
               klass.low_methods[name].params.each do |param_proxy|
@@ -22,6 +22,11 @@ module LowType
                 param_proxy.type_expression.validate!(value:, name: param_proxy.name)
                 param_proxy.position ? args[param_proxy.position] = value : kwargs[param_proxy.name] = value
               end
+
+              if return_expression
+                return_value = super(*args, **kwargs)
+                return_expression.validate!(value: return_value, name:)
+                return return_value
               end
 
               super(*args, **kwargs)
@@ -34,10 +39,22 @@ module LowType
         end
       end
 
-      def params_with_type_expressions(method_node)
+      def return_type_expression(method_node:)
+        return_node = Parser.return_node(method_node:)
+        return nil if return_node.nil?
+
+        expression = eval(return_node.slice).call
+
+        return expression if expression.class == TypeExpression
+        TypeExpression.new(type: expression)
+      end
+
+      def params_with_type_expressions(method_node:)
+        return [] if method_node.parameters.nil?
+
         params = method_node.parameters.slice
         proxy_method = eval("-> (#{params}) {}")
-        required_args, required_kwargs = Redefiner.required_args(proxy_method)
+        required_args, required_kwargs = Redefiner.required_args(proxy_method:)
 
         typed_method = eval(
           <<~RUBY
@@ -70,7 +87,7 @@ module LowType
         raise ArgumentError, "Incorrect param syntax"
       end
 
-      def required_args(proxy_method)
+      def required_args(proxy_method:)
         required_args = []
         required_kwargs = {}
 

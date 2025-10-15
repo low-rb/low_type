@@ -16,6 +16,8 @@ class LowHello
     greeting
   end
 
+  # Multiple types.
+
   def multiple_typed_args(greeting = String | Integer)
     greeting
   end
@@ -23,6 +25,8 @@ class LowHello
   def multiple_typed_args_and_default_value(greeting = String | Integer | 'Salutations')
     greeting
   end
+
+  # Enumerables.
 
   def typed_array_arg(greetings = Array[String])
     greetings
@@ -35,6 +39,23 @@ class LowHello
   def typed_hash_arg_and_default_value(greetings = Hash[String => String] | {'Hola' => 'Adios'} )
     greetings
   end
+
+  # Return values.
+
+  def return_value() -> { Integer }
+    2 + 2
+  end
+
+  def arg_and_return_value(greeting) -> { String }
+    addition = 2 + 2
+    greeting
+  end
+
+  def arg_and_nilable_return_value(greeting) -> { String | nil }
+    greeting
+  end
+
+  # Class methods.
 
   def self.inline_class_typed_arg(goodbye = String)
     goodbye

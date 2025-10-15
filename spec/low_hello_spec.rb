@@ -46,6 +46,8 @@ RSpec.describe LowHello do
     end
   end
 
+  # Multiple types.
+
   describe '#multiple_typed_args' do
     it 'passes through both arguments types' do
       expect(hello.multiple_typed_args('Shalom')).to eq('Shalom')
@@ -83,6 +85,8 @@ RSpec.describe LowHello do
       end
     end
   end
+
+  # Enumerables.
 
   describe '#typed_array_arg' do
     it 'passes through the argument' do
@@ -126,13 +130,61 @@ RSpec.describe LowHello do
     end
   end
 
+  # Return values.
+
+  describe '#return_value' do
+    it 'returns a value' do
+      expect(hello.return_value).to eq(4)
+    end
+
+    it 'defines return type expression' do
+      hello.return_value
+      expect(described_class.low_methods[:return_value].return_expression.types).to eq([Integer])
+    end
+  end
+
+  describe '#arg_and_return_value' do
+    it 'defines return type expression' do
+      hello.arg_and_return_value('Morning')
+      expect(described_class.low_methods[:arg_and_return_value].return_expression.types).to eq([String])
+    end
+
+    context 'when the return value is nil' do
+      it 'raises a type error' do
+        # TODO: This type expression error is actually coming from the return_expression but it doesn't know that. Make return type specific error.
+        expect { hello.arg_and_return_value(nil) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'when the return value does not validate the return type expression' do
+      it 'raises a type error' do
+        expect { hello.arg_and_return_value(123) }.to raise_error(TypeError)
+      end
+    end
+  end
+
+  describe '#arg_and_nilable_return_value' do
+    it 'defines return type expression' do
+      hello.arg_and_nilable_return_value(nil)
+      expect(described_class.low_methods[:arg_and_nilable_return_value].return_expression.types).to eq([String])
+    end
+
+    context 'when the return value does not validate the return type expression' do
+      it 'raises a type error' do
+        expect { hello.arg_and_nilable_return_value(123) }.to raise_error(TypeError)
+      end
+    end
+  end
+
+  # Class methods.
+
   describe '.inline_class_typed_arg' do
     it 'passes through the argument' do
       expect(described_class.inline_class_typed_arg('Hi')).to eq('Hi')
     end
 
     context 'when no arg provided' do
-      it 'raises a required type error' do
+      it 'raises an argument error' do
         expect { described_class.inline_class_typed_arg }.to raise_error(ArgumentError)
       end
     end
@@ -144,7 +196,7 @@ RSpec.describe LowHello do
     end
 
     context 'when no arg provided' do
-      it 'raises a required type error' do
+      it 'raises an argument error' do
         expect { described_class.class_typed_arg }.to raise_error(ArgumentError)
       end
     end
