@@ -1,3 +1,4 @@
+require_relative 'method_proxy'
 require_relative 'param_proxy'
 require_relative 'parser'
 require_relative 'type_expression'
@@ -8,11 +9,15 @@ module LowType
       def redefine_methods(method_nodes:, private_start_line:, klass:)
         Module.new do
           method_nodes.each do |method_node|
-            klass.low_params[method_node.name] = Redefiner.param_proxy_with_type_expressions(method_node)
-            next if klass.low_params[method_node.name].empty?
+            params = Redefiner.params_with_type_expressions(method_node)
+            next if params.empty?
 
-            define_method(method_node.name) do |*args, **kwargs|
-              klass.low_params[method_node.name].each do |param_proxy|
+            name = method_node.name
+            klass.low_methods[name] = MethodProxy.new(name:, params:)
+
+            define_method(name) do |*args, **kwargs|
+              klass.low_methods[name].params.each do |param_proxy|
+                binding.pry
                 arg = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
                 arg = param_proxy.type_expression.default_value if arg.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
                 param_proxy.type_expression.validate!(arg:, name: param_proxy.name)
@@ -23,13 +28,13 @@ module LowType
             end
 
             if private_start_line && method_node.start_line > private_start_line
-              private method_node.name
+              private name
             end
           end
         end
       end
 
-      def param_proxy_with_type_expressions(method_node)
+      def params_with_type_expressions(method_node)
         params = method_node.parameters.slice
         proxy_method = eval("-> (#{params}) {}")
         required_args, required_kwargs = Redefiner.required_args(proxy_method)

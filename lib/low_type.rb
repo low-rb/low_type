@@ -20,8 +20,8 @@ module LowType
     end
 
     class << klass
-      def low_params
-        @low_params ||= {}
+      def low_methods
+        @low_methods ||= {}
       end
 
       def type(expression)
@@ -51,7 +51,7 @@ module LowType
     end
 
     def type?(expression)
-      expression.respond_to?(:new) || expression == Integer
+      expression.respond_to?(:new) || expression == Integer || (expression.is_a?(Hash) && expression.keys.first.respond_to?(:new) && expression.values.first.respond_to?(:new))
     end
 
     def value?(expression)
