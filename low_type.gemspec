@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.files = [
     'lib/version.rb',
     'lib/low_type.rb',
+    'lib/method_proxy.rb',
     'lib/param_proxy.rb',
     'lib/parser.rb',
     'lib/redefiner.rb',
