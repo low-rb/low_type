@@ -29,19 +29,22 @@ module LowType
     end
 
     class << klass
-      def low_methods
-        @low_methods ||= {}
-      end
-
+      # Public API.
+      alias_method :low_type, :type
       def type(expression)
         # TODO: Runtime type expression for the supplied variable.
       end
-      alias_method :low_type, :type
 
+      # Public API.
+      alias_method :low_value, :value
       def value(expression)
         ValueExpression.new(value: expression)
       end
-      alias_method :low_value, :value
+
+      # Internal API.
+      def low_methods
+        @low_methods ||= {}
+      end
     end
 
     parser = Parser.new(file_path: LowType.file_path(klass:))
@@ -54,6 +57,7 @@ module LowType
     Hash.define_singleton_method('[]', hash_class_method)
   end
 
+  # Internal API.
   class << self
     def file_path(klass:)
       caller.find { |callee| callee.end_with?("<class:#{klass}>'") }.split(':').first
