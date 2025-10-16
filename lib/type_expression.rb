@@ -39,7 +39,7 @@ module LowType
         end
       end
 
-      raise TypeError, "Invalid type '#{value.class}' for '#{name}'"
+      raise TypeError, "Invalid type '#{value.class}' for '#{name}'. Valid types: [#{@types.join(', ')}]"
     end
   end
 end
