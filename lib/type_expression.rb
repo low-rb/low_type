@@ -46,13 +46,17 @@ end
 
 class Object
   class << self
+    # For "Type | [type_expression/type/value]" situations, redirecting to or generating a type expression from types.
     # "|" is not defined on Object class and this is the most compute-efficient way to achieve our goal (world peace).
+    # "|" is overridable by any child object. While we could def/undef this method, this approach is actually lighter.
     # "|" bitwise operator on Integer is not defined when the receiver is an Integer class, so we are not in conflict.
     def |(expression)
       if expression.class == ::LowType::TypeExpression
+        # We pass our type into their type expression.
         expression | self
         expression
       else
+        # We turn our type into a type expression and pass in their [type_expression/type/value].
         type_expression = ::LowType::TypeExpression.new(type: self)
         type_expression | expression        
       end
