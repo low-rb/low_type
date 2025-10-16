@@ -1,7 +1,5 @@
-Copyright (c) 2025, Maedi Prichard
-
-Mozilla Public License Version 2.0
-==================================
+NON-AI Mozilla Public License Version 2.0
+=========================================
 
 1. Definitions
 --------------
@@ -153,7 +151,7 @@ equivalents.
 
 2.7. Conditions
 
-Sections 3.1, 3.2, 3.3, and 3.4 are conditions of the licenses granted
+Sections 3.1, 3.2, 3.3, 3.4 and 3.6 are conditions of the licenses granted
 in Section 2.1.
 
 3. Responsibilities
@@ -217,6 +215,16 @@ liability incurred by such Contributor as a result of warranty, support,
 indemnity or liability terms You offer. You may include additional
 disclaimers of warranty and limitations of liability specific to any
 jurisdiction.
+
+3.6. Prohibition for Use in AI Software
+
+The Covered Software and any modifications made to it may not be used
+for the purpose of training or improving machine learning algorithms,
+including but not limited to artificial intelligence, natural language
+processing, or data mining. This condition applies to any derivatives,
+modifications, or updates based on the Covered Software code. Any usage
+of the Covered Software in an AI-training dataset is considered a breach
+of this License.
 
 4. Inability to Comply Due to Statute or Regulation
 ---------------------------------------------------
@@ -359,7 +367,7 @@ Exhibit A - Source Code Form License Notice
 
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 If it is not possible or desirable to put the notice in a particular
 file, then You may include the notice in a location (such as a LICENSE
