@@ -19,9 +19,14 @@ module LowType
 
             define_method(name) do |*args, **kwargs|
               klass.low_methods[name].params.each do |param_proxy|
+                # Get argument value or default value.
                 value = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
                 value = param_proxy.type_expression.default_value if value.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
+                # Validate argument type.
                 param_proxy.type_expression.validate!(value:, name: param_proxy.name, error_type: ArgumentError, error_keyword: 'required')
+                # Handle value(type) special case.
+                value = value.value if value.is_a?(ValueExpression)
+                # Redefine argument value.
                 param_proxy.position ? args[param_proxy.position] = value : kwargs[param_proxy.name] = value
               end
 
@@ -41,22 +46,12 @@ module LowType
         end
       end
 
-      def return_type_expression(method_node:)
-        return_node = Parser.return_node(method_node:)
-        return nil if return_node.nil?
-
-        expression = eval(return_node.slice).call
-
-        return expression if expression.class == TypeExpression
-        TypeExpression.new(type: expression)
-      end
-
       def params_with_type_expressions(method_node:)
         return [] if method_node.parameters.nil?
 
         params = method_node.parameters.slice
         proxy_method = eval("-> (#{params}) {}")
-        required_args, required_kwargs = Redefiner.required_args(proxy_method:)
+        required_args, required_kwargs = required_args(proxy_method:)
 
         typed_method = eval(
           <<~RUBY
@@ -86,8 +81,20 @@ module LowType
 
       # TODO: Write spec for this.
       rescue ArgumentError => e
-        raise ArgumentError, "Incorrect param syntax"
+        raise ArgumentError, "Incorrect param syntax: #{e.message}"
       end
+
+      def return_type_expression(method_node:)
+        return_node = Parser.return_node(method_node:)
+        return nil if return_node.nil?
+
+        expression = eval(return_node.slice).call
+
+        return expression if expression.class == TypeExpression
+        TypeExpression.new(type: expression)
+      end
+
+      private
 
       def required_args(proxy_method:)
         required_args = []
