@@ -12,6 +12,10 @@ class LowHello
     greeting
   end
 
+  def typed_arg_without_body(greeting = String)
+    # LowType should still validate the param without erroring.
+  end
+
   def typed_arg_and_default_value(greeting = String | 'Hello')
     greeting
   end

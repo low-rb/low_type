@@ -21,8 +21,10 @@ module LowType
 
     def self.return_node(method_node:)
       # Only a lambda defined immediately after a method's parameters is considered a return type expression.
-      node = method_node.compact_child_nodes.find { |node| node.is_a?(Prism::StatementsNode) }.body.first
+      statements_node = method_node.compact_child_nodes.find { |node| node.is_a?(Prism::StatementsNode) }
+      return nil if statements_node.nil? # Sometimes developers define methods without code inside them.
 
+      node = statements_node.body.first
       return node if node.is_a?(Prism::LambdaNode)
 
       nil

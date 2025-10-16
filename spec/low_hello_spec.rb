@@ -34,6 +34,18 @@ RSpec.describe LowHello do
     end
   end
 
+  describe '#typed_arg_without_body' do
+    it 'returns nil' do
+      expect(hello.typed_arg_without_body('Hola')).to eq(nil)
+    end
+
+    context 'when no arg provided' do
+      it 'raises a required type error' do
+        expect { hello.typed_arg_without_body }.to raise_error(ArgumentError)
+      end
+    end
+  end
+
   describe '#typed_arg_and_default_value' do
     it 'passes through the argument' do
       expect(hello.typed_arg_and_default_value('Howdy')).to eq('Howdy')
