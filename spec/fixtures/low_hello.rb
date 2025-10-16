@@ -20,6 +20,22 @@ class LowHello
     greeting
   end
 
+  def typed_arg_and_invalid_default_value(greeting = String | 123)
+    # => raises TypeError. A default value that is not nil still has to be an allowed type.
+    greeting
+  end
+
+  # Types as values.
+
+  def typed_arg_and_typed_default_value(greeting = String | value(String))
+    greeting
+  end
+
+  def typed_arg_and_invalid_default_type_value(greeting = String | Array | value(Integer))
+    # => raises TypeError. A default value(type) that is not nil still has to be an allowed type.
+    greeting
+  end
+
   # Multiple types.
 
   def multiple_typed_args(greeting = String | Integer)

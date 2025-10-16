@@ -37,7 +37,7 @@ module LowType
 
       # Public API.
       def value(expression)
-        ValueExpression.new(value: expression)
+        ::LowType.value(expression)
       end
       alias_method :low_value, :value
 
@@ -69,6 +69,10 @@ module LowType
 
     def value?(expression)
       !expression.respond_to?(:new) && expression != Integer
+    end
+
+    def value(type)
+      TypeExpression.new(default_value: ValueExpression.new(value: type))
     end
   end
 

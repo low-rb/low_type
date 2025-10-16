@@ -58,6 +58,46 @@ RSpec.describe LowHello do
     end
   end
 
+  describe '#typed_arg_and_invalid_default_value' do
+    it 'passes through the argument' do
+      expect(hello.typed_arg_and_invalid_default_value('Howdy')).to eq('Howdy')
+    end
+
+    context 'when no arg provided' do
+      it 'raises an argument error' do
+        # => raises TypeError. A default value that is not nil still has to be an allowed type.
+        expect { hello.typed_arg_and_invalid_default_value }.to raise_error(TypeError)
+      end
+    end
+  end
+
+  # Types as values.
+
+  describe '#typed_arg_and_typed_default_value' do
+    it 'passes through the argument' do
+      expect(hello.typed_arg_and_typed_default_value('Howdy')).to eq('Howdy')
+    end
+
+    context 'when no arg provided' do
+      it 'provides the default value' do
+        expect(hello.typed_arg_and_typed_default_value).to eq(String)
+      end
+    end
+  end
+
+  describe '#typed_arg_and_invalid_default_type_value' do
+    it 'passes through the argument' do
+      expect(hello.typed_arg_and_invalid_default_type_value('Howdy')).to eq('Howdy')
+    end
+
+    context 'when no arg provided' do
+      it 'raises an argument error' do
+        # => raises TypeError. A default value(type) that is not nil still has to be an allowed type.
+        expect { hello.typed_arg_and_invalid_default_type_value }.to raise_error(TypeError)
+      end
+    end
+  end
+
   # Multiple types.
 
   describe '#multiple_typed_args' do

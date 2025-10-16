@@ -113,6 +113,11 @@ module LowType
 
         [required_args, required_kwargs]
       end
+
+      # Type expressions are eval()'d in the context of this module class (the instance doesn't exist yet) so alias API.
+      def value(expression)
+        ::LowType.value(expression)
+      end
     end
   end
 end

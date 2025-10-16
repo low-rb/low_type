@@ -81,7 +81,7 @@ def say_hello() -> { String }
 end
 ```
 
-If you need a multi-line return type/value then I’ll even let you put the `-> {}` on multiple lines, okay? I won't judge. You are a unique flower 🌸 with your own style, your own needs. You have purpose in this world and though you may never find it, your loved ones will cherish knowing you and wish you were never gone:
+If you need a multi-line return type/value then I'll even let you put the `-> {}` on multiple lines, okay? I won't judge. You are a unique flower 🌸 with your own style, your own needs. You have purpose in this world and though you may never find it, your loved ones will cherish knowing you and wish you were never gone:
 ```ruby
 def say_farewell_with_a_long_method_name(farewell: String)
   -> do
@@ -134,9 +134,9 @@ my_var = AnotherType.new # Raises InvalidType error.
 
 ## Syntax
 
-### `[]` Enumerables
+### `[T]` Enumerables
 
-`Array[]` and `Hash[]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new`/`Hash.new` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have runtime types in Ruby. Additionally [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) suggests `{}` over `Hash[]` syntax for creating hashes.
+`Array[T]` and `Hash[T]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new`/`Hash.new` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have runtime types in Ruby. [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) also suggests `{}` over `Hash[]` syntax for creating hashes.
 
 ### `|` Union Types / Default Value
 
@@ -146,12 +146,26 @@ The pipe symbol (`|`) is used in the context of type expressions to define multi
 
 If no default value is defined then the argument will be required.
 
+### `value(T)` Value Expression
+
+To treat a type as if it were a value, pass it through `value()` first:
+```ruby
+def my_method(my_arg: String | MyType | value(MyType)) # => MyType is the default value
+```
+
 ## Performance
 
 LowType evaluates type expressions on class load (just once) to be efficient and thread-safe. Then the defined types are checked per method call.
 
+## Config [UNRELEASED]
+
+- Type Assignment method must be enabled manually as it overrides Array/Hash `[]` class methods during runtime
+- Shallow VS deep type checking
+
 ## Philosophy
 
-**Duck typing is beautiful.** Ruby is an amazing language **BECAUSE** it's not typed. I don't believe Ruby should ever be fully typed, this is just a module to include in some areas of your codebase where you'd like self-documentation and a little extra assurance that the right values are coming in/out.
+🦆 **Duck typing is beautiful.** Ruby is an amazing language **BECAUSE** it's not typed. I don't believe Ruby should ever be fully typed, but you should be able to sprinkle in types into some areas of your codebase where you'd like self-documentation and a little reassurance that the right values are coming in/out.
 
-**No DSL. Just types**. As much as possible LowType looks just like Ruby if it had types. There’s no special method calls for the base functionality, and defining types at runtime simply uses a `type()` method which almost looks like a `type` keyword, had Ruby implemented types.
+🌀 **No DSL. Just types**. As much as possible LowType looks just like Ruby if it had types. There's no special method calls for the base functionality, and defining types at runtime simply uses a `type()` method which almost looks like a `type` keyword, had Ruby implemented types.
+
+🤖 **No AI**. AI is theoretically a cool concept but in practice capitalism just uses it to steal wealth. Chuck an [anti-AI variant](https://github.com/non-ai-licenses/non-ai-licenses) of your favourite license into your repo today!
