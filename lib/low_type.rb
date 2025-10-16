@@ -30,16 +30,16 @@ module LowType
 
     class << klass
       # Public API.
-      alias_method :low_type, :type
       def type(expression)
         # TODO: Runtime type expression for the supplied variable.
       end
+      alias_method :low_type, :type
 
       # Public API.
-      alias_method :low_value, :value
       def value(expression)
         ValueExpression.new(value: expression)
       end
+      alias_method :low_value, :value
 
       # Internal API.
       def low_methods
