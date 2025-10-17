@@ -94,7 +94,8 @@ end
 
 ## Typed access methods [UNRELEASED]
 
-Replace `attr_[reader, writer, accessor]` methods with `type_[reader, writer, accessor]` to also define types:
+To define typed `@instance` variables use the `type_[reader, writer, accessor]` methods.  
+These replicate `attr_[reader, writer, accessor]` methods but also allow you to define and check types.
 
 ### Type Reader
 
@@ -125,14 +126,14 @@ type_accessor :name, String | 'Cher' # Get/set the value of @name with a default
 
 *alias: `low_type()`*
 
-To define instance/local variable types at runtime use the `type()` method:
+To define typed `local` variables at runtime use the `type()` method:
 ```ruby
 my_var = type MyType | fetch_my_object(id: 123)
 ```
 
 `my_var` is now type checked to be of type `MyType` when first assigned to.
 
-### ⚠️ IMPORTANT
+### ⚠️ Important
 
 The `type()` method must be manually enabled via `LowType.config` because of the following requirements:
 - `TypeExpression`s are evaluated at *runtime* per instance (not once on *class load*) and will impact performance
@@ -152,9 +153,11 @@ my_var = type MyType | fetch_my_object(id: 123)
 my_var.with_type = fetch_my_object(id: 456) # Raises TypeError if the new object is not of type MyType
 ```
 
-**Note:**
-- Single-instance objects like `nil`, `true` and `false` aren't supported by `with_type`. Your object needs to be a unique instance.
-- `with_type` updates the current object rather than referencing a new object. All other variables referencing the current object will reference the updated object.
+### ⚠️ Important
+
+- Single-instance objects like `nil`, `true` and `false` aren't supported by `with_type`. Your object needs to be a unique instance
+- `with_type` updates the current object rather than referencing a new object. All other variables referencing the current object will reference the updated object
+- Because we can't reassign `self` in Ruby we reassign the object's instance variables instead, impacting performance
 
 ## Syntax
 

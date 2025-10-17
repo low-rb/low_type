@@ -17,7 +17,7 @@ module TypeAssignment
       type_expression = self.instance_variable_get('@type_expression')
       type_expression.validate!(value:, name: self, error_type: TypeError, error_keyword: 'object')
 
-      # We can't re-assign self in Ruby so we re-assign instance variables instead.
+      # We can't reassign self in Ruby so we reassign instance variables instead.
       value.instance_variables.each do |variable|
         self.instance_variable_set(variable, value.instance_variable_get(variable))
       end
