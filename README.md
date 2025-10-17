@@ -120,7 +120,7 @@ name = 'Tim' # Set the value with type checking
 type_accessor :name, String | 'Cher' # Get/set the value of @name with a default value if it's `nil`
 ```
 
-## Type assignment methods
+## Type assignment methods [BETA]
 
 ### `type()`
 
@@ -140,8 +140,6 @@ The `type()` method must be manually enabled via `LowType.config` because of the
 - Class methods `Array[]`/`Hash[]` are subclassed at runtime for the enumerable type syntax to work (but only for the class the `LowType` module is included in).  
   While `LowType::Array/Hash` behave just like `Array/Hash`, equality comparisons may be affected in some situations
 - The `type()` method dynamically adds a `.with_type=()` method to your referenced instance
-
-If you know what you're doing and how to work around the above limitations then you should be fine.
 
 ### `with_type=()`
 
@@ -199,8 +197,9 @@ end
 
 ## Installation
 
+Add `gem 'low_state'` to your Gemfile then:
 ```
-bundle install low_type
+bundle install
 ```
 
 ## Philosophy
