@@ -1,4 +1,4 @@
-<a href="https://rubygems.org/gems/low_type" title="Install gem"><img alt="Gem version" src="https://img.shields.io/gem/v/low_type"></a>
+<a href="https://rubygems.org/gems/low_type" title="Install gem"><img src="https://badge.fury.io/rb/low_type.svg" alt="Gem version" height="18"></a>
 
 # LowType
 
