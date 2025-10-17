@@ -63,8 +63,8 @@ module LowType
       caller.find { |callee| callee.end_with?("<class:#{klass}>'") }.split(':').first
     end
 
-    def type?(expression)
-      expression.respond_to?(:new) || expression == Integer || (expression.is_a?(Hash) && expression.keys.first.respond_to?(:new) && expression.values.first.respond_to?(:new))
+    def type?(type)
+      type.respond_to?(:new) || type == Integer || (type.is_a?(::Hash) && type.keys.first.respond_to?(:new) && type.values.first.respond_to?(:new))
     end
 
     def value?(expression)
