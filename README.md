@@ -92,7 +92,7 @@ def say_farewell_with_a_long_method_name(farewell: String)
 end
 ```
 
-## Type Access methods [UNRELEASED]
+## Typed access methods [UNRELEASED]
 
 Replace `attr_[reader, writer, accessor]` methods with `type_[reader, writer, accessor]` to also define types:
 
@@ -119,18 +119,42 @@ name = 'Tim' # Set the value with type checking
 type_accessor :name, String | 'Cher' # Get/set the value of @name with a default value if it's `nil`
 ```
 
-## Type Assignment method [UNRELEASED]
+## Type assignment methods
 
-To define instance/local variable types at runtime use the `type()` method like so:
+### `type()`
+
+*alias: `low_type()`*
+
+To define instance/local variable types at runtime use the `type()` method:
 ```ruby
-my_var = type MyType | nil
+my_var = type MyType | fetch_my_object(id: 123)
 ```
 
-`my_var` will be type checked when assigned to from now on:
+`my_var` is now type checked to be of type `MyType` when first assigned to.
+
+### ⚠️ IMPORTANT
+
+The `type()` method must be manually enabled via `LowType.config` because of the following requirements:
+- `TypeExpression`s are evaluated at *runtime* per instance (not once on *class load*) and will impact performance
+- Class methods `Array[]`/`Hash[]` are subclassed at runtime for the enumerable type syntax to work (but only for the class the `LowType` module is included in).  
+  While `LowType::Array/Hash` behave just like `Array/Hash`, equality comparisons may be affected in some situations
+- The `type()` method dynamically adds a `.with_type=()` method to your referenced instance
+
+If you know what you're doing and how to work around the above limitations then you should be fine.
+
+### `with_type=()`
+
+Keep in mind that you can still reassign `my_var` to reference another object of a different type, negating type checking.  
+If you feel that a variable referencing an object should also control the type of that object on reassignment, then use `with_type`:
 
 ```ruby
-my_var = AnotherType.new # Raises InvalidType error.
+my_var = type MyType | fetch_my_object(id: 123)
+my_var.with_type = fetch_my_object(id: 456) # Raises TypeError if the new object is not of type MyType
 ```
+
+**Note:**
+- Single-instance objects like `nil`, `true` and `false` aren't supported by `with_type`. Your object needs to be a unique instance.
+- `with_type` updates the current object rather than referencing a new object. All other variables referencing the current object will reference the updated object.
 
 ## Syntax
 
@@ -148,6 +172,8 @@ If no default value is defined then the argument will be required.
 
 ### `value(T)` Value Expression
 
+*alias: `low_value()`*
+
 To treat a type as if it were a value, pass it through `value()` first:
 ```ruby
 def my_method(my_arg: String | MyType | value(MyType)) # => MyType is the default value
@@ -157,10 +183,22 @@ def my_method(my_arg: String | MyType | value(MyType)) # => MyType is the defaul
 
 LowType evaluates type expressions on class load (just once) to be efficient and thread-safe. Then the defined types are checked per method call.
 
-## Config [UNRELEASED]
+## Config
 
-- Type Assignment method must be enabled manually as it overrides Array/Hash `[]` class methods during runtime
-- Shallow VS deep type checking
+Copy and paste the following and change the defaults to configure LowType:
+
+```ruby
+LowType.configure do |config|
+  config.type_assignment = false # Set to true to enable the type assignment method (advanced feature)
+  config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) UNRELEASED
+end
+```
+
+## Installation
+
+```
+bundle install low_type
+```
 
 ## Philosophy
 

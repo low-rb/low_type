@@ -29,19 +29,6 @@ module LowType
     end
 
     class << klass
-      # Public API.
-      def type(expression)
-        # TODO: Runtime type expression for the supplied variable.
-      end
-      alias_method :low_type, :type
-
-      # Public API.
-      def value(expression)
-        ::LowType.value(expression)
-      end
-      alias_method :low_value, :value
-
-      # Internal API.
       def low_methods
         @low_methods ||= {}
       end
@@ -57,8 +44,25 @@ module LowType
     Hash.define_singleton_method('[]', hash_class_method)
   end
 
-  # Internal API.
   class << self
+    # Public API.
+
+    def config
+      config = Struct.new(:type_assignment, :deep_type_check)
+      @config ||= config.new(false, false)
+    end
+
+    def configure
+      yield(config)
+
+      if config.type_assignment
+        require_relative 'type_assignment'
+        include TypeAssignment
+      end
+    end
+  
+    # Internal API.
+
     def file_path(klass:)
       caller.find { |callee| callee.end_with?("<class:#{klass}>'") }.split(':').first
     end
@@ -71,7 +75,7 @@ module LowType
       !expression.respond_to?(:new) && expression != Integer
     end
 
-    def value(type)
+    def value(type:)
       TypeExpression.new(default_value: ValueExpression.new(value: type))
     end
   end

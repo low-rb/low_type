@@ -1,0 +1,41 @@
+require_relative '../../lib/low_type.rb'
+
+class MyType
+  attr_reader :id
+
+  def initialize(id:)
+    @id = id
+  end
+end
+
+class TypeAssigner
+  include LowType
+
+  attr_reader :typed_array, :typed_default_value, :typed_instance_variable
+
+  def initialize
+    @typed_array = nil
+    @typed_default_value = nil
+    @typed_instance_variable = nil
+  end
+
+  def assign_typed_array
+    @typed_array = type Array[Integer] | [1, 2, 3]
+  end
+
+  def assign_typed_default_value
+    @typed_default_value = type String | value(String)
+  end
+
+  def assign_typed_instance_variable
+    @typed_instance_variable = type MyType | MyType.new(id: 'assigned')
+  end
+
+  def reassign_typed_instance_variable
+    @typed_instance_variable.with_type = type MyType | MyType.new(id: 'reassigned')
+  end
+
+  def reassign_invalid_typed_instance_variable
+    @typed_instance_variable.with_type = type MyType | 'Invalid String'
+  end
+end

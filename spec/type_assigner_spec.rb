@@ -1,0 +1,58 @@
+# frozen_string_literal: true
+
+require_relative 'fixtures/type_assigner.rb'
+
+LowType.configure do |config|
+  config.type_assignment = true
+end
+
+RSpec.describe TypeAssigner do
+  subject { described_class.new }
+
+  describe '#initialize' do
+    it 'instantiates a class' do
+      expect { subject }.not_to raise_error
+    end
+  end
+
+  # Runtime type expression.
+
+  describe '#assign_typed_array' do
+    it 'assigns a typed array' do
+      expect(subject.assign_typed_array).to eq([1, 2, 3])
+    end
+  end
+
+  # Runtime value expression.
+
+  describe '#assign_typed_default_value' do
+    it 'passes through the value(Type) argument' do
+      subject.assign_typed_default_value
+      expect(subject.typed_default_value).to eq(String)
+    end
+  end
+
+  # Assignment and re-assignment.
+
+  describe '#assign_typed_instance_variable' do
+    it 'assigns a typed instance variable' do
+      subject.assign_typed_instance_variable
+      expect(subject.typed_instance_variable.class).to eq(MyType)
+    end
+  end
+
+  describe '#reassign_typed_instance_variable' do
+    it 're-assigns a typed instance variable' do
+      subject.assign_typed_instance_variable
+      subject.reassign_typed_instance_variable
+      expect(subject.typed_instance_variable.id).to eq('reassigned')
+    end
+  end
+
+  describe '#reassign_invalid_typed_instance_variable' do
+    it 'raises a type error' do
+      subject.assign_typed_instance_variable
+      expect { subject.reassign_invalid_typed_instance_variable }.to raise_error(TypeError)
+    end
+  end
+end

@@ -74,12 +74,12 @@ RSpec.describe LowHello do
   # Types as values.
 
   describe '#typed_arg_and_typed_default_value' do
-    it 'passes through the argument' do
+    it 'passes through the value(Type) argument' do
       expect(hello.typed_arg_and_typed_default_value('Howdy')).to eq('Howdy')
     end
 
     context 'when no arg provided' do
-      it 'provides the default value' do
+      it 'provides the default value (which is a type)' do
         expect(hello.typed_arg_and_typed_default_value).to eq(String)
       end
     end

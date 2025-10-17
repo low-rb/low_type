@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ['maedi']
   spec.email = ['maediprichard@gmail.com']
 
-  spec.summary = 'An elegant way to define types in Ruby'
+  spec.summary = 'Elegant types in Ruby'
   spec.description = 'An elegant and simple way to define types in Ruby, only when you need them.'
   spec.homepage = 'https://codeberg.org/low_ruby/low_type'
   spec.required_ruby_version = '>= 3.3.0'
@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
     'lib/param_proxy.rb',
     'lib/parser.rb',
     'lib/redefiner.rb',
+    'lib/type_assignment.rb',
     'lib/type_expression.rb',
     'lib/value_expression.rb',
   ]
