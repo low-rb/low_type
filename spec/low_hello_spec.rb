@@ -182,34 +182,45 @@ RSpec.describe LowHello do
     end
   end
 
-  # Return values.
+  # Return types.
 
-  describe '#return_value' do
+  describe '#return_type' do
     it 'returns a value' do
-      expect(hello.return_value).to eq(4)
+      expect(hello.return_type).to eq(4)
     end
 
     it 'defines return type expression' do
-      hello.return_value
-      expect(described_class.low_methods[:return_value].return_expression.types).to eq([Integer])
+      hello.return_type
+      expect(described_class.low_methods[:return_type].return_expression.types).to eq([Integer])
     end
   end
 
-  describe '#arg_and_return_value' do
+  describe '#array_return_type' do
+    it 'returns an array of symbols' do
+      expect(hello.array_return_type).to eq([:one, :two, :three])
+    end
+
+    it 'defines Array[Symmbol] return type expression' do
+      hello.array_return_type
+      expect(described_class.low_methods[:array_return_type].return_expression.types).to eq([Array[Symbol]])
+    end
+  end
+
+  describe '#arg_and_return_type' do
     it 'defines return type expression' do
-      hello.arg_and_return_value('Morning')
-      expect(described_class.low_methods[:arg_and_return_value].return_expression.types).to eq([String])
+      hello.arg_and_return_type('Morning')
+      expect(described_class.low_methods[:arg_and_return_type].return_expression.types).to eq([String])
     end
 
     context 'when the return value is nil' do
       it 'raises a type error' do
-        expect { hello.arg_and_return_value(nil) }.to raise_error(::LowType::ReturnError)
+        expect { hello.arg_and_return_type(nil) }.to raise_error(::LowType::ReturnError)
       end
     end
 
     context 'when the return value does not validate the return type expression' do
       it 'raises a type error' do
-        expect { hello.arg_and_return_value(123) }.to raise_error(TypeError)
+        expect { hello.arg_and_return_type(123) }.to raise_error(TypeError)
       end
     end
   end

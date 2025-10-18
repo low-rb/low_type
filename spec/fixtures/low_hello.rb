@@ -60,13 +60,17 @@ class LowHello
     greetings
   end
 
-  # Return values.
+  # Return types.
 
-  def return_value() -> { Integer }
+  def return_type() -> { Integer }
     2 + 2
   end
 
-  def arg_and_return_value(greeting) -> { String }
+  def array_return_type() -> { Array[Symbol] }
+    [:one, :two, :three]
+  end
+
+  def arg_and_return_type(greeting) -> { String }
     addition = 2 + 2
     greeting
   end
