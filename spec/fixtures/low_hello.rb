@@ -21,7 +21,7 @@ class LowHello
   end
 
   def typed_arg_and_invalid_default_value(greeting = String | 123)
-    # => raises TypeError. A default value that is not nil still has to be an allowed type.
+    # => raises TypeError. A default value that is not nil still has to be a valid type.
     greeting
   end
 
@@ -31,8 +31,8 @@ class LowHello
     greeting
   end
 
-  def typed_arg_and_invalid_default_type_value(greeting = String | Array | value(Integer))
-    # => raises TypeError. A default value(type) that is not nil still has to be an allowed type.
+  def typed_arg_and_invalid_default_typed_value(greeting = String | Array[Symbol] | value(Integer))
+    # => raises TypeError. A default value(type) that is not nil still has to be a valid type.
     greeting
   end
 
@@ -60,13 +60,17 @@ class LowHello
     greetings
   end
 
-  # Return values.
+  # Return types.
 
-  def return_value() -> { Integer }
+  def return_type() -> { Integer }
     2 + 2
   end
 
-  def arg_and_return_value(greeting) -> { String }
+  def array_return_type() -> { Array[Symbol] }
+    [:one, :two, :three]
+  end
+
+  def arg_and_return_type(greeting) -> { String }
     addition = 2 + 2
     greeting
   end

@@ -1,3 +1,5 @@
+require_relative 'proxies/param_proxy'
+
 module LowType
   class TypeExpression
     attr_reader :types, :default_value
@@ -25,10 +27,10 @@ module LowType
       @default_value == :LOW_TYPE_UNDEFINED
     end
 
-    def validate!(value:, name:, error_type:, error_keyword:)
+    def validate!(value:, proxy:, line: nil)
       if value.nil?
         return true if @default_value.nil?
-        raise error_type, "Missing #{error_keyword} value of type '#{@types.join(', ')}' for '#{name}'" if required?
+        raise proxy.error_type(value:), proxy.error_message(value:, line:) if required?
       end
 
       @types.each do |type|
@@ -40,7 +42,13 @@ module LowType
         end
       end
 
-      raise TypeError, "Invalid type '#{value.class}' for '#{name}'. Valid types: [#{@types.join(', ')}]"
+      raise proxy.error_type(value:), proxy.error_message(value:, line:)
+    end
+
+    def valid_types
+      types = @types.map { |type| type.inspect.to_s }
+      return types + ['nil'] if @default_value.nil?
+      types
     end
   end
 end

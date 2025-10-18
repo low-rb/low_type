@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'fixtures/type_assigner.rb'
+require_relative '../lib/errors'
+require_relative 'fixtures/type_assigner'
 
 LowType.configure do |config|
   config.type_assignment = true
@@ -20,6 +21,14 @@ RSpec.describe TypeAssigner do
   describe '#assign_typed_array' do
     it 'assigns a typed array' do
       expect(subject.assign_typed_array).to eq([1, 2, 3])
+    end
+
+    context 'when the type is wrong' do
+      let(:error_message) { "Invalid variable type Array in 'TypeAssigner' on line 27. Valid types: '[Integer]'" }
+  
+      it 'raises an argument type error' do
+        expect { subject.assign_invalid_typed_array }.to raise_error(LocalTypeError, error_message)
+      end
     end
   end
 

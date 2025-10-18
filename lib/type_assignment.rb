@@ -1,3 +1,4 @@
+require_relative 'proxies/local_proxy'
 require_relative 'type_expression'
 require_relative 'value_expression'
 
@@ -11,11 +12,15 @@ module TypeAssignment
       raise AssignmentError, "Single-instance objects like #{object} are not supported"
     end
 
-    object.instance_variable_set('@type_expression', type_expression)
+    local_proxy = LowType::LocalProxy.new(type_expression:, name: self)
+    object.instance_variable_set('@local_proxy', local_proxy)
+
+    type_expression.validate!(value: object, proxy: local_proxy, line: caller_locations(1, 1).first.lineno)
 
     def object.with_type=(value)
-      type_expression = self.instance_variable_get('@type_expression')
-      type_expression.validate!(value:, name: self, error_type: TypeError, error_keyword: 'object')
+      local_proxy = self.instance_variable_get('@local_proxy')
+      type_expression = local_proxy.type_expression
+      type_expression.validate!(value:, proxy: local_proxy, line: caller_locations(1, 1).first.lineno)
 
       # We can't reassign self in Ruby so we reassign instance variables instead.
       value.instance_variables.each do |variable|

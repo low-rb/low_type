@@ -21,15 +21,19 @@ Gem::Specification.new do |spec|
   gemspec = File.basename(__FILE__)
 
   spec.files = [
-    'lib/version.rb',
+    'lib/interfaces/proxy_interface.rb',
+    'lib/proxies/local_proxy.rb',
+    'lib/proxies/method_proxy.rb',
+    'lib/proxies/param_proxy.rb',
+    'lib/proxies/return_proxy.rb',
+    'lib/errors.rb',
     'lib/low_type.rb',
-    'lib/method_proxy.rb',
-    'lib/param_proxy.rb',
     'lib/parser.rb',
     'lib/redefiner.rb',
     'lib/type_assignment.rb',
     'lib/type_expression.rb',
     'lib/value_expression.rb',
+    'lib/version.rb',
   ]
 
   spec.bindir = 'exe'
