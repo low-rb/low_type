@@ -23,6 +23,10 @@ class TypeAssigner
     @typed_array = type Array[Integer] | [1, 2, 3]
   end
 
+  def assign_invalid_typed_array
+    @typed_array = type Array[Integer] | ['a', 'b', 'c']
+  end
+
   def assign_typed_default_value
     @typed_default_value = type String | value(String)
   end

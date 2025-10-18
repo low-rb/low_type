@@ -1,11 +1,10 @@
-require_relative 'method_proxy'
-require_relative 'param_proxy'
+require_relative 'proxies/method_proxy'
+require_relative 'proxies/param_proxy'
+require_relative 'proxies/return_proxy'
 require_relative 'parser'
 require_relative 'type_expression'
 
 module LowType
-  class ReturnError < StandardError; end
-
   class Redefiner
     class << self
       def redefine_methods(method_nodes:, private_start_line:, klass:)
@@ -13,9 +12,9 @@ module LowType
           method_nodes.each do |method_node|
             name = method_node.name
             params = Redefiner.params_with_type_expressions(method_node:)
-            return_expression = Redefiner.return_type_expression(method_node:)
+            return_proxy = Redefiner.return_proxy(method_node:)
 
-            klass.low_methods[name] = MethodProxy.new(name:, params:, return_expression:)
+            klass.low_methods[name] = MethodProxy.new(name:, params:, return_proxy:)
 
             define_method(name) do |*args, **kwargs|
               klass.low_methods[name].params.each do |param_proxy|
@@ -23,16 +22,16 @@ module LowType
                 value = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
                 value = param_proxy.type_expression.default_value if value.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
                 # Validate argument type.
-                param_proxy.type_expression.validate!(value:, name: param_proxy.name, error_type: ArgumentError, error_keyword: 'required')
+                param_proxy.type_expression.validate!(value:, proxy: param_proxy)
                 # Handle value(type) special case.
                 value = value.value if value.is_a?(ValueExpression)
                 # Redefine argument value.
                 param_proxy.position ? args[param_proxy.position] = value : kwargs[param_proxy.name] = value
               end
 
-              if return_expression
+              if return_proxy
                 return_value = super(*args, **kwargs)
-                return_expression.validate!(value: return_value, name:, error_type: ReturnError, error_keyword: 'return')
+                return_proxy.type_expression.validate!(value: return_value, proxy: klass.low_methods[name].return_proxy)
                 return return_value
               end
 
@@ -84,14 +83,14 @@ module LowType
         raise ArgumentError, "Incorrect param syntax: #{e.message}"
       end
 
-      def return_type_expression(method_node:)
+      def return_proxy(method_node:)
         return_node = Parser.return_node(method_node:)
         return nil if return_node.nil?
 
         expression = eval(return_node.slice).call
+        expression = TypeExpression.new(type: expression) unless expression.is_a?(TypeExpression)
 
-        return expression if expression.class == TypeExpression
-        TypeExpression.new(type: expression)
+        ReturnProxy.new(type_expression: expression, name: method_node.name)
       end
 
       private
