@@ -10,7 +10,7 @@ module LowType
       @name = name
     end
 
-    def error_type(value:)
+    def error_type
       ReturnTypeError
     end
 

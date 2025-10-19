@@ -12,14 +12,11 @@ module LowType
       @position = position
     end
 
-    def error_type(value:)
-      return ArgumentError if value.nil?
+    def error_type
       ArgumentTypeError
     end
 
     def error_message(value:, line: nil)
-      return "Missing argument for parameter '#{@name}'. Position: #{@position}" if value.nil?
-
       "Invalid argument type '#{value.class}' for parameter '#{@name}'. Valid types: '#{@type_expression.valid_types}'"
     end
   end

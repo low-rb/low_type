@@ -30,7 +30,7 @@ module LowType
     def validate!(value:, proxy:, line: nil)
       if value.nil?
         return true if @default_value.nil?
-        raise proxy.error_type(value:), proxy.error_message(value:, line:) if required?
+        raise proxy.error_type, proxy.error_message(value:, line:) if required?
       end
 
       @types.each do |type|
@@ -42,7 +42,7 @@ module LowType
         end
       end
 
-      raise proxy.error_type(value:), proxy.error_message(value:, line:)
+      raise proxy.error_type, proxy.error_message(value:, line:)
     end
 
     def valid_types
