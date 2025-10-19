@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
     'lib/proxies/method_proxy.rb',
     'lib/proxies/param_proxy.rb',
     'lib/proxies/return_proxy.rb',
-    'lib/errors.rb',
+    'lib/error_types.rb',
     'lib/low_type.rb',
     'lib/parser.rb',
     'lib/redefiner.rb',

@@ -32,7 +32,7 @@ RSpec.describe LowHelloKeywords do
       let(:error_message) { "Invalid argument type 'NilClass' for parameter 'greeting'. Valid types: 'String'" }
 
       it 'raises a required type error' do
-        expect { hello.typed_arg }.to raise_error(ArgumentTypeError, error_message)
+        expect { hello.typed_arg }.to raise_error(LowType::ArgumentTypeError, error_message)
       end
     end
   end
@@ -65,7 +65,7 @@ RSpec.describe LowHelloKeywords do
       let(:error_message) { "Invalid argument type 'NilClass' for parameter 'greeting'. Valid types: 'String | Integer'" }
 
       it 'raises a required type error' do
-        expect { hello.multiple_typed_args }.to raise_error(ArgumentTypeError, error_message)
+        expect { hello.multiple_typed_args }.to raise_error(LowType::ArgumentTypeError, error_message)
       end
     end
   end

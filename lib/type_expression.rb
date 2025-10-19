@@ -46,15 +46,19 @@ module LowType
 
       raise proxy.error_type, proxy.error_message(value:)
     rescue proxy.error_type => e
+      file_paths = [FILE_PATH, LowType::Redefiner::FILE_PATH]
+      raise proxy.error_type, e.message, backtrace_with_proxy(file_paths:, backtrace: e.backtrace, proxy:)
+    end
+
+    def backtrace_with_proxy(file_paths:, proxy:, backtrace:)
       # Remove LowType file paths from the backtrace.
-      internal_file_paths = [FILE_PATH, LowType::Redefiner::FILE_PATH]
-      external_backtrace = e.backtrace.reject { |line| internal_file_paths.include?(line.split(':').first) }
+      filtered_backtrace = backtrace.reject { |line| file_paths.find { |file_path| line.include?(file_path) } }
 
       # Add the proxied file to the backtrace.
-      file = proxy.file
-      proxy_file_backtrace = "#{file.path}:#{file.line}:in '#{file.scope}'"
+      proxy_file_backtrace = "#{proxy.file.path}:#{proxy.file.line}:in '#{proxy.file.scope}'"
+      proxy_file_backtrace = "from " + proxy_file_backtrace if filtered_backtrace.first.start_with?('from')
 
-      raise proxy.error_type, e.message, [proxy_file_backtrace, *external_backtrace]
+      [proxy_file_backtrace, *filtered_backtrace]
     end
 
     def valid_types
