@@ -47,8 +47,9 @@ module LowType
 
     def valid_types
       types = @types.map { |type| type.inspect.to_s }
-      return types + ['nil'] if @default_value.nil?
-      types
+      types = types + ['nil'] if @default_value.nil?
+
+      types.join(' | ')
     end
   end
 end
