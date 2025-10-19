@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'fixtures/low_hello'
-require_relative '../lib/errors'
+require_relative '../../lib/error_types'
+require_relative '../fixtures/low_hello'
 
 RSpec.describe LowHello do
   subject(:hello) { described_class.new(greeting, name) }

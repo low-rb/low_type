@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../lib/errors'
-require_relative 'fixtures/type_assigner'
+require_relative '../../lib/error_types'
+require_relative '../fixtures/type_assigner'
 
 LowType.configure do |config|
   config.type_assignment = true

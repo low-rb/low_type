@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'fixtures/hello.rb'
+require_relative '../fixtures/hello.rb'
 
 RSpec.describe Hello do
   subject(:hello) { described_class.new(greeting, name) }
