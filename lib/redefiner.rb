@@ -1,3 +1,4 @@
+require_relative 'proxies/file_proxy'
 require_relative 'proxies/method_proxy'
 require_relative 'proxies/param_proxy'
 require_relative 'proxies/return_proxy'
@@ -6,13 +7,16 @@ require_relative 'type_expression'
 
 module LowType
   class Redefiner
+    FILE_PATH = File.expand_path(__FILE__)
+
     class << self
-      def redefine_methods(method_nodes:, private_start_line:, klass:)
+      def redefine_methods(method_nodes:, klass:, private_start_line:, file_path:)
         Module.new do
           method_nodes.each do |method_node|
             name = method_node.name
-            params = Redefiner.params_with_type_expressions(method_node:)
-            return_proxy = Redefiner.return_proxy(method_node:)
+            file = FileProxy.new(path: file_path, line: method_node.start_line, scope: "#{klass}##{method_node.name}")
+            params = Redefiner.params_with_type_expressions(method_node:, file:)
+            return_proxy = Redefiner.return_proxy(method_node:, file:)
 
             klass.low_methods[name] = MethodProxy.new(name:, params:, return_proxy:)
 
@@ -45,7 +49,7 @@ module LowType
         end
       end
 
-      def params_with_type_expressions(method_node:)
+      def params_with_type_expressions(method_node:, file:)
         return [] if method_node.parameters.nil?
 
         params = method_node.parameters.slice
@@ -64,9 +68,9 @@ module LowType
                 expression = binding.local_variable_get(name)
 
                 if expression.class == TypeExpression
-                  param_proxies << ParamProxy.new(type_expression: expression, name:, type:, position:)
+                  param_proxies << ParamProxy.new(type_expression: expression, name:, type:, position:, file:)
                 elsif ::LowType.type?(expression)
-                  param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: expression), name:, type:, position:)
+                  param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: expression), name:, type:, position:, file:)
                 end
               end
 
@@ -83,14 +87,14 @@ module LowType
         raise ArgumentError, "Incorrect param syntax: #{e.message}"
       end
 
-      def return_proxy(method_node:)
+      def return_proxy(method_node:, file:)
         return_node = Parser.return_node(method_node:)
         return nil if return_node.nil?
 
         expression = eval(return_node.slice).call
         expression = TypeExpression.new(type: expression) unless expression.is_a?(TypeExpression)
 
-        ReturnProxy.new(type_expression: expression, name: method_node.name)
+        ReturnProxy.new(type_expression: expression, name: method_node.name, file:)
       end
 
       private

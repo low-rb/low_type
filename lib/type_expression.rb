@@ -2,6 +2,8 @@ require_relative 'proxies/param_proxy'
 
 module LowType
   class TypeExpression
+    FILE_PATH = File.expand_path(__FILE__)
+
     attr_reader :types, :default_value
 
     def initialize(type: nil, default_value: :LOW_TYPE_UNDEFINED)
@@ -27,10 +29,10 @@ module LowType
       @default_value == :LOW_TYPE_UNDEFINED
     end
 
-    def validate!(value:, proxy:, line: nil)
+    def validate!(value:, proxy:)
       if value.nil?
         return true if @default_value.nil?
-        raise proxy.error_type, proxy.error_message(value:, line:) if required?
+        raise proxy.error_type, proxy.error_message(value:) if required?
       end
 
       @types.each do |type|
@@ -42,7 +44,17 @@ module LowType
         end
       end
 
-      raise proxy.error_type, proxy.error_message(value:, line:)
+      raise proxy.error_type, proxy.error_message(value:)
+    rescue proxy.error_type => e
+      # Remove LowType file paths from the backtrace.
+      internal_file_paths = [FILE_PATH, LowType::Redefiner::FILE_PATH]
+      external_backtrace = e.backtrace.reject { |line| internal_file_paths.include?(line.split(':').first) }
+
+      # Add the proxied file to the backtrace.
+      file = proxy.file
+      proxy_file_backtrace = "#{file.path}:#{file.line}:in '#{file.scope}'"
+
+      raise proxy.error_type, e.message, [proxy_file_backtrace, *external_backtrace]
     end
 
     def valid_types

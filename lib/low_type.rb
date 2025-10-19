@@ -34,11 +34,12 @@ module LowType
       end
     end
 
-    parser = Parser.new(file_path: LowType.file_path(klass:))
+    file_path = LowType.file_path(klass:)
+    parser = Parser.new(file_path:)
     private_start_line = parser.private_start_line
 
-    klass.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, private_start_line:, klass:)
-    klass.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, private_start_line:, klass:)
+    klass.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
+    klass.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
   ensure
     Array.define_singleton_method('[]', array_class_method)
     Hash.define_singleton_method('[]', hash_class_method)

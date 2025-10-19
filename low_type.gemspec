@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.files = [
     'lib/interfaces/error_interface.rb',
+    'lib/proxies/file_proxy.rb',
     'lib/proxies/local_proxy.rb',
     'lib/proxies/method_proxy.rb',
     'lib/proxies/param_proxy.rb',
