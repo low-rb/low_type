@@ -1,5 +1,5 @@
 require_relative '../interfaces/error_interface'
-require_relative '../errors'
+require_relative '../error_types'
 
 module LowType
   class ReturnProxy < ErrorInterface
