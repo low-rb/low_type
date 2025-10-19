@@ -9,6 +9,35 @@ RSpec.describe LowHello do
   let(:greeting) { 'Hey' }
   let(:name) { 'Mate' }
 
+  describe '.included' do
+    it 'redefines methods on class load' do
+      expect(described_class.low_methods.keys).to include(
+        *[
+          :initialize,
+          :typed_arg,
+          :typed_arg_without_body,
+          :typed_arg_and_default_value,
+          :typed_arg_and_invalid_default_value,
+          :typed_arg_and_typed_default_value,
+          :typed_arg_and_invalid_default_typed_value,
+          :multiple_typed_args,
+          :multiple_typed_args_and_default_value,
+          :typed_array_arg,
+          :typed_hash_arg,
+          :typed_hash_arg_and_default_value,
+          :return_type,
+          :array_return_type,
+          :arg_and_return_type,
+          :arg_and_nilable_return_value,
+          :private_typed_arg,
+          :inline_class_typed_arg,
+          :class_typed_arg,
+          :class_typed_arg_and_default_value,
+        ]
+      )
+    end
+  end
+
   describe '#initialize' do
     it 'instantiates a typed class' do
       expect { hello }.not_to raise_error
