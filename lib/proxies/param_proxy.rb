@@ -1,8 +1,8 @@
-require_relative '../interfaces/proxy_interface'
+require_relative '../interfaces/error_interface'
 require_relative '../errors'
 
 module LowType
-  class ParamProxy < ProxyInterface
+  class ParamProxy < ErrorInterface
     attr_reader :type_expression, :name, :type, :position
 
     def initialize(type_expression:, name:, type:, position: nil)
