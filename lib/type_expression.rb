@@ -56,7 +56,8 @@ module LowType
 
       # Add the proxied file to the backtrace.
       proxy_file_backtrace = "#{proxy.file.path}:#{proxy.file.line}:in '#{proxy.file.scope}'"
-      proxy_file_backtrace = "from " + proxy_file_backtrace if filtered_backtrace.first.start_with?('from')
+      from_prefix = filtered_backtrace.first.match(/\s+from /)
+      proxy_file_backtrace = "#{from_prefix}#{proxy_file_backtrace}" if from_prefix
 
       [proxy_file_backtrace, *filtered_backtrace]
     end
