@@ -10,12 +10,12 @@ module LowType
       @name = name
     end
 
-    def error_type(value:)
+    def error_type
       LocalTypeError
     end
 
     def error_message(value:, line:)
-      "Invalid variable type #{value.class} in '#{@name.class}' on line #{line}. Valid types: '#{@type_expression.valid_types.join(', ')}'"
+      "Invalid variable type #{value.class} in '#{@name.class}' on line #{line}. Valid types: '#{@type_expression.valid_types}'"
     end
   end
 end

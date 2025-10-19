@@ -10,12 +10,12 @@ module LowType
       @name = name
     end
 
-    def error_type(value:)
+    def error_type
       ReturnTypeError
     end
 
     def error_message(value:, line: nil)
-      "Invalid return type '#{value.class}' for method '#{@name}'. Valid types: '#{@type_expression.valid_types.join(', ')}'"
+      "Invalid return type '#{value.class}' for method '#{@name}'. Valid types: '#{@type_expression.valid_types}'"
     end
   end
 end

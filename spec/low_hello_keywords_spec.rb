@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'fixtures/low_hello_keywords.rb'
+require_relative '../lib/errors'
 
 RSpec.describe LowHelloKeywords do
   subject(:hello) { described_class.new(greeting:, name:) }
@@ -28,8 +29,10 @@ RSpec.describe LowHelloKeywords do
     end
 
     context 'when no arg provided' do
+      let(:error_message) { "Invalid argument type 'NilClass' for parameter 'greeting'. Valid types: 'String'" }
+
       it 'raises a required type error' do
-        expect { hello.typed_arg }.to raise_error(ArgumentError)
+        expect { hello.typed_arg }.to raise_error(ArgumentTypeError, error_message)
       end
     end
   end
@@ -59,8 +62,10 @@ RSpec.describe LowHelloKeywords do
     end
 
     context 'when no arg is provided' do
+      let(:error_message) { "Invalid argument type 'NilClass' for parameter 'greeting'. Valid types: 'String | Integer'" }
+
       it 'raises a required type error' do
-        expect { hello.multiple_typed_args }.to raise_error(ArgumentError)
+        expect { hello.multiple_typed_args }.to raise_error(ArgumentTypeError, error_message)
       end
     end
   end

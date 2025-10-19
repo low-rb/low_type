@@ -1,6 +1,6 @@
 module LowType
   class ProxyInterface
-    def error_type(value:)
+    def error_type
       raise NotImplementedError
     end
 
