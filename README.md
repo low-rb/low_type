@@ -199,7 +199,7 @@ end
 
 ## Installation
 
-Add `gem 'low_state'` to your Gemfile then:
+Add `gem 'low_type'` to your Gemfile then:
 ```
 bundle install
 ```
