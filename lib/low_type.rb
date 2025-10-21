@@ -65,7 +65,10 @@ module LowType
     # Internal API.
 
     def file_path(klass:)
-      caller.find { |callee| callee.end_with?("<class:#{klass}>'") }.split(':').first
+      # Remove module namespaces from class.
+      class_name = klass.to_s.split(':').last
+      # The first class found regardless of namespace will be the class that did the include.
+      caller.find { |callee| callee.end_with?("<class:#{class_name}>'") }.split(':').first
     end
 
     def type?(type)
