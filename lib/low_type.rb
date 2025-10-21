@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'adapters/adapter_loader'
 require_relative 'redefiner'
 require_relative 'type_expression'
 require_relative 'value_expression'
@@ -10,22 +11,22 @@ module LowType
 
     # Array[] class method returns a type expression only for the duration of this "included" hook.
     array_class_method = Array.method('[]').unbind
-    Array.define_singleton_method('[]') do |expression|
-      TypeExpression.new(type: [(expression)])
+    Array.define_singleton_method('[]') do |*types|
+      TypeExpression.new(type: [*types])
     end
 
     # Hash[] class method returns a type expression only for the duration of this "included" hook.
     hash_class_method = Hash.method('[]').unbind
-    Hash.define_singleton_method('[]') do |expression|
+    Hash.define_singleton_method('[]') do |type|
       # Support Pry which uses Hash[].
-      unless LowType.type?(expression)
+      unless LowType.type?(type)
         Hash.define_singleton_method('[]', hash_class_method)
-        result = Hash[expression]
+        result = Hash[type]
         Hash.method('[]').unbind
         return result
       end
 
-      TypeExpression.new(type: expression)
+      TypeExpression.new(type:)
     end
 
     class << klass
@@ -40,6 +41,8 @@ module LowType
 
     klass.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
     klass.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
+
+    AdapterLoader.load(klass:, parser:, file_path:)
   ensure
     Array.define_singleton_method('[]', array_class_method)
     Hash.define_singleton_method('[]', hash_class_method)

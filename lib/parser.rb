@@ -32,17 +32,13 @@ module LowType
 
       # Block statements.
       if statements_node.nil?
-        statements_node = method_node.compact_child_nodes.find do |node|
-          node.is_a?(Prism::BlockNode)
-        end.compact_child_nodes.find do |node|
-          node.is_a?(Prism::StatementsNode)
-        end
+        block_node = method_node.compact_child_nodes.find { |node| node.is_a?(Prism::BlockNode) }
+        statements_node = block_node.compact_child_nodes.find { |node| node.is_a?(Prism::StatementsNode) } if block_node
       end
 
       return nil if statements_node.nil? # Sometimes developers define methods without code inside them.
 
       node = statements_node.body.first
-      # TODO: Evaluate that the lambda contains type expressions too.
       return node if node.is_a?(Prism::LambdaNode)
 
       nil

@@ -86,15 +86,15 @@ end
 If you need a multi-line return type/value then I'll even let you put the `-> {}` on multiple lines, okay? I won't judge. You are a unique flower 🌸 with your own style, your own needs. You have purpose in this world and though you may never find it, your loved ones will cherish knowing you and wish you were never gone:
 ```ruby
 def say_farewell_with_a_long_method_name(farewell: String)
-  -> do
+  -> {
     ::Long::Name::Space::CustomClassOne | ::Long::Name::Space::CustomClassTwo | ::Long::Name::Space::CustomClassThree
-  end
+  }
 
   # Code that returns an instance of one of the above types.
 end
 ```
 
-## Typed access methods [UNRELEASED]
+## Instance variables [UNRELEASED]
 
 To define typed `@instance` variables use the `type_[reader, writer, accessor]` methods.  
 These replicate `attr_[reader, writer, accessor]` methods but also allow you to define and check types.
@@ -196,6 +196,54 @@ LowType.configure do |config|
   config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
 end
 ```
+
+## Basic types
+
+- `String`
+- `Integer`
+- `Array`
+- `Hash`
+- `Boolean` (accepts `true`/`false`)
+- `HTML` (subclass of `String`)
+- `JSON` (subclass of `String`)
+
+`nil` represents an optional value.
+
+## Integrations
+
+Because LowType is low-level it should work with method definitions in any framework out of the box. With that in mind we go a little further here at free-software-by-shadowy-figure-co to give you that extra framework-specific-special-feeling:
+
+### Sinatra
+
+`include LowType` in your modular `Sinatra::Base` subclass to get Sinatra specific return types.  
+LowType will automatically add the necessary `content_type` and type check the return value:
+
+```ruby
+require 'sinatra/base'
+require 'low_type'
+
+class MyApp < Sinatra::Base
+  include LowType
+
+  get '/body' do -> { HTML }
+    # A simple response is a string.
+    'body'
+  end
+
+  get '/status-headers-body' do -> { Array[Integer, Hash, String] }
+    # The standard response is an array of 3 values representing status, headers and body.
+    [200, {}, 'body']    
+  end
+end
+```
+
+### ℹ️️ Note
+
+LowType checks types on the resulting `Rack::Response` object rather than the actual return value. This allows for Sinatra’s DSL like `headers()` and `body()` to alter the response as well and still have those values be type checked. As a result LowType will appear more forgiving than usual when type checking a Sinatra route return value; it will be *inclusive* rather than *exclusive*. For example, the return type `-> { Integer }` will allow a return value of `200` *as well as* `[200, 'body']`, because `-> { Integer }` is a single integer response and represents only one thing in Sinatra; a HTTP status code. So we only check the type of `response.status` and will allow this value even if there are other values on `response`. To fully type check the response use `Array[Integer, Hash, String]`.
+
+<!--### Rails [UNRELEASED]
+
+If you still want to access Rails' `HTML` sanitizer class while in the scope of the `LowType` module, then use their full namespace `Rails::HTML`.-->
 
 ## Installation
 

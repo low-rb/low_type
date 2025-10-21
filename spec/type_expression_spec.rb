@@ -48,7 +48,7 @@ RSpec.describe LowType::TypeExpression do
     end
 
     it 'returns filtered backtrace with proxy' do
-      expect(type_expression.backtrace_with_proxy(file_paths:, backtrace:, proxy:)).to eq(
+      expect(type_expression.send(:backtrace_with_proxy, file_paths:, backtrace:, proxy:)).to eq(
         [
           "    from /Users/name/dev/app/lib/my_class:123:in 'MyClass#my_method'",
           "    from /Users/name/dev/app/lib/models/time_tree/trunk_cone.rb:45:in 'TrunkCone#grow'",

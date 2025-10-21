@@ -21,6 +21,9 @@ Gem::Specification.new do |spec|
   gemspec = File.basename(__FILE__)
 
   spec.files = [
+    'lib/adapters/adapter_loader.rb',
+    'lib/adapters/sinatra_adapter.rb',
+    'lib/interfaces/adapter_interface.rb',
     'lib/interfaces/error_interface.rb',
     'lib/proxies/file_proxy.rb',
     'lib/proxies/local_proxy.rb',
