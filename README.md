@@ -192,8 +192,8 @@ Copy and paste the following and change the defaults to configure LowType:
 
 ```ruby
 LowType.configure do |config|
-  config.type_assignment = false # Set to true to enable the type assignment method (advanced feature)
-  config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) UNRELEASED
+  config.type_assignment = false # Set to true to enable the type assignment method [BETA]
+  config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
 end
 ```
 
