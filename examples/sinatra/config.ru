@@ -1,0 +1,2 @@
+require './sinatra'
+run SinatraApp
