@@ -5,33 +5,51 @@ module LowType
     attr_reader :parent_map, :instance_methods, :class_methods, :private_start_line
 
     def initialize(file_path:)
-      root_node = Prism.parse_file(file_path).value
+      @root_node = Prism.parse_file(file_path).value
 
       parent_mapper = ParentMapper.new
-      parent_mapper.visit(root_node)
+      parent_mapper.visit(@root_node)
       @parent_map = parent_mapper.parent_map
 
-      method_visitor = MethodVisitor.new(@parent_map)
-      root_node.accept(method_visitor)
+      method_visitor = MethodDefVisitor.new(@parent_map)
+      @root_node.accept(method_visitor)
 
       @instance_methods = method_visitor.instance_methods
       @class_methods = method_visitor.class_methods
       @private_start_line = method_visitor.private_start_line
     end
 
-    def self.return_node(method_node:)
-      # Only a lambda defined immediately after a method's parameters is considered a return type expression.
+    def method_calls(method_names:)
+      block_visitor = MethodCallVisitor.new(parent_map: @parent_map, method_names:)
+      @root_node.accept(block_visitor)
+      block_visitor.method_calls
+    end
+
+    # Only a lambda defined immediately after a method's parameters/block is considered a return type expression.
+    def self.return_type(method_node:)
+      # Method statements.
       statements_node = method_node.compact_child_nodes.find { |node| node.is_a?(Prism::StatementsNode) }
+
+      # Block statements.
+      if statements_node.nil?
+        statements_node = method_node.compact_child_nodes.find do |node|
+          node.is_a?(Prism::BlockNode)
+        end.compact_child_nodes.find do |node|
+          node.is_a?(Prism::StatementsNode)
+        end
+      end
+
       return nil if statements_node.nil? # Sometimes developers define methods without code inside them.
 
       node = statements_node.body.first
+      # TODO: Evaluate that the lambda contains type expressions too.
       return node if node.is_a?(Prism::LambdaNode)
 
       nil
     end
   end
 
-  class MethodVisitor < Prism::Visitor
+  class MethodDefVisitor < Prism::Visitor
     attr_reader :class_methods, :instance_methods, :private_start_line
 
     def initialize(parent_map)
@@ -67,6 +85,23 @@ module LowType
       end
 
       false
+    end
+  end
+
+  class MethodCallVisitor < Prism::Visitor
+    attr_reader :method_calls
+
+    def initialize(parent_map:, method_names:)
+      @parent_map = parent_map
+      @method_names = method_names
+
+      @method_calls = []
+    end
+
+    def visit_call_node(node)
+      @method_calls << node if @method_names.include?(node.name)
+
+      super # Continue walking the tree.
     end
   end
 
