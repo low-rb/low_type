@@ -11,7 +11,9 @@ RSpec.configure do |config|
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
 
-  config.expect_with :rspec do |c|
-    c.syntax = :expect
+  config.expect_with :rspec do |expectations|
+    expectations.syntax = :expect
+    # Large diff when expected objects don't match.
+    expectations.max_formatted_output_length = 10_000
   end
 end
