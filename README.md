@@ -122,7 +122,7 @@ name = 'Tim' # Set the value with type checking
 type_accessor :name, String | 'Cher' # Get/set the value of @name with a default value if it's `nil`
 ```
 
-## Type assignment methods [BETA]
+## Local variables [BETA]
 
 ### `type()`
 
@@ -138,14 +138,14 @@ my_var = type MyType | fetch_my_object(id: 123)
 ### ⚠️ Important
 
 The `type()` method must be manually enabled via `LowType.config` because of the following requirements:
-- `TypeExpression`s are evaluated at *runtime* per instance (not once on *class load*) and will impact performance
+- `TypeExpression`s are evaluated at *runtime* per instance (not once on *class load*) and this will impact performance
 - Class methods `Array[]`/`Hash[]` are subclassed at runtime for the enumerable type syntax to work (but only for the class the `LowType` module is included in).  
   While `LowType::Array/Hash` behave just like `Array/Hash`, equality comparisons may be affected in some situations
 - The `type()` method dynamically adds a `.with_type=()` method to your referenced instance
 
 ### `with_type=()`
 
-Keep in mind that you can still reassign `my_var` to reference another object of a different type, negating type checking.  
+In Ruby you can still reassign `my_var` to reference another object of a different type, negating type checking.  
 If you feel that a variable referencing an object should also control the type of that object on reassignment, then use `with_type`:
 
 ```ruby
@@ -156,7 +156,7 @@ my_var.with_type = fetch_my_object(id: 456) # Raises TypeError if the new object
 ### ⚠️ Important
 
 - Single-instance objects like `nil`, `true` and `false` aren't supported by `with_type`. Your object needs to be a unique instance
-- `with_type` updates the current object rather than referencing a new object. All other variables referencing the current object will reference the updated object
+- `with_type` updates the current object rather than referencing a new object. So all other variables referencing the current object will reference the updated object
 - Because we can't reassign `self` in Ruby we reassign the object's instance variables instead, impacting performance
 
 ## Syntax
@@ -192,7 +192,7 @@ Copy and paste the following and change the defaults to configure LowType:
 
 ```ruby
 LowType.configure do |config|
-  config.type_assignment = false # Set to true to enable the type assignment method [BETA]
+  config.local_types = false # Set to true to enable the type() method for local variables [BETA]
   config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
 end
 ```

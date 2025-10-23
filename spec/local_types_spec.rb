@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/error_types'
-require_relative '../fixtures/type_assigner'
+require_relative '../lib/error_types'
+require_relative 'fixtures/low_local'
 
 LowType.configure do |config|
-  config.type_assignment = true
+  config.local_types = true
 end
 
-RSpec.describe TypeAssigner do
+RSpec.describe LowLocal do
   subject { described_class.new }
 
   describe '#initialize' do
@@ -18,9 +18,9 @@ RSpec.describe TypeAssigner do
 
   # Runtime type expression.
 
-  describe '#assign_typed_array' do
+  describe '#local_type_array' do
     it 'assigns a typed array' do
-      expect(subject.assign_typed_array).to eq([1, 2, 3])
+      expect(subject.local_type_array).to eq([1, 2, 3])
     end
 
     context 'when the type is wrong' do
@@ -34,33 +34,33 @@ RSpec.describe TypeAssigner do
 
   # Runtime value expression.
 
-  describe '#assign_typed_default_value' do
+  describe '#local_type_default_value' do
     it 'passes through the value(Type) argument' do
-      subject.assign_typed_default_value
+      subject.local_type_default_value
       expect(subject.typed_default_value).to eq(String)
     end
   end
 
   # Assignment and re-assignment.
 
-  describe '#assign_typed_instance_variable' do
+  describe '#local_type_instance_variable' do
     it 'assigns a typed instance variable' do
-      subject.assign_typed_instance_variable
+      subject.local_type_instance_variable
       expect(subject.typed_instance_variable.class).to eq(MyType)
     end
   end
 
-  describe '#reassign_typed_instance_variable' do
+  describe '#reassign_local_type_instance_variable' do
     it 're-assigns a typed instance variable' do
-      subject.assign_typed_instance_variable
-      subject.reassign_typed_instance_variable
+      subject.local_type_instance_variable
+      subject.reassign_local_type_instance_variable
       expect(subject.typed_instance_variable.id).to eq('reassigned')
     end
   end
 
   describe '#reassign_invalid_typed_instance_variable' do
     it 'raises a type error' do
-      subject.assign_typed_instance_variable
+      subject.local_type_instance_variable
       expect { subject.reassign_invalid_typed_instance_variable }.to raise_error(LowType::LocalTypeError)
     end
   end

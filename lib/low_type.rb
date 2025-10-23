@@ -49,16 +49,16 @@ module LowType
     # Public API.
 
     def config
-      config = Struct.new(:type_assignment, :deep_type_check)
+      config = Struct.new(:local_types, :deep_type_check)
       @config ||= config.new(false, false)
     end
 
     def configure
       yield(config)
 
-      if config.type_assignment
-        require_relative 'type_assignment'
-        include TypeAssignment
+      if config.local_types
+        require_relative 'local_types'
+        include LocalTypes
       end
     end
   

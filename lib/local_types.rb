@@ -3,7 +3,7 @@ require_relative 'proxies/local_proxy'
 require_relative 'type_expression'
 require_relative 'value_expression'
 
-module TypeAssignment
+module LocalTypes
   class AssignmentError < StandardError; end
 
   def type(type_expression)
