@@ -3,9 +3,7 @@
 require_relative '../lib/error_types'
 require_relative 'fixtures/low_local'
 
-LowType.configure do |config|
-  config.local_types = true
-end
+LowType.configure { |config| config.local_types = true }
 
 RSpec.describe LowLocal do
   subject { described_class.new }
@@ -24,10 +22,24 @@ RSpec.describe LowLocal do
     end
 
     context 'when the type is wrong' do
-      let(:error_message) { "Invalid variable type Array in 'TypeAssigner' on line 27. Valid types: '[Integer]'" }
+      let(:error_message) { "Invalid variable type Array in 'LowLocal' on line 27. Valid types: '[Integer]'" }
   
       it 'raises an argument type error' do
-        expect { subject.assign_invalid_typed_array }.to raise_error(LowType::LocalTypeError, error_message)
+        expect { subject.invalid_local_type_array }.to raise_error(LowType::LocalTypeError, error_message)
+      end
+    end
+  end
+
+  describe '#array_multiple_subtypes' do
+    it 'assigns a sub typed array' do
+      expect(subject.array_multiple_subtypes).to eq([1, '2', :three])
+    end
+
+    context 'when the type is wrong' do
+      let(:error_message) { "Invalid variable type Array in 'LowLocal' on line 35. Valid types: '[Integer, String, Symbol]'" }
+  
+      it 'raises an argument type error' do
+        expect { subject.invalid_array_multiple_subtypes }.to raise_error(LowType::LocalTypeError, error_message)
       end
     end
   end
@@ -65,3 +77,5 @@ RSpec.describe LowLocal do
     end
   end
 end
+
+LowType.configure { |config| config.local_types = false }

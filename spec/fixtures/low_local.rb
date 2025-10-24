@@ -23,8 +23,16 @@ class LowLocal
     @typed_array = type Array[Integer] | [1, 2, 3]
   end
 
-  def assign_invalid_typed_array
+  def invalid_local_type_array
     @typed_array = type Array[Integer] | ['a', 'b', 'c']
+  end
+
+  def array_multiple_subtypes
+    @typed_array = type Array[Integer, String, Symbol] | [1, '2', :three]
+  end
+
+  def invalid_array_multiple_subtypes
+    @typed_array = type Array[Integer, String, Symbol] | [:one, 2, '3']
   end
 
   def local_type_default_value
