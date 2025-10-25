@@ -1,3 +1,8 @@
+PATH
+  remote: ../..
+  specs:
+    low_type (0.7.4)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -59,7 +64,6 @@ GEM
     json (2.15.1)
     localhost (1.6.0)
     logger (1.7.0)
-    low_type (0.7.4)
     mapping (1.1.3)
     memory-leak (0.7.0)
     metrics (0.15.0)
@@ -112,7 +116,7 @@ PLATFORMS
 
 DEPENDENCIES
   falcon
-  low_type
+  low_type!
   puma
   rackup
   sinatra
