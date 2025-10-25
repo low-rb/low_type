@@ -74,8 +74,9 @@ module LowType
       caller.find { |callee| callee.end_with?("<class:#{class_name}>'") }.split(':').first
     end
 
+    # TODO: Unit test this.
     def type?(type)
-      type.respond_to?(:new) || type == Integer || (type.is_a?(::Hash) && type.keys.first.respond_to?(:new) && type.values.first.respond_to?(:new))
+      type.respond_to?(:new) || type == Integer || type == Symbol || (type.is_a?(::Hash) && type.keys.first.respond_to?(:new) && type.values.first.respond_to?(:new))
     end
 
     def value?(expression)
