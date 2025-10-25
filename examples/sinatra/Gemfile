@@ -6,3 +6,8 @@ gem 'puma'
 gem 'falcon'
 gem 'webrick'
 gem 'low_type', path: '../../'
+
+group :development do
+  gem 'pry'
+  gem 'pry-nav'
+end
