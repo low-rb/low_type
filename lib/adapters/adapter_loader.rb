@@ -11,7 +11,7 @@ module LowType
 
         return if adaptor.nil?
 
-        adaptor.redefine_methods
+        adaptor
       end
     end
   end
