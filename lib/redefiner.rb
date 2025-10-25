@@ -79,7 +79,7 @@ module LowType
           RUBY
         )
 
-        # Call method with only its required args to evaluate type expressions (which are stored as default values).
+        # Called with only required args present (as nil) and optional args omitted, to evaluate type expressions (which are stored as default values).
         typed_method.call(*required_args, **required_kwargs)
 
       # TODO: Write spec for this.
