@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'adapters/adapter_loader'
+require_relative 'basic_types'
 require_relative 'redefiner'
 require_relative 'type_expression'
 require_relative 'value_expression'
@@ -87,6 +88,4 @@ module LowType
       TypeExpression.new(default_value: ValueExpression.new(value: type))
     end
   end
-
-  class Boolean; end # TrueClass or FalseClass
 end
