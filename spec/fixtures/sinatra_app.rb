@@ -1,15 +1,13 @@
-require_relative 'sinatra_mock.rb'
+require 'sinatra'
 
 class SinatraApp < Sinatra::Base
   include LowType
 
+  set :host_authorization, { permitted_hosts: [] }
+
   # Status.
 
   get('/status') do -> { Integer }
-    200
-  end
-
-  get('/status-invalid') do -> { String }
     200
   end
 
@@ -20,6 +18,10 @@ class SinatraApp < Sinatra::Base
   end
 
   get('/body-invalid') do -> { String }
+    123
+  end
+
+  get('/body-invalid-html') do -> { HTML }
     123
   end
 

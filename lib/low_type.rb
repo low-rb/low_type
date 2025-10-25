@@ -44,7 +44,7 @@ module LowType
     klass.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
 
     adapter = AdapterLoader.load(klass:, parser:, file_path:)
-    adapter.redefine_methods
+    adapter.redefine_methods if adapter
   ensure
     Array.define_singleton_method('[]', array_class_method)
     Hash.define_singleton_method('[]', hash_class_method)

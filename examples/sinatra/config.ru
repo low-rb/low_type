@@ -1,2 +1,2 @@
-require './sinatra'
-run SinatraApp
+require './app'
+run App

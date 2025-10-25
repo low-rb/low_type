@@ -62,7 +62,7 @@ end
 
 ## Return values
 
-After your method's parameters add `-> { MyType }` to define a return value:
+After your method's parameters add `-> { T }` to define a return value:
 ```ruby
 def say_hello(greetings: Array[String]) -> { String }
   greetings # Raises exception if the returned value is not a String.
@@ -76,14 +76,14 @@ def say_hello(greetings: Array[String]) -> { String | nil }
 end
 ```
 
-A method that takes no arguments must include empty parameters `()` for the `-> { MyType }` syntax to be valid:
+A method that takes no arguments must include empty parameters `()` for the `-> { T }` syntax to be valid:
 ```ruby
 def say_hello() -> { String }
   'Hello'
 end
 ```
 
-If you need a multi-line return type/value then I'll even let you put the `-> {}` on multiple lines, okay? I won't judge. You are a unique flower 🌸 with your own style, your own needs. You have purpose in this world and though you may never find it, your loved ones will cherish knowing you and wish you were never gone:
+If you need a multi-line return type/value then I'll even let you put the `-> { T }` on multiple lines, okay? I won't judge. You are a unique flower 🌸 with your own style, your own needs. You have purpose in this world and though you may never find it, your loved ones will cherish knowing you and wish you were never gone:
 ```ruby
 def say_farewell_with_a_long_method_name(farewell: String)
   -> {
@@ -173,6 +173,10 @@ The pipe symbol (`|`) is used in the context of type expressions to define multi
 
 If no default value is defined then the argument will be required.
 
+### Return Type
+
+The `-> { T }` syntax is a lambda without an assignment to a local variable. This is valid Ruby that can be placed immediately after a method definition and on the same line as the method definition, to visually look like the output of that method, but technically it belongs to the body of the method definition. It's inert and doesn't run when the method is called, similar to how default values are never called if the argument is managed by LowType. Pretty cool stuff yeah? Your type expressions won't keep re-evaluating in the wild 🐴, only on class load.
+
 ### `value(T)` Value Expression
 
 *alias: `low_value()`*
@@ -193,6 +197,7 @@ Copy and paste the following and change the defaults to configure LowType:
 ```ruby
 LowType.configure do |config|
   config.local_types = false # Set to true to enable the type() method for local variables [BETA]
+  config.severity_level = :error # [:error, :log] [UNRELEASED]
   config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
 end
 ```
@@ -203,7 +208,7 @@ end
 - `Integer`
 - `Array`
 - `Hash`
-- `Boolean` (accepts `true`/`false`)
+- `Boolean` (accepts `true`/`false`) [UNRELEASED]
 - `HTML` (subclass of `String`)
 - `JSON` (subclass of `String`)
 
@@ -216,7 +221,7 @@ Because LowType is low-level it should work with method definitions in any frame
 ### Sinatra
 
 `include LowType` in your modular `Sinatra::Base` subclass to get Sinatra specific return types.  
-LowType will automatically add the necessary `content_type` and type check the return value:
+LowType will automatically add the necessary `content_type` [UNRELEASED] and type check the return value:
 
 ```ruby
 require 'sinatra/base'
@@ -237,9 +242,9 @@ class MyApp < Sinatra::Base
 end
 ```
 
-### ℹ️️ Note
+### ℹ️ Note
 
-LowType checks types on the resulting `Rack::Response` object rather than the actual return value. This allows for Sinatra’s DSL like `headers()` and `body()` to alter the response as well and still have those values be type checked. As a result LowType will appear more forgiving than usual when type checking a Sinatra route return value; it will be *inclusive* rather than *exclusive*. For example, the return type `-> { Integer }` will allow a return value of `200` *as well as* `[200, 'body']`, because `-> { Integer }` is a single integer response and represents only one thing in Sinatra; a HTTP status code. So we only check the type of `response.status` and will allow this value even if there are other values on `response`. To fully type check the response use `Array[Integer, Hash, String]`.
+LowType checks types on the resulting `Rack::Response` object rather than the actual return value. This allows for Sinatra's DSL like `headers()` and `body()` to alter the response as well and still have those values be type checked. As a result LowType will appear more forgiving than usual when type checking a Sinatra route return value; it will be *inclusive* rather than *exclusive*. For example, the return type `-> { Integer }` will allow a return value of `200` *as well as* `[200, 'body']`, because `-> { Integer }` is a single integer response and represents only one thing in Sinatra; a HTTP status code. So we only check the type of `response.status` and will allow this value even if there are other values on `response`. To fully type check the response use `Array[Integer, Hash, String]`.
 
 <!--### Rails [UNRELEASED]
 

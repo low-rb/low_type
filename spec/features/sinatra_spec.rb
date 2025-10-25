@@ -1,22 +1,21 @@
 # frozen_string_literal: true
 
+require 'rack/test'
 require_relative '../../lib/low_type.rb'
 require_relative '../fixtures/sinatra_app.rb'
 
+ENV['APP_ENV'] = 'test'
+
 RSpec.describe SinatraApp do
-  subject(:app) { described_class }
+  include Rack::Test::Methods
+
+  subject(:app) { described_class.new }
 
   # Status.
 
   context 'with status response' do
     it 'type checks response' do
-      app.simulate_request(:get, '/status')
-    end
-
-    context 'when invalid type' do
-      it 'raises invalid return type error' do
-        expect { app.simulate_request(:get, '/status-invalid') }.to raise_error(LowType::ReturnTypeError)
-      end
+      get '/status'
     end
   end
 
@@ -24,19 +23,29 @@ RSpec.describe SinatraApp do
 
   context 'with body response' do
     it 'type checks response' do
-      app.simulate_request(:get, '/body')
+      get '/body'
     end
 
-    context 'when invalid type' do
+    context 'when invalid string type' do
       it 'raises invalid return type error' do
-        expect { app.simulate_request(:get, '/body-invalid') }.to raise_error(LowType::ReturnTypeError)
+        get '/body-invalid'
+        expect(last_response.status).to eq(500)
+        expect(last_response.body).to eq("Invalid return value 'nil' for method 'GET /body-invalid'. Valid types: 'String'")
+      end
+    end
+
+    context 'when invalid HTML type' do
+      it 'raises invalid return type error' do
+        get '/body-invalid-html'
+        expect(last_response.status).to eq(500)
+        expect(last_response.body).to eq("Invalid return value 'nil' for method 'GET /body-invalid-html'. Valid types: 'LowType::HTML'")
       end
     end
 
     context 'when from array' do
       it 'validates body from response' do
-        app.simulate_request(:get, '/body-in-array')
-        expect(app.response.body).to eq('body')
+        get '/body-in-array'
+        expect(last_response.body).to eq('body')
       end
     end
   end
@@ -45,19 +54,20 @@ RSpec.describe SinatraApp do
 
   context 'with status/body response' do
     it 'type checks response' do
-      app.simulate_request(:get, '/status-body')
+      get '/status-body'
     end
 
     context 'when invalid type' do
       it 'raises invalid return type error' do
-        expect { app.simulate_request(:get, '/status-body-invalid') }.to raise_error(LowType::ReturnTypeError)
+        get '/status-body-invalid'
+        expect(last_response.status).to eq(500)
       end
     end
 
     context 'when body from single value' do
       it 'validates body from response' do
-        app.simulate_request(:get, '/status-body-single-value')
-        expect(app.response.body).to eq('body')
+        get '/status-body-single-value'
+        expect(last_response.body).to eq('body')
       end
     end
   end
@@ -66,19 +76,20 @@ RSpec.describe SinatraApp do
 
   context 'with status/hash/body response' do
     it 'type checks response' do
-      app.simulate_request(:get, '/status-hash-body')
+      get '/status-hash-body'
     end
 
     context 'when invalid type' do
       it 'raises invalid return type error' do
-        expect { app.simulate_request(:get, '/status-hash-body-invalid') }.to raise_error(LowType::ReturnTypeError)
+        get '/status-hash-body-invalid'
+        expect(last_response.status).to eq(500)
       end
     end
 
     context 'when body from single value' do
       it 'validates body from response' do
-        app.simulate_request(:get, '/status-hash-body-single-value')
-        expect(app.response.body).to eq('body')
+        get '/status-hash-body-single-value'
+        expect(last_response.body).to eq('body')
       end
     end
   end
