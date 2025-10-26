@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Sinatra route return type support
 - Introduce `AllowedTypeError` for situations where a framework limits available types
+- Add `HTML` and `JSON` types
+
+### Changed
+
+- Rename "type assignment" to "local types"
 
 ## 0.7.0
 
