@@ -230,14 +230,19 @@ require 'low_type'
 class MyApp < Sinatra::Base
   include LowType
 
-  get '/body' do -> { HTML }
-    # A simple response is a string.
+  # A simple string response type.
+  get '/' do -> { String }
     'body'
   end
 
-  get '/status-headers-body' do -> { Array[Integer, Hash, String] }
-    # The standard response is an array of 3 values representing status, headers and body.
-    [200, {}, 'body']    
+  # Standard Sinatra response type.
+  get '/' do -> { Array[Integer, Hash, String] }
+    [200, {}, '<h1>Hello!</h1>']    
+  end
+
+  # Sinatra-specific response type.
+  get '/' do -> { Array[Status, Headers, HTML] }
+    [200, {}, '<h1>Hello!</h1>']    
   end
 end
 ```

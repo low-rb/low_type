@@ -56,4 +56,8 @@ class SinatraApp < Sinatra::Base
   get('/status-hash-body-single-value') do -> { Array[Integer, Hash, String] }
     'body'
   end
+
+  get('/status-hash-body-sinatra') do -> { Array[Status, Headers, HTML] }
+    [200, {}, '<strong>Hello!</strong>']
+  end
 end

@@ -6,6 +6,9 @@ require_relative '../proxies/file_proxy'
 require_relative '../error_types'
 
 module LowType
+  class Status < Integer; end
+  class Headers < Hash; end
+
   # We don't use https://sinatrarb.com/extensions.html because we need to type check all Ruby methods (not just Sinatra) at a lower level.
   class SinatraAdapter < AdapterInterface
     def initialize(klass:, parser:, file_path:)
