@@ -62,7 +62,7 @@ end
 
 ## Return values
 
-After your method's parameters add `-> { MyType }` to define a return value:
+After your method's parameters add `-> { T }` to define a return value:
 ```ruby
 def say_hello(greetings: Array[String]) -> { String }
   greetings # Raises exception if the returned value is not a String.
@@ -76,25 +76,25 @@ def say_hello(greetings: Array[String]) -> { String | nil }
 end
 ```
 
-A method that takes no arguments must include empty parameters `()` for the `-> { MyType }` syntax to be valid:
+A method that takes no arguments must include empty parameters `()` for the `-> { T }` syntax to be valid:
 ```ruby
 def say_hello() -> { String }
   'Hello'
 end
 ```
 
-If you need a multi-line return type/value then I'll even let you put the `-> {}` on multiple lines, okay? I won't judge. You are a unique flower 🌸 with your own style, your own needs. You have purpose in this world and though you may never find it, your loved ones will cherish knowing you and wish you were never gone:
+If you need a multi-line return type/value then I'll even let you put the `-> { T }` on multiple lines, okay? I won't judge. You are a unique flower 🌸 with your own style, your own needs. You have purpose in this world and though you may never find it, your loved ones will cherish knowing you and wish you were never gone:
 ```ruby
 def say_farewell_with_a_long_method_name(farewell: String)
-  -> do
+  -> {
     ::Long::Name::Space::CustomClassOne | ::Long::Name::Space::CustomClassTwo | ::Long::Name::Space::CustomClassThree
-  end
+  }
 
   # Code that returns an instance of one of the above types.
 end
 ```
 
-## Typed access methods [UNRELEASED]
+## Instance variables [UNRELEASED]
 
 To define typed `@instance` variables use the `type_[reader, writer, accessor]` methods.  
 These replicate `attr_[reader, writer, accessor]` methods but also allow you to define and check types.
@@ -122,7 +122,7 @@ name = 'Tim' # Set the value with type checking
 type_accessor :name, String | 'Cher' # Get/set the value of @name with a default value if it's `nil`
 ```
 
-## Type assignment methods [BETA]
+## Local variables [BETA]
 
 ### `type()`
 
@@ -138,14 +138,14 @@ my_var = type MyType | fetch_my_object(id: 123)
 ### ⚠️ Important
 
 The `type()` method must be manually enabled via `LowType.config` because of the following requirements:
-- `TypeExpression`s are evaluated at *runtime* per instance (not once on *class load*) and will impact performance
+- `TypeExpression`s are evaluated at *runtime* per instance (not once on *class load*) and this will impact performance
 - Class methods `Array[]`/`Hash[]` are subclassed at runtime for the enumerable type syntax to work (but only for the class the `LowType` module is included in).  
   While `LowType::Array/Hash` behave just like `Array/Hash`, equality comparisons may be affected in some situations
 - The `type()` method dynamically adds a `.with_type=()` method to your referenced instance
 
 ### `with_type=()`
 
-Keep in mind that you can still reassign `my_var` to reference another object of a different type, negating type checking.  
+In Ruby you can still reassign `my_var` to reference another object of a different type, negating type checking.  
 If you feel that a variable referencing an object should also control the type of that object on reassignment, then use `with_type`:
 
 ```ruby
@@ -156,7 +156,7 @@ my_var.with_type = fetch_my_object(id: 456) # Raises TypeError if the new object
 ### ⚠️ Important
 
 - Single-instance objects like `nil`, `true` and `false` aren't supported by `with_type`. Your object needs to be a unique instance
-- `with_type` updates the current object rather than referencing a new object. All other variables referencing the current object will reference the updated object
+- `with_type` updates the current object rather than referencing a new object. So all other variables referencing the current object will reference the updated object
 - Because we can't reassign `self` in Ruby we reassign the object's instance variables instead, impacting performance
 
 ## Syntax
@@ -172,6 +172,10 @@ The pipe symbol (`|`) is used in the context of type expressions to define multi
 - The last *value* defined becomes the default value: `my_variable = TypeOne | TypeTwo | nil`
 
 If no default value is defined then the argument will be required.
+
+### Return Type
+
+The `-> { T }` syntax is a lambda without an assignment to a local variable. This is valid Ruby that can be placed immediately after a method definition and on the same line as the method definition, to visually look like the output of that method, but technically it belongs to the body of the method definition. It's inert and doesn't run when the method is called, similar to how default values are never called if the argument is managed by LowType. Pretty cool stuff yeah? Your type expressions won't keep re-evaluating in the wild 🐴, only on class load.
 
 ### `value(T)` Value Expression
 
@@ -192,14 +196,63 @@ Copy and paste the following and change the defaults to configure LowType:
 
 ```ruby
 LowType.configure do |config|
-  config.type_assignment = false # Set to true to enable the type assignment method (advanced feature)
-  config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) UNRELEASED
+  config.local_types = false # Set to true to enable the type() method for local variables [BETA]
+  config.severity_level = :error # [:error, :log] [UNRELEASED]
+  config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
 end
 ```
 
+## Basic types
+
+- `String`
+- `Integer`
+- `Array`
+- `Hash`
+- `Boolean` (accepts `true`/`false`) [UNRELEASED]
+- `HTML` (subclass of `String`)
+- `JSON` (subclass of `String`)
+
+`nil` represents an optional value.
+
+## Integrations
+
+Because LowType is low-level it should work with method definitions in any framework out of the box. With that in mind we go a little further here at free-software-by-shadowy-figure-co to give you that extra framework-specific-special-feeling:
+
+### Sinatra
+
+`include LowType` in your modular `Sinatra::Base` subclass to get Sinatra specific return types.  
+LowType will automatically add the necessary `content_type` [UNRELEASED] and type check the return value:
+
+```ruby
+require 'sinatra/base'
+require 'low_type'
+
+class MyApp < Sinatra::Base
+  include LowType
+
+  get '/body' do -> { HTML }
+    # A simple response is a string.
+    'body'
+  end
+
+  get '/status-headers-body' do -> { Array[Integer, Hash, String] }
+    # The standard response is an array of 3 values representing status, headers and body.
+    [200, {}, 'body']    
+  end
+end
+```
+
+### ℹ️ Note
+
+LowType checks types on the resulting `Rack::Response` object rather than the actual return value. This allows for Sinatra's DSL like `headers()` and `body()` to alter the response as well and still have those values be type checked. As a result LowType will appear more forgiving than usual when type checking a Sinatra route return value; it will be *inclusive* rather than *exclusive*. For example, the return type `-> { Integer }` will allow a return value of `200` *as well as* `[200, 'body']`, because `-> { Integer }` is a single integer response and represents only one thing in Sinatra; a HTTP status code. So we only check the type of `response.status` and will allow this value even if there are other values on `response`. To fully type check the response use `Array[Integer, Hash, String]`.
+
+<!--### Rails [UNRELEASED]
+
+If you still want to access Rails' `HTML` sanitizer class while in the scope of the `LowType` module, then use their full namespace `Rails::HTML`.-->
+
 ## Installation
 
-Add `gem 'low_state'` to your Gemfile then:
+Add `gem 'low_type'` to your Gemfile then:
 ```
 bundle install
 ```

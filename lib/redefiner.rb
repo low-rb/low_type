@@ -79,7 +79,7 @@ module LowType
           RUBY
         )
 
-        # Call method with only its required args to evaluate type expressions (which are stored as default values).
+        # Called with only required args present (as nil) and optional args omitted, to evaluate type expressions (which are stored as default values).
         typed_method.call(*required_args, **required_kwargs)
 
       # TODO: Write spec for this.
@@ -88,10 +88,10 @@ module LowType
       end
 
       def return_proxy(method_node:, file:)
-        return_node = Parser.return_node(method_node:)
-        return nil if return_node.nil?
+        return_type = Parser.return_type(method_node:)
+        return nil if return_type.nil?
 
-        expression = eval(return_node.slice).call
+        expression = eval(return_type.slice).call
         expression = TypeExpression.new(type: expression) unless expression.is_a?(TypeExpression)
 
         ReturnProxy.new(type_expression: expression, name: method_node.name, file:)

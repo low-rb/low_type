@@ -8,7 +8,7 @@ class MyType
   end
 end
 
-class TypeAssigner
+class LowLocal
   include LowType
 
   attr_reader :typed_array, :typed_default_value, :typed_instance_variable
@@ -19,23 +19,31 @@ class TypeAssigner
     @typed_instance_variable = nil
   end
 
-  def assign_typed_array
+  def local_type_array
     @typed_array = type Array[Integer] | [1, 2, 3]
   end
 
-  def assign_invalid_typed_array
+  def invalid_local_type_array
     @typed_array = type Array[Integer] | ['a', 'b', 'c']
   end
 
-  def assign_typed_default_value
+  def array_multiple_subtypes
+    @typed_array = type Array[Integer, String, Symbol] | [1, '2', :three]
+  end
+
+  def invalid_array_multiple_subtypes
+    @typed_array = type Array[Integer, String, Symbol] | [:one, 2, '3']
+  end
+
+  def local_type_default_value
     @typed_default_value = type String | value(String)
   end
 
-  def assign_typed_instance_variable
+  def local_type_instance_variable
     @typed_instance_variable = type MyType | MyType.new(id: 'assigned')
   end
 
-  def reassign_typed_instance_variable
+  def reassign_local_type_instance_variable
     @typed_instance_variable.with_type = type MyType | MyType.new(id: 'reassigned')
   end
 

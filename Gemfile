@@ -10,4 +10,7 @@ group :development do
   gem 'pry-nav'
   gem 'rake', '~> 13.0'
   gem 'rspec', '~> 3.0'
+  gem 'rack'
+  gem 'rack-test'
+  gem 'sinatra'
 end

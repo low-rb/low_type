@@ -16,12 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `Boolean` type
+- Typed access methods
 
-## 0.8.0 [UNRELEASED]
+## 0.8.0
 
 ### Added
 
-- Typed access methods
+- Sinatra route return type support
+- Introduce `AllowedTypeError` for situations where a framework limits available types
 
 ## 0.7.0
 

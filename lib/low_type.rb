@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'adapters/adapter_loader'
+require_relative 'basic_types'
 require_relative 'redefiner'
 require_relative 'type_expression'
 require_relative 'value_expression'
@@ -10,22 +12,22 @@ module LowType
 
     # Array[] class method returns a type expression only for the duration of this "included" hook.
     array_class_method = Array.method('[]').unbind
-    Array.define_singleton_method('[]') do |expression|
-      TypeExpression.new(type: [(expression)])
+    Array.define_singleton_method('[]') do |*types|
+      TypeExpression.new(type: [*types])
     end
 
     # Hash[] class method returns a type expression only for the duration of this "included" hook.
     hash_class_method = Hash.method('[]').unbind
-    Hash.define_singleton_method('[]') do |expression|
+    Hash.define_singleton_method('[]') do |type|
       # Support Pry which uses Hash[].
-      unless LowType.type?(expression)
+      unless LowType.type?(type)
         Hash.define_singleton_method('[]', hash_class_method)
-        result = Hash[expression]
+        result = Hash[type]
         Hash.method('[]').unbind
         return result
       end
 
-      TypeExpression.new(type: expression)
+      TypeExpression.new(type:)
     end
 
     class << klass
@@ -40,6 +42,9 @@ module LowType
 
     klass.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
     klass.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
+
+    adapter = AdapterLoader.load(klass:, parser:, file_path:)
+    adapter.redefine_methods if adapter
   ensure
     Array.define_singleton_method('[]', array_class_method)
     Hash.define_singleton_method('[]', hash_class_method)
@@ -49,27 +54,31 @@ module LowType
     # Public API.
 
     def config
-      config = Struct.new(:type_assignment, :deep_type_check)
+      config = Struct.new(:local_types, :deep_type_check)
       @config ||= config.new(false, false)
     end
 
     def configure
       yield(config)
 
-      if config.type_assignment
-        require_relative 'type_assignment'
-        include TypeAssignment
+      if config.local_types
+        require_relative 'local_types'
+        include LocalTypes
       end
     end
   
     # Internal API.
 
     def file_path(klass:)
-      caller.find { |callee| callee.end_with?("<class:#{klass}>'") }.split(':').first
+      # Remove module namespaces from class.
+      class_name = klass.to_s.split(':').last
+      # The first class found regardless of namespace will be the class that did the include.
+      caller.find { |callee| callee.end_with?("<class:#{class_name}>'") }.split(':').first
     end
 
+    # TODO: Unit test this.
     def type?(type)
-      type.respond_to?(:new) || type == Integer || (type.is_a?(::Hash) && type.keys.first.respond_to?(:new) && type.values.first.respond_to?(:new))
+      type.respond_to?(:new) || type == Integer || type == Symbol || (type.is_a?(::Hash) && type.keys.first.respond_to?(:new) && type.values.first.respond_to?(:new))
     end
 
     def value?(expression)
@@ -80,6 +89,4 @@ module LowType
       TypeExpression.new(default_value: ValueExpression.new(value: type))
     end
   end
-
-  class Boolean; end # TrueClass or FalseClass
 end

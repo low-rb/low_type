@@ -29,6 +29,26 @@ module LowType
       @default_value == :LOW_TYPE_UNDEFINED
     end
 
+    # Called in situations where we want to be inclusive rather than exclusive and pass validation if one of the types is valid.
+    def validate(value:, proxy:)
+      if value.nil?
+        return true if @default_value.nil?
+        return false if required?
+      end
+
+      @types.each do |type|
+        return true if LowType.type?(type) && type <= value.class # Example: HTML is a subclass of String and should pass as a String.
+
+        # TODO: Shallow validation of enumerables could be made deeper with user config.
+        return true if type.class == ::Array && value.class == ::Array && type.first == value.first.class
+        if type.class == ::Hash && value.class == ::Hash && type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
+          return true
+        end
+      end
+
+      false
+    end
+
     def validate!(value:, proxy:)
       if value.nil?
         return true if @default_value.nil?
@@ -37,8 +57,9 @@ module LowType
 
       @types.each do |type|
         return true if LowType.type?(type) && type == value.class 
-        # TODO: Shallow validation of enumerables could be made deeper with user config.
-        return true if type.class == ::Array && value.class == ::Array && type.first == value.first.class
+        return true if type.class == ::Array && value.class == ::Array && array_types_match_values?(types: type, values: value)
+
+        # TODO: Shallow validation of hash could be made deeper with user config.
         if type.class == ::Hash && value.class == ::Hash && type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
           return true
         end
@@ -48,6 +69,23 @@ module LowType
     rescue proxy.error_type => e
       file_paths = [FILE_PATH, LowType::Redefiner::FILE_PATH]
       raise proxy.error_type, e.message, backtrace_with_proxy(file_paths:, backtrace: e.backtrace, proxy:)
+    end
+
+    def valid_types
+      types = @types.map { |type| type.inspect.to_s }
+      types = types + ['nil'] if @default_value.nil?
+      types.join(' | ')
+    end
+
+    private
+
+    def array_types_match_values?(types:, values:)
+      # TODO: Probably better to use an each that breaks early when types run out.
+      types.zip(values) do |type, value|
+        return false unless type === value
+      end
+
+      true
     end
 
     def backtrace_with_proxy(file_paths:, proxy:, backtrace:)
@@ -60,13 +98,6 @@ module LowType
       proxy_file_backtrace = "#{from_prefix}#{proxy_file_backtrace}" if from_prefix
 
       [proxy_file_backtrace, *filtered_backtrace]
-    end
-
-    def valid_types
-      types = @types.map { |type| type.inspect.to_s }
-      types = types + ['nil'] if @default_value.nil?
-
-      types.join(' | ')
     end
   end
 end
