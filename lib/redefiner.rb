@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
+require_relative 'factories/proxy_factory'
 require_relative 'proxies/file_proxy'
 require_relative 'proxies/method_proxy'
 require_relative 'proxies/param_proxy'
-require_relative 'proxies/return_proxy'
-require_relative 'parser'
 require_relative 'type_expression'
 
 module LowType
@@ -18,7 +17,7 @@ module LowType
             line = Parser.line_number(node: method_node)
             file = FileProxy.new(path: file_path, line:, scope: "#{klass}##{method_node.name}")
             params = Redefiner.params_with_type_expressions(method_node:, file:)
-            return_proxy = Redefiner.return_proxy(method_node:, file:)
+            return_proxy = ProxyFactory.return_proxy(method_node:, file:)
 
             klass.low_methods[name] = MethodProxy.new(name:, params:, return_proxy:)
 
@@ -86,17 +85,6 @@ module LowType
       # TODO: Write spec for this.
       rescue ArgumentError => e
         raise ArgumentError, "Incorrect param syntax: #{e.message}"
-      end
-
-      def return_proxy(method_node:, file:)
-        return_type = Parser.return_type(method_node:)
-        return nil if return_type.nil?
-
-        # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
-        expression = eval(return_type.slice).call # rubocop:disable Security/Eval
-        expression = TypeExpression.new(type: expression) unless expression.is_a?(TypeExpression)
-
-        ReturnProxy.new(type_expression: expression, name: method_node.name, file:)
       end
 
       private
