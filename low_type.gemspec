@@ -20,30 +20,13 @@ Gem::Specification.new do |spec|
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
   gemspec = File.basename(__FILE__)
 
-  spec.files = [
-    'lib/adapters/adapter_loader.rb',
-    'lib/adapters/sinatra_adapter.rb',
-    'lib/interfaces/adapter_interface.rb',
-    'lib/interfaces/error_interface.rb',
-    'lib/proxies/file_proxy.rb',
-    'lib/proxies/local_proxy.rb',
-    'lib/proxies/method_proxy.rb',
-    'lib/proxies/param_proxy.rb',
-    'lib/proxies/return_proxy.rb',
-    'lib/basic_types.rb',
-    'lib/error_types.rb',
-    'lib/local_types.rb',
-    'lib/low_type.rb',
-    'lib/parser.rb',
-    'lib/redefiner.rb',
-    'lib/type_expression.rb',
-    'lib/value_expression.rb',
-    'lib/version.rb',
-  ]
+  spec.files = Dir.chdir(File.expand_path(__dir__)) do
+    Dir.glob('lib/**/*')
+  end
 
+  spec.require_paths = ['lib']
   spec.bindir = 'exe'
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  spec.require_paths = ['lib']
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency 'example-gem', '~> 1.0'
