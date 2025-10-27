@@ -14,7 +14,7 @@ module LowType
         Module.new do
           method_nodes.each do |method_node|
             name = method_node.name
-            file = FileProxy.new(path: file_path, line: method_node.start_line, scope: "#{klass}##{method_node.name}")
+            file = FileProxy.new(path: file_path, line: method_node&.start_line, scope: "#{klass}##{method_node.name}")
             params = Redefiner.params_with_type_expressions(method_node:, file:)
             return_proxy = Redefiner.return_proxy(method_node:, file:)
 
