@@ -67,7 +67,7 @@ module LowType
     end
 
     def visit_call_node(node)
-      @private_start_line = node.start_line if node.name == :private
+      @private_start_line = node.start_line if node.name == :private && node.respond_to?(:start_line)
     end
 
     private
