@@ -27,7 +27,8 @@ module LowType
 
         pattern = arguments_node.arguments.first.content
 
-        file = FileProxy.new(path: @file_path, line: method_call.start_line, scope: "#{@klass}##{method_call.name}")
+        line = method_call.respond_to?(:start_line) ? method_call.start_line : nil
+        file = FileProxy.new(path: @file_path, line:, scope: "#{@klass}##{method_call.name}")
         params = [ParamProxy.new(type_expression: nil, name: :route, type: :req, position: 0, file:)]
         return_proxy = return_proxy(method_node: method_call, pattern:, file:)
         next unless return_proxy
