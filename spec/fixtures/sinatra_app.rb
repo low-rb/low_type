@@ -5,71 +5,87 @@ class SinatraApp < Sinatra::Base
 
   set :host_authorization, { permitted_hosts: [] }
 
-  # Status.
+  # Key:
+  # @ = Only
+  # ! = Invalid
 
-  get('/status') do -> { Integer }
+  # Integer.
+
+  get('/integer') do -> { Integer }
     200
   end
 
-  # Body.
+  # String.
 
-  get('/body') do -> { String }
+  get('/string') do -> { String }
     'body'
   end
 
-  get('/body-invalid') do -> { String }
+  get('/string-invalid') do -> { String }
     123
   end
 
-  get('/body-invalid-html') do -> { HTML }
-    123
-  end
-
-  get('/body-in-array') do -> { String }
+  get('/string-in-array') do -> { String }
     [200, {}, 'body'] # Passes because Sinatra type checking is inclusive rather than exclusive.
   end
 
-  # Status, Body.
+  # Integer, String.
 
-  get('/status-body') do -> { Array[Integer, String] }
+  get('/integer-string') do -> { Array[Integer, String] }
     [200, 'body']
   end
 
-  get('/status-body-invalid') do -> { Array[Integer, String] }
+  get('/integer-string-invalid') do -> { Array[Integer, String] }
     ['200', 123]
   end
 
-  get('/only-status-body') do -> { Array[Integer, String] }
+  get('/@integer-string') do -> { Array[Integer, String] }
     200
   end
 
-  get('/status-only-body') do -> { Array[Integer, String] }
+  get('/integer-@string') do -> { Array[Integer, String] }
     'body'
   end
 
-  # Status, Hash, Body.
+  # Integer, Hash, String.
 
-  get('/status-hash-body') do -> { Array[Integer, Hash, String] }
+  get('/integer-hash-string') do -> { Array[Integer, Hash, String] }
     [200, {}, 'body']
   end
 
-  get('/status-hash-invalid-body') do -> { Array[Integer, Hash, String] }
+  get('/integer-hash-!string') do -> { Array[Integer, Hash, String] }
     [200, {}, 123]
   end
 
-  get('/status-invalid-hash-body') do -> { Array[Integer, Hash, String] }
+  get('/integer-!hash-string') do -> { Array[Integer, Hash, String] }
     [200, 'invalid hash', 'body']
   end
 
-  get('/status-hash-only-body') do -> { Array[Integer, Hash, String] }
+  get('/integer-!hash-!string') do -> { Array[Integer, Hash, String] }
+    [200, 'invalid hash', {}]
+  end
+
+  get('/integer-hash-@string') do -> { Array[Integer, Hash, String] }
     'body'
   end
 
-  get('/only-status-hash-body') do -> { Array[Integer, Hash, String] }
+  get('/@integer-hash-string') do -> { Array[Integer, Hash, String] }
     201
   end
 
+  # Status, HTML
+
+  get('/string-!html') do -> { HTML }
+    123
+  end
+
+  # Status, Headers, HTML
+
   get('/status-headers-html') do -> { Array[Status, Headers, HTML] }
     [200, {}, '<strong>Hello!</strong>']
+  end
+
+  get('/status-headers-!html') do -> { Array[Status, Headers, HTML] }
+    [200, {}, 123]
   end
 end

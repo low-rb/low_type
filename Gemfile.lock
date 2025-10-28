@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    low_type (0.8.6)
+    low_type (0.8.7)
 
 GEM
   remote: https://rubygems.org/
