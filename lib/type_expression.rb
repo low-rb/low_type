@@ -7,6 +7,7 @@ module LowType
     attr_reader :types, :default_value
 
     def initialize(type: nil, default_value: :LOW_TYPE_UNDEFINED)
+      # Types can be instance representations of a structure.
       @types = []
       @types << type unless type.nil?
       @default_value = default_value
