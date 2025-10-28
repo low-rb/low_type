@@ -39,7 +39,11 @@ class SinatraApp < Sinatra::Base
     ['200', 123]
   end
 
-  get('/status-body-single-value') do -> { Array[Integer, String] }
+  get('/only-status-body') do -> { Array[Integer, String] }
+    200
+  end
+
+  get('/status-only-body') do -> { Array[Integer, String] }
     'body'
   end
 
@@ -49,15 +53,23 @@ class SinatraApp < Sinatra::Base
     [200, {}, 'body']
   end
 
-  get('/status-hash-body-invalid') do -> { Array[Integer, Hash, String] }
-    ['200', {}, 123]
+  get('/status-hash-invalid-body') do -> { Array[Integer, Hash, String] }
+    [200, {}, 123]
   end
 
-  get('/status-hash-body-single-value') do -> { Array[Integer, Hash, String] }
+  get('/status-invalid-hash-body') do -> { Array[Integer, Hash, String] }
+    [200, 'invalid hash', 'body']
+  end
+
+  get('/status-hash-only-body') do -> { Array[Integer, Hash, String] }
     'body'
   end
 
-  get('/status-hash-body-sinatra') do -> { Array[Status, Headers, HTML] }
+  get('/only-status-hash-body') do -> { Array[Integer, Hash, String] }
+    201
+  end
+
+  get('/status-headers-html') do -> { Array[Status, Headers, HTML] }
     [200, {}, '<strong>Hello!</strong>']
   end
 end

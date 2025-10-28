@@ -64,9 +64,19 @@ RSpec.describe SinatraApp do
       end
     end
 
-    context 'when body from single value' do
+    context 'when only status' do
+      it 'responds with invalid value because body is empty' do
+        get '/only-status-body'
+        expect(last_response.status).to eq(500)
+        expect(last_response.body.force_encoding('utf-8')).to eq(
+          "Invalid return value '[200]' for method 'GET /only-status-body'. Valid types: '[Integer, String]'"
+        )
+      end
+    end
+
+    context 'when only body' do
       it 'validates body from response' do
-        get '/status-body-single-value'
+        get '/status-only-body'
         expect(last_response.body).to eq('body')
       end
     end
@@ -79,17 +89,34 @@ RSpec.describe SinatraApp do
       get '/status-hash-body'
     end
 
-    context 'when invalid type' do
+    context 'when invalid body type' do
       it 'raises invalid return type error' do
-        get '/status-hash-body-invalid'
+        get '/status-hash-invalid-body'
         expect(last_response.status).to eq(500)
       end
     end
 
-    context 'when body from single value' do
+    context 'when invalid hash type' do
+      it 'raises invalid return type error' do
+        get '/status-invalid-hash-body'
+        expect(last_response.status).to eq(500)
+      end
+    end
+
+    context 'when only body returned' do
       it 'validates body from response' do
-        get '/status-hash-body-single-value'
+        get '/status-hash-only-body'
         expect(last_response.body).to eq('body')
+      end
+    end
+
+    context 'when only status returned' do
+      it 'responds with invalid value because body is empty' do
+        get '/only-status-hash-body'
+        expect(last_response.status).to eq(500)
+        expect(last_response.body.force_encoding('utf-8')).to eq(
+          "Invalid return value '[201, {}]' for method 'GET /only-status-hash-body'. Valid types: '[Integer, Hash, String]'"
+        )
       end
     end
   end

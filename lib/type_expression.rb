@@ -38,9 +38,9 @@ module LowType
 
       @types.each do |type|
         return true if LowType.type?(type) && type <= value.class # Example: HTML is a subclass of String and should pass as a String.
+        return true if ::Array === type && ::Array === value && array_types_match_values?(types: type, values: value)
 
         # TODO: Shallow validation of enumerables could be made deeper with user config.
-        return true if type.class == ::Array && value.class == ::Array && type.first == value.first.class
         if type.class == ::Hash && value.class == ::Hash && type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
           return true
         end
@@ -56,8 +56,8 @@ module LowType
       end
 
       @types.each do |type|
-        return true if LowType.type?(type) && type == value.class 
-        return true if type.class == ::Array && value.class == ::Array && array_types_match_values?(types: type, values: value)
+        return true if LowType.type?(type) && type == value.class
+        return true if ::Array === type && ::Array === value && array_types_match_values?(types: type, values: value)
 
         # TODO: Shallow validation of hash could be made deeper with user config.
         if type.class == ::Hash && value.class == ::Hash && type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
@@ -80,10 +80,16 @@ module LowType
     private
 
     def array_types_match_values?(types:, values:)
-      # TODO: Probably better to use an each that breaks early when types run out.
-      types.zip(values) do |type, value|
-        return false unless type === value
+      # [T, T, T]
+      if types.length > 1
+        types.each_with_index do |type, index|
+          return false unless type === values[index]
+        end
+      # [T]
+      elsif types.length == 1
+        return false unless types.first == values.first.class
       end
+      # TODO: Deep type check (all elements for [T]).
 
       true
     end
