@@ -51,9 +51,7 @@ module LowType
               proxy.type_expression.types.each do |type|
                 value = SinatraAdapter.reconstruct_return_value(type:, response:)
                 unless proxy.type_expression.validate(value:, proxy:)
-                  status(500)
-                  body(proxy.error_message(value: value.inspect))
-                  break
+                  halt 500, {}, proxy.error_message(value: value.inspect)
                 end
               end
             end
@@ -72,12 +70,11 @@ module LowType
         HTML => -> (response) { response.body.first },
         JSON => -> (response) { response.body.first },
 
-        # TODO: Should these be Enumerable[T] instead? How would we match a Module of a class in a hash key?
-        # NOTE: These keys represent types, not type expressions.
-        #       A type lives inside a type expression and is actually an instance representing that type.
-        [String] => -> (response) { response.body },
-        [Integer, String] => -> (response) { [response.status, *response.body] },
-        [Integer, Hash, String] => -> (response) { [response.status, response.headers, *response.body] },
+        [String] => -> (response) { response.body }, # Body is stored internally as an array.
+        [Integer, String] => -> (response) { [response.status, response.body.first] },
+        [Integer, Hash, String] => -> (response) { [response.status, response.headers, response.body.first] },
+
+        # TODO: Represent Enumerable[T]. How would we match a Module of a class in a hash key?
       }
 
       raise AllowedTypeError, 'Did you mean "Response.finish"?' if type.to_s == 'Response'
