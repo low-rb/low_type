@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module LowType
-  VERSION = '0.8.7'
+  VERSION = '0.8.8'
 end

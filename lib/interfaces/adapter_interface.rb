@@ -1,6 +1,6 @@
 module LowType
   class AdapterInterface
-    def redefine_methods
+    def process
       raise NotImplementedError
     end
   end

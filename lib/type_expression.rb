@@ -84,7 +84,7 @@ module LowType
       # [T, T, T]
       if types.length > 1
         types.each_with_index do |type, index|
-          return false unless type === values[index]
+          return false unless type <= values[index].class # Example: HTML is a subclass of String and should pass as a String.
         end
       # [T]
       elsif types.length == 1

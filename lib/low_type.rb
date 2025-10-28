@@ -43,8 +43,10 @@ module LowType
     klass.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
     klass.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
 
-    adapter = AdapterLoader.load(klass:, parser:, file_path:)
-    adapter.redefine_methods if adapter
+    if (adapter = AdapterLoader.load(klass:, parser:, file_path:))
+      adapter.process
+      klass.prepend adapter.redefine
+    end
   ensure
     Array.define_singleton_method('[]', array_class_method)
     Hash.define_singleton_method('[]', hash_class_method)

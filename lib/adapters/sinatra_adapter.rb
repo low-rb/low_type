@@ -1,8 +1,8 @@
 require 'prism'
 
-require_relative 'sinatra_return_proxy'
 require_relative '../interfaces/adapter_interface'
 require_relative '../proxies/file_proxy'
+require_relative '../proxies/return_proxy'
 require_relative '../error_types'
 
 module LowType
@@ -17,7 +17,7 @@ module LowType
       @file_path = file_path
     end
 
-    def redefine_methods
+    def process
       method_calls = @parser.method_calls(method_names: [:get, :post, :patch, :put, :delete, :options, :query])
 
       # Type check return values.
@@ -35,54 +35,35 @@ module LowType
 
         route = "#{method_call.name.upcase} #{pattern}"
         @klass.low_methods[route] = MethodProxy.new(name: method_call.name, params:, return_proxy:)
-
-        # We're in Sinatra now. Objects request/response are from Sinatra.
-        @klass.after pattern do
-          if (method_proxy = self.class.low_methods["#{request.request_method} #{pattern}"])
-            proxy = method_proxy.return_proxy
-
-            # Inclusive rather than exclusive validation. If one type/value is valid then there's no need to error.
-            valid_type = proxy.type_expression.types.any? do |type|
-              proxy.type_expression.validate(value: SinatraAdapter.reconstruct_return_value(type:, response:), proxy:)
-            end
-
-            # No valid types so let's return a server error to the client.
-            unless valid_type
-              proxy.type_expression.types.each do |type|
-                value = SinatraAdapter.reconstruct_return_value(type:, response:)
-                unless proxy.type_expression.validate(value:, proxy:)
-                  halt 500, {}, proxy.error_message(value: value.inspect)
-                end
-              end
-            end
-          end
-        end
       end
     end
 
-    # The route's String/Array/Enumerable return value populates a Rack::Response object.
-    # This response also contains values added via Sinatra DSL's header()/body() methods.
-    # So reconstruct the return value from the response object, based on the return type.
-    def self.reconstruct_return_value(type:, response:)
-      valid_types = {
-        Integer => -> (response) { response.status },
-        String => -> (response) { response.body.first },
-        HTML => -> (response) { response.body.first },
-        JSON => -> (response) { response.body.first },
+    def redefine
+      Module.new do
+        def invoke(&block)
+          res = catch(:halt, &block)
 
-        [String] => -> (response) { response.body }, # Body is stored internally as an array.
-        [Integer, String] => -> (response) { [response.status, response.body.first] },
-        [Integer, Hash, String] => -> (response) { [response.status, response.headers, response.body.first] },
+          raise AllowedTypeError, 'Did you mean "Response.finish"?' if res.to_s == 'Response'
 
-        # TODO: Represent Enumerable[T]. How would we match a Module of a class in a hash key?
-      }
+          route = "#{request.request_method} #{request.path}"
+          if (res && (method_proxy = self.class.low_methods[route]) && (proxy = method_proxy.return_proxy))
+            proxy.type_expression.types.each do |type|
+              proxy.type_expression.validate!(value: res, proxy:)
+            end
+          end
 
-      raise AllowedTypeError, 'Did you mean "Response.finish"?' if type.to_s == 'Response'
-
-      if (reconstructed_value = valid_types[type])
-        return reconstructed_value.call(response)
-      else
-        raise AllowedTypeError, "Valid Sinatra return types: #{valid_types.keys.map(&:to_s).join(' | ')}"
+          res = [res] if (Integer === res) || (String === res)
+          if (Array === res) && (Integer === res.first)
+            res = res.dup
+            status(res.shift)
+            body(res.pop)
+            headers(*res)
+          elsif res.respond_to? :each
+            body res
+          end
+          
+          nil # avoid double setting the same response tuple twice
+        end
       end
     end
 
@@ -95,7 +76,7 @@ module LowType
       expression = eval(return_type.slice).call
       expression = TypeExpression.new(type: expression) unless TypeExpression === expression
 
-      SinatraReturnProxy.new(type_expression: expression, name: "#{method_node.name.upcase} #{pattern}", file:)
+      ReturnProxy.new(type_expression: expression, name: "#{method_node.name.upcase} #{pattern}", file:)
     end
   end
 end

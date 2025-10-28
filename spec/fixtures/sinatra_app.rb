@@ -12,7 +12,7 @@ class SinatraApp < Sinatra::Base
   # Integer.
 
   get('/integer') do -> { Integer }
-    200
+    201
   end
 
   # String.
@@ -21,21 +21,17 @@ class SinatraApp < Sinatra::Base
     'body'
   end
 
-  get('/string-invalid') do -> { String }
+  get('/!string') do -> { String }
     123
-  end
-
-  get('/string-in-array') do -> { String }
-    [200, {}, 'body'] # Passes because Sinatra type checking is inclusive rather than exclusive.
   end
 
   # Integer, String.
 
   get('/integer-string') do -> { Array[Integer, String] }
-    [200, 'body']
+    [201, 'body']
   end
 
-  get('/integer-string-invalid') do -> { Array[Integer, String] }
+  get('/!integer-!string') do -> { Array[Integer, String] }
     ['200', 123]
   end
 
@@ -50,7 +46,7 @@ class SinatraApp < Sinatra::Base
   # Integer, Hash, String.
 
   get('/integer-hash-string') do -> { Array[Integer, Hash, String] }
-    [200, {}, 'body']
+    [201, {}, 'body']
   end
 
   get('/integer-hash-!string') do -> { Array[Integer, Hash, String] }
@@ -58,11 +54,11 @@ class SinatraApp < Sinatra::Base
   end
 
   get('/integer-!hash-string') do -> { Array[Integer, Hash, String] }
-    [200, 'invalid hash', 'body']
+    [200, '!headers', 'body']
   end
 
   get('/integer-!hash-!string') do -> { Array[Integer, Hash, String] }
-    [200, 'invalid hash', {}]
+    [200, '!headers', {}]
   end
 
   get('/integer-hash-@string') do -> { Array[Integer, Hash, String] }
@@ -75,17 +71,21 @@ class SinatraApp < Sinatra::Base
 
   # Status, HTML
 
-  get('/string-!html') do -> { HTML }
-    123
+  get('/status-html') do -> { Array[Status, HTML] }
+    [201, 'body']
+  end
+
+  get('/status-!html') do -> { Array[Status, HTML] }
+    [201, 123]
   end
 
   # Status, Headers, HTML
 
   get('/status-headers-html') do -> { Array[Status, Headers, HTML] }
-    [200, {}, '<strong>Hello!</strong>']
+    [201, {}, '<em>Hello</em>']
   end
 
   get('/status-headers-!html') do -> { Array[Status, Headers, HTML] }
-    [200, {}, 123]
+    [201, {}, 123]
   end
 end
