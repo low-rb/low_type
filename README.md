@@ -206,11 +206,13 @@ end
 
 - `String`
 - `Integer`
+- `Boolean` (accepts `true`/`false`) [UNRELEASED]
 - `Array`
 - `Hash`
-- `Boolean` (accepts `true`/`false`) [UNRELEASED]
+- `Tuple` [UNRELEASED]
 - `HTML` (subclass of `String`)
 - `JSON` (subclass of `String`)
+- `XML` (subclass of `String`)
 
 `nil` represents an optional value.
 
@@ -235,13 +237,13 @@ class MyApp < Sinatra::Base
     'body'
   end
 
-  # Standard Sinatra response type.
+  # Standard types Sinatra uses.
   get '/' do -> { Array[Integer, Hash, String] }
     [200, {}, '<h1>Hello!</h1>']    
   end
 
-  # Sinatra-specific response type.
-  get '/' do -> { Array[Status, Headers, HTML] }
+  # Types specifically for Sinatra.
+  get '/' do -> { Tuple[Status, Headers, HTML] }
     [200, {}, '<h1>Hello!</h1>']    
   end
 end
