@@ -249,10 +249,6 @@ class MyApp < Sinatra::Base
 end
 ```
 
-### ℹ️ Note
-
-LowType checks types on the resulting `Rack::Response` object rather than the actual return value. This allows for Sinatra's DSL like `headers()` and `body()` to alter the response as well and still have those values be type checked. As a result LowType will appear more forgiving than usual when type checking a Sinatra route return value; it will be *inclusive* rather than *exclusive*. For example, the return type `-> { Integer }` will allow a return value of `200` *as well as* `[200, 'body']`, because `-> { Integer }` is a single integer response and represents only one thing in Sinatra; a HTTP status code. So we only check the type of `response.status` and will allow this value even if there are other values on `response`. To fully type check the response use `Array[Integer, Hash, String]`.
-
 <!--### Rails [UNRELEASED]
 
 If you still want to access Rails' `HTML` sanitizer class while in the scope of the `LowType` module, then use their full namespace `Rails::HTML`.-->
