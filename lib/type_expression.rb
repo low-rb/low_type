@@ -34,26 +34,6 @@ module LowType
       @default_value == :LOW_TYPE_UNDEFINED
     end
 
-    # Called in situations where we want to be inclusive rather than exclusive and pass validation if one of the types is valid.
-    def validate(value:, proxy:)
-      if value.nil?
-        return true if @default_value.nil?
-        return false if required?
-      end
-
-      @types.each do |type|
-        return true if LowType.type?(type) && type <= value.class # Example: HTML is a subclass of String and should pass as a String.
-        return true if ::Array === type && ::Array === value && array_types_match_values?(types: type, values: value)
-
-        # TODO: Shallow validation of enumerables could be made deeper with user config.
-        if type.class == ::Hash && value.class == ::Hash && type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
-          return true
-        end
-      end
-
-      false
-    end
-
     def validate!(value:, proxy:)
       if value.nil?
         return true if @default_value.nil?
