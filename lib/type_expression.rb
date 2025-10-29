@@ -41,7 +41,7 @@ module LowType
       end
 
       @types.each do |type|
-        return true if LowType.type?(type) && type == value.class
+        return true if LowType.type?(type) && type <= value.class # Example: HTML is a subclass of String and should pass as a String.
         return true if ::Array === type && ::Array === value && array_types_match_values?(types: type, values: value)
 
         # TODO: Shallow validation of hash could be made deeper with user config.
