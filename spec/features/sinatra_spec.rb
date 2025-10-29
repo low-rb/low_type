@@ -15,7 +15,7 @@ RSpec.describe SinatraApp do
   subject(:app) { described_class.new }
 
   let(:error_message) do
-    # We must be careful that we're picking up the error message from the exception itself and not from the spec's backtrace.
+    # We must be careful that we're picking up the error message from the exception itself and not from our spec's backtrace.
     interpolated_message = "Invalid return type '#{type}' for method '#{route}'. Valid types: '#{valid_types}'"
     escaped_message = CGI.escapeHTML(interpolated_message)
     "<h2>#{escaped_message}</h2>"

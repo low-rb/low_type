@@ -1,13 +1,17 @@
 require_relative 'proxies/param_proxy'
 
 module LowType
-  class TypeExpression
-    FILE_PATH = File.expand_path(__FILE__)
+  root_path = File.expand_path(__dir__)
+  file_path = File.expand_path(__FILE__)
+  adapter_paths = Dir.chdir(root_path) { Dir.glob('adapters/*') }.map { |path| File.join(root_path, path) }
 
+  HIDDEN_PATHS = [file_path, *adapter_paths, File.join(root_path, 'redefiner.rb')]
+
+  class TypeExpression
     attr_reader :types, :default_value
 
+    # @param type - A literal type or an instance representation of a typed structure.
     def initialize(type: nil, default_value: :LOW_TYPE_UNDEFINED)
-      # Types can be instance representations of a structure.
       @types = []
       @types << type unless type.nil?
       @default_value = default_value
@@ -68,8 +72,7 @@ module LowType
 
       raise proxy.error_type, proxy.error_message(value:)
     rescue proxy.error_type => e
-      file_paths = [FILE_PATH, LowType::Redefiner::FILE_PATH]
-      raise proxy.error_type, e.message, backtrace_with_proxy(file_paths:, backtrace: e.backtrace, proxy:)
+      raise proxy.error_type, e.message, backtrace_with_proxy(backtrace: e.backtrace, proxy:)
     end
 
     def valid_types
@@ -95,9 +98,9 @@ module LowType
       true
     end
 
-    def backtrace_with_proxy(file_paths:, proxy:, backtrace:)
-      # Remove LowType file paths from the backtrace.
-      filtered_backtrace = backtrace.reject { |line| file_paths.find { |file_path| line.include?(file_path) } }
+    def backtrace_with_proxy(proxy:, backtrace:)
+      # Remove LowType defined method file paths from the backtrace.
+      filtered_backtrace = backtrace.reject { |line| HIDDEN_PATHS.find { |file_path| line.include?(file_path) } }
 
       # Add the proxied file to the backtrace.
       proxy_file_backtrace = "#{proxy.file.path}:#{proxy.file.line}:in '#{proxy.file.scope}'"

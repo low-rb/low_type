@@ -7,8 +7,6 @@ require_relative 'type_expression'
 
 module LowType
   class Redefiner
-    FILE_PATH = File.expand_path(__FILE__)
-
     class << self
       def redefine_methods(method_nodes:, klass:, private_start_line:, file_path:)
         Module.new do
