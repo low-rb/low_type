@@ -37,7 +37,7 @@ module LowType
     end
 
     file_path = LowType.file_path(klass:)
-    parser = Parser.new(file_path:)
+    parser = LowType::Parser.new(file_path:)
     private_start_line = parser.private_start_line
 
     klass.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
