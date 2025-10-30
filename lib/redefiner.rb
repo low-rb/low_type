@@ -52,7 +52,8 @@ module LowType
         return [] if method_node.parameters.nil?
 
         params = method_node.parameters.slice
-        proxy_method = eval("-> (#{params}) {}")
+        # This isn't a security risk because the code comes from a trusted source; the file that just did the include. Does the file trust itself?
+        proxy_method = eval("-> (#{params}) {}") # rubocop:disable Security/Eval
         required_args, required_kwargs = required_args(proxy_method:)
 
         typed_method = eval(
@@ -90,7 +91,8 @@ module LowType
         return_type = Parser.return_type(method_node:)
         return nil if return_type.nil?
 
-        expression = eval(return_type.slice).call
+        # This isn't a security risk because the code comes from a trusted source; the file that just did the include. Does the file trust itself?
+        expression = eval(return_type.slice).call # rubocop:disable Security/Eval
         expression = TypeExpression.new(type: expression) unless expression.is_a?(TypeExpression)
 
         ReturnProxy.new(type_expression: expression, name: method_node.name, file:)

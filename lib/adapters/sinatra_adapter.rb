@@ -73,7 +73,8 @@ module LowType
       return_type = Parser.return_type(method_node:)
       return nil if return_type.nil?
 
-      expression = eval(return_type.slice).call
+      # This isn't a security risk because the code comes from a trusted source; the file that just did the include. Does the file trust itself?
+      expression = eval(return_type.slice).call # rubocop:disable Security/Eval
       expression = TypeExpression.new(type: expression) unless TypeExpression === expression
 
       ReturnProxy.new(type_expression: expression, name: "#{method_node.name.upcase} #{pattern}", file:)

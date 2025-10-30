@@ -1,0 +1,18 @@
+# External.
+
+Style/TrailingBodyOnMethodDefinition:
+  Enabled: false
+
+Layout/MultilineBlockLayout:
+  Enabled: false
+
+Style/DefWithParentheses:
+  Enabled: false
+
+Lint/Void:
+  Enabled: false
+
+# Internal:
+
+Naming/BinaryOperatorParameterName:
+  Enabled: false
