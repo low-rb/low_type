@@ -202,17 +202,24 @@ LowType.configure do |config|
 end
 ```
 
-## Basic types
+## Types
+
+### Basic types
 
 - `String`
 - `Integer`
-- `Boolean` (accepts `true`/`false`) [UNRELEASED]
 - `Array`
 - `Hash`
-- `Tuple` [UNRELEASED]
-- `HTML` (subclass of `String`)
-- `JSON` (subclass of `String`)
-- `XML` (subclass of `String`)
+
+### Complex types
+
+- `Boolean` (accepts `true`/`false`) [UNRELEASED]
+- `Tuple` (subclass of `Array`)
+- `Status` (subclass of `Integer`) - TODO: Check integer to be a valid HTTP status code
+- `Headers` (subclass of `Hash`)
+- `HTML` (subclass of `String`) - TODO: Check that string is HTML
+- `JSON` (subclass of `String`) - TODO: Check that string is JSON
+- `XML` (subclass of `String`) - TODO: Check that string is XML
 
 `nil` represents an optional value.
 
@@ -252,6 +259,24 @@ end
 <!--### Rails [UNRELEASED]
 
 If you still want to access Rails' `HTML` sanitizer class while in the scope of the `LowType` module, then use their full namespace `Rails::HTML`.-->
+
+### Rubocop
+
+Because we're living in the future, Rubocop isn't ready for us. Put the following in your `.rubocop.yml`:
+
+```yaml
+Style/TrailingBodyOnMethodDefinition:
+  Enabled: false
+
+Layout/MultilineBlockLayout:
+  Enabled: false
+
+Style/DefWithParentheses:
+  Enabled: false
+
+Lint/Void:
+  Enabled: false
+```
 
 ## Installation
 
