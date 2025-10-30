@@ -6,29 +6,14 @@ require_relative 'redefiner'
 require_relative 'type_expression'
 require_relative 'value_expression'
 
+# Include this module into your class to define and check types.
 module LowType
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
   def self.included(klass)
-
-    # Array[] class method returns a type expression only for the duration of this "included" hook.
+    # Array[] and Hash[] class method returns a type expression only for the duration of this "included" hook.
     array_class_method = Array.method('[]').unbind
-    Array.define_singleton_method('[]') do |*types|
-      TypeExpression.new(type: [*types])
-    end
-
-    # Hash[] class method returns a type expression only for the duration of this "included" hook.
     hash_class_method = Hash.method('[]').unbind
-    Hash.define_singleton_method('[]') do |type|
-      # Support Pry which uses Hash[].
-      unless LowType.type?(type)
-        Hash.define_singleton_method('[]', hash_class_method)
-        result = Hash[type]
-        Hash.method('[]').unbind
-        return result
-      end
-
-      TypeExpression.new(type:)
-    end
+    redefine(hash_class_method:)
 
     class << klass
       def low_methods
@@ -40,8 +25,8 @@ module LowType
     parser = LowType::Parser.new(file_path:)
     private_start_line = parser.private_start_line
 
-    klass.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
-    klass.singleton_class.prepend LowType::Redefiner.redefine_methods(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
+    klass.prepend LowType::Redefiner.redefine(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
+    klass.singleton_class.prepend LowType::Redefiner.redefine(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
 
     if (adapter = AdapterLoader.load(klass:, parser:, file_path:))
       adapter.process
@@ -63,12 +48,12 @@ module LowType
     def configure
       yield(config)
 
-      if config.local_types
-        require_relative 'local_types'
-        include LocalTypes
-      end
+      return unless config.local_types
+
+      require_relative 'local_types'
+      include LocalTypes
     end
-  
+
     # Internal API.
 
     def file_path(klass:)
@@ -80,7 +65,7 @@ module LowType
 
     # TODO: Unit test this.
     def type?(type)
-      type.respond_to?(:new) || type == Integer || type == Symbol || (type.is_a?(::Hash) && type.keys.first.respond_to?(:new) && type.values.first.respond_to?(:new))
+      type.respond_to?(:new) || type == Integer || type == Symbol || typed_hash?(type:)
     end
 
     def value?(expression)
@@ -89,6 +74,30 @@ module LowType
 
     def value(type:)
       TypeExpression.new(default_value: ValueExpression.new(value: type))
+    end
+  end
+
+  private
+
+  def typed_hash?(type:)
+    type.is_a?(::Hash) && type.keys.first.respond_to?(:new) && type.values.first.respond_to?(:new)
+  end
+
+  def redefine(hash_class_method:)
+    Array.define_singleton_method('[]') do |*types|
+      TypeExpression.new(type: [*types])
+    end
+
+    Hash.define_singleton_method('[]') do |type|
+      # Support Pry which uses Hash[].
+      unless LowType.type?(type)
+        Hash.define_singleton_method('[]', hash_class_method)
+        result = Hash[type]
+        Hash.method('[]').unbind
+        return result
+      end
+
+      TypeExpression.new(type:)
     end
   end
 end

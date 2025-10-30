@@ -1,4 +1,6 @@
-require_relative '../../lib/low_type.rb'
+# frozen_string_literal: true
+
+require_relative '../../lib/low_type'
 
 class MyType
   attr_reader :id
@@ -24,7 +26,7 @@ class LowLocal
   end
 
   def invalid_local_type_array
-    @typed_array = type Array[Integer] | ['a', 'b', 'c']
+    @typed_array = type Array[Integer] | %w[a b c]
   end
 
   def array_multiple_subtypes

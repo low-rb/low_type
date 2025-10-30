@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'proxies/file_proxy'
 require_relative 'proxies/method_proxy'
 require_relative 'proxies/param_proxy'
@@ -6,9 +8,10 @@ require_relative 'parser'
 require_relative 'type_expression'
 
 module LowType
+  # Redefine methods to have their arguments and return values type checked.
   class Redefiner
     class << self
-      def redefine_methods(method_nodes:, klass:, private_start_line:, file_path:)
+      def redefine(method_nodes:, klass:, private_start_line:, file_path:)
         Module.new do
           method_nodes.each do |method_node|
             name = method_node.name
@@ -23,7 +26,9 @@ module LowType
               klass.low_methods[name].params.each do |param_proxy|
                 # Get argument value or default value.
                 value = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
-                value = param_proxy.type_expression.default_value if value.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
+                if value.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
+                  value = param_proxy.type_expression.default_value
+                end
                 # Validate argument type.
                 param_proxy.type_expression.validate!(value:, proxy: param_proxy)
                 # Handle value(type) special case.
@@ -41,46 +46,42 @@ module LowType
               super(*args, **kwargs)
             end
 
-            if private_start_line && method_node.start_line > private_start_line
-              private name
-            end
+            private name if private_start_line && method_node.start_line > private_start_line
           end
         end
       end
 
-      def params_with_type_expressions(method_node:, file:)
+      def params_with_type_expressions(method_node:, file:) # rubocop:disable Metrics/MethodLength
         return [] if method_node.parameters.nil?
 
         params = method_node.parameters.slice
-        # This isn't a security risk because the code comes from a trusted source; the file that just did the include. Does the file trust itself?
-        proxy_method = eval("-> (#{params}) {}") # rubocop:disable Security/Eval
+        # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
+        proxy_method = eval("-> (#{params}) {}", binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
         required_args, required_kwargs = required_args(proxy_method:)
 
-        typed_method = eval(
-          <<~RUBY
-            -> (#{params}) {
-              param_proxies = []
+        # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
+        typed_method = <<~RUBY
+          -> (#{params}) {
+            param_proxies = []
 
-              proxy_method.parameters.each_with_index do |param, position|
-                type, name = param
-                position = nil unless [:opt, :req, :rest].include?(type)
+            proxy_method.parameters.each_with_index do |param, position|
+              type, name = param
+              position = nil unless [:opt, :req, :rest].include?(type)
+              expression = binding.local_variable_get(name)
 
-                expression = binding.local_variable_get(name)
-
-                if expression.class == TypeExpression
-                  param_proxies << ParamProxy.new(type_expression: expression, name:, type:, position:, file:)
-                elsif ::LowType.type?(expression)
-                  param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: expression), name:, type:, position:, file:)
-                end
+              if expression.is_a?(TypeExpression)
+                param_proxies << ParamProxy.new(type_expression: expression, name:, type:, position:, file:)
+              elsif ::LowType.type?(expression)
+                param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: expression), name:, type:, position:, file:)
               end
+            end
 
-              param_proxies
-            }
-          RUBY
-        )
+            param_proxies
+          }
+        RUBY
 
-        # Called with only required args present (as nil) and optional args omitted, to evaluate type expressions (which are stored as default values).
-        typed_method.call(*required_args, **required_kwargs)
+        # Called with only required args (as nil) and optional args omitted, to evaluate type expressions (stored as default values).
+        eval(typed_method).call(*required_args, **required_kwargs) # rubocop:disable Security/Eval
 
       # TODO: Write spec for this.
       rescue ArgumentError => e
@@ -91,7 +92,7 @@ module LowType
         return_type = Parser.return_type(method_node:)
         return nil if return_type.nil?
 
-        # This isn't a security risk because the code comes from a trusted source; the file that just did the include. Does the file trust itself?
+        # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
         expression = eval(return_type.slice).call # rubocop:disable Security/Eval
         expression = TypeExpression.new(type: expression) unless expression.is_a?(TypeExpression)
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'proxies/file_proxy'
 require_relative 'proxies/local_proxy'
 require_relative 'type_expression'
@@ -9,9 +11,7 @@ module LocalTypes
   def type(type_expression)
     referenced_object = type_expression.default_value
 
-    if !LowType.value?(referenced_object)
-      raise AssignmentError, "Single-instance objects like #{referenced_object} are not supported"
-    end
+    raise AssignmentError, "Single-instance objects like #{referenced_object} are not supported" unless LowType.value?(referenced_object)
 
     last_caller = caller_locations(1, 1).first
     file = LowType::FileProxy.new(path: last_caller.path, line: last_caller.lineno, scope: 'local type')
@@ -21,13 +21,13 @@ module LocalTypes
     type_expression.validate!(value: referenced_object, proxy: local_proxy)
 
     def referenced_object.with_type=(value)
-      local_proxy = self.instance_variable_get('@local_proxy')
+      local_proxy = instance_variable_get('@local_proxy')
       type_expression = local_proxy.type_expression
       type_expression.validate!(value:, proxy: local_proxy)
 
       # We can't reassign self in Ruby so we reassign instance variables instead.
       value.instance_variables.each do |variable|
-        self.instance_variable_set(variable, value.instance_variable_get(variable))
+        instance_variable_set(variable, value.instance_variable_get(variable))
       end
 
       self
@@ -37,19 +37,17 @@ module LocalTypes
 
     referenced_object
   end
-  alias_method :low_type, :type
+  alias low_type type
 
   def value(type)
     LowType.value(type:)
   end
-  alias_method :low_value, :value
+  alias low_value value
 
   # Scoped to the class that includes LowTypes module.
   class Array < ::Array
     def self.[](*types)
-      if types.all? { |type| LowType.type?(type) }
-        return LowType::TypeExpression.new(type: [*types])
-      end
+      return LowType::TypeExpression.new(type: [*types]) if types.all? { |type| LowType.type?(type) }
 
       super
     end
@@ -59,6 +57,7 @@ module LocalTypes
   class Hash < ::Hash
     def self.[](type)
       return LowType::TypeExpression.new(type:) if LowType.type?(type)
+
       super
     end
   end

@@ -1,4 +1,6 @@
-require_relative '../../lib/low_type.rb'
+# frozen_string_literal: true
+
+require_relative '../../lib/low_type'
 
 class LowHelloKeywords
   include LowType

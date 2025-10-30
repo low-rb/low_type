@@ -6,10 +6,10 @@ require_relative '../lib/type_expression'
 
 RSpec.describe LowType::TypeExpression do
   subject(:type_expression) { described_class.new(default_value: nil) }
-  
+
   # TODO: Use FactoryBot.
   let(:proxy) { LowType::ParamProxy.new(type_expression:, name: 'greetings', type: :req, file:) }
-  let(:file) { LowType::FileProxy.new(path: '/Users/name/dev/app/lib/my_class', line: 123, scope: "MyClass#my_method") }
+  let(:file) { LowType::FileProxy.new(path: '/Users/name/dev/app/lib/my_class', line: 123, scope: 'MyClass#my_method') }
 
   describe '#initialize' do
     it 'instantiates a class' do
@@ -21,7 +21,7 @@ RSpec.describe LowType::TypeExpression do
     let(:hidden_paths) do
       [
         '/Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/redefiner.rb',
-        '/Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/type_expression.rb',
+        '/Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/type_expression.rb'
       ]
     end
     let(:backtrace) do
@@ -43,7 +43,7 @@ RSpec.describe LowType::TypeExpression do
         "    from sudoku.rb:27:in 'block in Sudoku.run'",
         "    from sudoku.rb:24:in 'Array#each'",
         "    from sudoku.rb:24:in 'Sudoku.run'",
-        "    from sudoku.rb:98:in '<main>'",
+        "    from sudoku.rb:98:in '<main>'"
       ]
     end
 
@@ -65,7 +65,7 @@ RSpec.describe LowType::TypeExpression do
           "    from sudoku.rb:27:in 'block in Sudoku.run'",
           "    from sudoku.rb:24:in 'Array#each'",
           "    from sudoku.rb:24:in 'Sudoku.run'",
-          "    from sudoku.rb:98:in '<main>'",
+          "    from sudoku.rb:98:in '<main>'"
         ]
       )
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../interfaces/error_interface'
 require_relative '../error_types'
 

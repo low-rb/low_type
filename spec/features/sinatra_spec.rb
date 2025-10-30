@@ -22,7 +22,7 @@ RSpec.describe SinatraApp do
   end
   let(:type) { 'body' }
   let(:route) { "#{verb} #{path}" }
-  let(:verb) { "GET" }
+  let(:verb) { 'GET' }
 
   # Key:
   # @ = Only
@@ -186,7 +186,6 @@ RSpec.describe SinatraApp do
   end
 
   # Status, Headers, HTML.
-
 
   context 'with status/headers/html response' do
     let(:valid_types) { [LowType::Status, LowType::Headers, LowType::HTML] }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'proxies/param_proxy'
 
 module LowType
@@ -5,8 +7,9 @@ module LowType
   file_path = File.expand_path(__FILE__)
   adapter_paths = Dir.chdir(root_path) { Dir.glob('adapters/*') }.map { |path| File.join(root_path, path) }
 
-  HIDDEN_PATHS = [file_path, *adapter_paths, File.join(root_path, 'redefiner.rb')]
+  HIDDEN_PATHS = [file_path, *adapter_paths, File.join(root_path, 'redefiner.rb')].freeze
 
+  # Represent types and default values as a series of chainable expressions.
   class TypeExpression
     attr_reader :types, :default_value
 
@@ -18,8 +21,8 @@ module LowType
     end
 
     def |(expression)
-      if expression.class == ::LowType::TypeExpression
-        @types = @types + expression.types
+      if expression.instance_of?(::LowType::TypeExpression)
+        @types += expression.types
         @default_value = expression.default_value
       elsif ::LowType.value?(expression)
         @default_value = expression
@@ -41,13 +44,10 @@ module LowType
       end
 
       @types.each do |type|
-        return true if LowType.type?(type) && type <= value.class # Example: HTML is a subclass of String and should pass as a String.
-        return true if ::Array === type && ::Array === value && array_types_match_values?(types: type, values: value)
-
-        # TODO: Shallow validation of hash could be made deeper with user config.
-        if type.class == ::Hash && value.class == ::Hash && type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
-          return true
-        end
+        # Example: HTML is a subclass of String and should pass as a String.
+        return true if LowType.type?(type) && type <= value.class
+        return true if type.is_a?(::Array) && value.is_a?(::Array) && array_types_match_values?(types: type, values: value)
+        return true if type.instance_of?(::Hash) && value.instance_of?(::Hash) && hash_types_match_values?(type:, value:)
       end
 
       raise proxy.error_type, proxy.error_message(value:)
@@ -57,7 +57,7 @@ module LowType
 
     def valid_types
       types = @types.map { |type| type.inspect.to_s }
-      types = types + ['nil'] if @default_value.nil?
+      types += ['nil'] if @default_value.nil?
       types.join(' | ')
     end
 
@@ -67,7 +67,8 @@ module LowType
       # [T, T, T]
       if types.length > 1
         types.each_with_index do |type, index|
-          return false unless type <= values[index].class # Example: HTML is a subclass of String and should pass as a String.
+          # Example: HTML is a subclass of String and should pass as a String.
+          return false unless type <= values[index].class
         end
       # [T]
       elsif types.length == 1
@@ -76,6 +77,11 @@ module LowType
       # TODO: Deep type check (all elements for [T]).
 
       true
+    end
+
+    def hash_types_match_values?(type:, value:)
+      # TODO: Shallow validation of hash could be made deeper with user config.
+      type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
     end
 
     def backtrace_with_proxy(proxy:, backtrace:)
@@ -92,21 +98,21 @@ module LowType
   end
 end
 
+# For "Type | [type_expression/type/value]" situations, redirecting to or generating a type expression from types.
+# "|" is not defined on Object class and this is the most compute-efficient way to achieve our goal (world peace).
+# "|" is overridable by any child object. While we could def/undef this method, this approach is actually lighter.
+# "|" bitwise operator on Integer is not defined when the receiver is an Integer class, so we are not in conflict.
 class Object
   class << self
-    # For "Type | [type_expression/type/value]" situations, redirecting to or generating a type expression from types.
-    # "|" is not defined on Object class and this is the most compute-efficient way to achieve our goal (world peace).
-    # "|" is overridable by any child object. While we could def/undef this method, this approach is actually lighter.
-    # "|" bitwise operator on Integer is not defined when the receiver is an Integer class, so we are not in conflict.
     def |(expression)
-      if expression.class == ::LowType::TypeExpression
+      if expression.instance_of?(::LowType::TypeExpression)
         # We pass our type into their type expression.
         expression | self
         expression
       else
         # We turn our type into a type expression and pass in their [type_expression/type/value].
         type_expression = ::LowType::TypeExpression.new(type: self)
-        type_expression | expression        
+        type_expression | expression
       end
     end
   end

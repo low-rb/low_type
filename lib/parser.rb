@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'prism'
 
 module LowType
@@ -73,7 +75,7 @@ module LowType
     private
 
     def class_method?(node)
-      return true if node.is_a?(::Prism::DefNode) && node.receiver.class == Prism::SelfNode # self.method_name
+      return true if node.is_a?(::Prism::DefNode) && node.receiver.instance_of?(Prism::SelfNode) # self.method_name
       return true if node.is_a?(::Prism::SingletonClassNode) # class << self
 
       if (parent_node = @parent_map[node])

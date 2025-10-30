@@ -12,28 +12,26 @@ RSpec.describe LowHello do
   describe '.included' do
     it 'redefines methods on class load' do
       expect(described_class.low_methods.keys).to include(
-        *[
-          :initialize,
-          :typed_arg,
-          :typed_arg_without_body,
-          :typed_arg_and_default_value,
-          :typed_arg_and_invalid_default_value,
-          :typed_arg_and_typed_default_value,
-          :typed_arg_and_invalid_default_typed_value,
-          :multiple_typed_args,
-          :multiple_typed_args_and_default_value,
-          :typed_array_arg,
-          :typed_hash_arg,
-          :typed_hash_arg_and_default_value,
-          :return_type,
-          :array_return_type,
-          :arg_and_return_type,
-          :arg_and_nilable_return_value,
-          :private_typed_arg,
-          :inline_class_typed_arg,
-          :class_typed_arg,
-          :class_typed_arg_and_default_value,
-        ]
+        :initialize,
+        :typed_arg,
+        :typed_arg_without_body,
+        :typed_arg_and_default_value,
+        :typed_arg_and_invalid_default_value,
+        :typed_arg_and_typed_default_value,
+        :typed_arg_and_invalid_default_typed_value,
+        :multiple_typed_args,
+        :multiple_typed_args_and_default_value,
+        :typed_array_arg,
+        :typed_hash_arg,
+        :typed_hash_arg_and_default_value,
+        :return_type,
+        :array_return_type,
+        :arg_and_return_type,
+        :arg_and_nilable_return_value,
+        :private_typed_arg,
+        :inline_class_typed_arg,
+        :class_typed_arg,
+        :class_typed_arg_and_default_value
       )
     end
   end
@@ -128,11 +126,15 @@ RSpec.describe LowHello do
     end
 
     context 'when no arg provided' do
-      let(:error_message) { "Invalid argument type 'Integer' for parameter 'greeting'. Valid types: '[Symbol] | String'" }
+      let(:error_message) do
+        "Invalid argument type 'Integer' for parameter 'greeting'. Valid types: '[Symbol] | String'"
+      end
 
       it 'raises an argument type error' do
         # => raises LowType::ArgumentTypeError. A default value(type) that is not nil still has to be an allowed type.
-        expect { hello.typed_arg_and_invalid_default_typed_value }.to raise_error(LowType::ArgumentTypeError, error_message)
+        expect do
+          hello.typed_arg_and_invalid_default_typed_value
+        end.to raise_error(LowType::ArgumentTypeError, error_message)
       end
     end
   end
@@ -146,7 +148,9 @@ RSpec.describe LowHello do
     end
 
     context 'when arg is wrong type' do
-      let(:error_message) { "Invalid argument type 'TrueClass' for parameter 'greeting'. Valid types: 'String | Integer'" }
+      let(:error_message) do
+        "Invalid argument type 'TrueClass' for parameter 'greeting'. Valid types: 'String | Integer'"
+      end
 
       it 'raises an invalid type error' do
         expect { hello.multiple_typed_args(true) }.to raise_error(LowType::ArgumentTypeError, error_message)
@@ -154,7 +158,9 @@ RSpec.describe LowHello do
     end
 
     context 'when no arg is provided' do
-      let(:error_message) { "Invalid argument type 'NilClass' for parameter 'greeting'. Valid types: 'String | Integer'" }
+      let(:error_message) do
+        "Invalid argument type 'NilClass' for parameter 'greeting'. Valid types: 'String | Integer'"
+      end
 
       it 'raises an argument error' do
         expect { hello.multiple_typed_args }.to raise_error(LowType::ArgumentTypeError, error_message)
@@ -169,10 +175,14 @@ RSpec.describe LowHello do
     end
 
     context 'when arg is wrong type' do
-      let(:error_message) { "Invalid argument type 'TrueClass' for parameter 'greeting'. Valid types: 'String | Integer'" }
+      let(:error_message) do
+        "Invalid argument type 'TrueClass' for parameter 'greeting'. Valid types: 'String | Integer'"
+      end
 
       it 'raises an argument type error' do
-        expect { hello.multiple_typed_args_and_default_value(true) }.to raise_error(LowType::ArgumentTypeError, error_message)
+        expect do
+          hello.multiple_typed_args_and_default_value(true)
+        end.to raise_error(LowType::ArgumentTypeError, error_message)
       end
     end
 
@@ -187,7 +197,7 @@ RSpec.describe LowHello do
 
   describe '#typed_array_arg' do
     it 'passes through the argument' do
-      expect(hello.typed_array_arg(['Hi', 'Hey', 'Howdy'])).to eq(['Hi', 'Hey', 'Howdy'])
+      expect(hello.typed_array_arg(%w[Hi Hey Howdy])).to eq(%w[Hi Hey Howdy])
     end
 
     context 'when no arg provided' do
@@ -201,19 +211,23 @@ RSpec.describe LowHello do
 
   describe '#typed_hash_arg' do
     it 'passes through the argument' do
-      expect(hello.typed_hash_arg({'Hello' => 'Goodbye'})).to eq({'Hello' => 'Goodbye'})
+      expect(hello.typed_hash_arg({ 'Hello' => 'Goodbye' })).to eq({ 'Hello' => 'Goodbye' })
     end
 
     context 'when arg is wrong type' do
-      let(:error_message) { "Invalid argument type 'Hash' for parameter 'greetings'. Valid types: '{String => String}'" }
+      let(:error_message) do
+        "Invalid argument type 'Hash' for parameter 'greetings'. Valid types: '{String => String}'"
+      end
 
       it 'raises an argumment type error' do
-        expect { hello.typed_hash_arg({123 => 456}) }.to raise_error(LowType::ArgumentTypeError, error_message)
+        expect { hello.typed_hash_arg({ 123 => 456 }) }.to raise_error(LowType::ArgumentTypeError, error_message)
       end
     end
 
     context 'when no arg provided' do
-      let(:error_message) { "Invalid argument type 'NilClass' for parameter 'greetings'. Valid types: '{String => String}'" }
+      let(:error_message) do
+        "Invalid argument type 'NilClass' for parameter 'greetings'. Valid types: '{String => String}'"
+      end
 
       it 'raises an argument error' do
         expect { hello.typed_hash_arg }.to raise_error(LowType::ArgumentTypeError, error_message)
@@ -223,12 +237,12 @@ RSpec.describe LowHello do
 
   describe '#typed_hash_arg_and_default_value' do
     it 'passes through the argument' do
-      expect(hello.typed_hash_arg_and_default_value({'Hello' => 'Goodbye'})).to eq({'Hello' => 'Goodbye'})
+      expect(hello.typed_hash_arg_and_default_value({ 'Hello' => 'Goodbye' })).to eq({ 'Hello' => 'Goodbye' })
     end
 
     context 'when no arg provided' do
       it 'provides the default value' do
-        expect(hello.typed_hash_arg_and_default_value).to eq({'Hola' => 'Adios'})
+        expect(hello.typed_hash_arg_and_default_value).to eq({ 'Hola' => 'Adios' })
       end
     end
   end
@@ -248,7 +262,7 @@ RSpec.describe LowHello do
 
   describe '#array_return_type' do
     it 'returns an array of symbols' do
-      expect(hello.array_return_type).to eq([:one, :two, :three])
+      expect(hello.array_return_type).to eq(%i[one two three])
     end
 
     it 'defines Array[Symmbol] return type expression' do
@@ -287,7 +301,9 @@ RSpec.describe LowHello do
     end
 
     context 'when the return value does not validate the return type expression' do
-      let(:error_message) { "Invalid return type 'Integer' for method 'arg_and_nilable_return_value'. Valid types: 'String | nil'" }
+      let(:error_message) do
+        "Invalid return type 'Integer' for method 'arg_and_nilable_return_value'. Valid types: 'String | nil'"
+      end
 
       it 'raises a return type error' do
         expect { hello.arg_and_nilable_return_value(123) }.to raise_error(LowType::ReturnTypeError, error_message)
@@ -331,9 +347,9 @@ RSpec.describe LowHello do
     end
 
     context 'when no arg provided' do
-    it 'provides the default value' do
-      expect(described_class.class_typed_arg_and_default_value).to eq('Bye')
-    end
+      it 'provides the default value' do
+        expect(described_class.class_typed_arg_and_default_value).to eq('Bye')
+      end
     end
   end
 

@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
+gem 'falcon'
+gem 'low_type', path: '../../'
+gem 'puma'
 gem 'rackup'
 gem 'sinatra'
-gem 'puma'
-gem 'falcon'
 gem 'webrick'
-gem 'low_type', path: '../../'
 
 group :development do
   gem 'pry'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LowType
   class FileProxy
     attr_reader :path, :line, :scope

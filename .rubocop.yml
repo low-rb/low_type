@@ -3,6 +3,9 @@
 Style/TrailingBodyOnMethodDefinition:
   Enabled: false
 
+Layout/IndentationConsistency:
+  Enabled: false
+
 Layout/MultilineBlockLayout:
   Enabled: false
 
@@ -13,6 +16,18 @@ Lint/Void:
   Enabled: false
 
 # Internal:
+
+Style/Documentation:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 140
+
+Metrics/MethodLength:
+  Max: 20
+
+Lint/MissingSuper:
+  Enabled: false
 
 Naming/BinaryOperatorParameterName:
   Enabled: false

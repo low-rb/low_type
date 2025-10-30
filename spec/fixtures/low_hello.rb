@@ -1,4 +1,6 @@
-require_relative '../../lib/low_type.rb'
+# frozen_string_literal: true
+
+require_relative '../../lib/low_type'
 
 class LowHello
   include LowType
@@ -56,7 +58,7 @@ class LowHello
     greetings
   end
 
-  def typed_hash_arg_and_default_value(greetings = Hash[String => String] | {'Hola' => 'Adios'} )
+  def typed_hash_arg_and_default_value(greetings = Hash[String => String] | { 'Hola' => 'Adios' })
     greetings
   end
 
@@ -67,11 +69,11 @@ class LowHello
   end
 
   def array_return_type() -> { Array[Symbol] }
-    [:one, :two, :three]
+    %i[one two three]
   end
 
   def arg_and_return_type(greeting) -> { String }
-    addition = 2 + 2
+    2 + 2
     greeting
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LowType
   class MethodProxy
     attr_reader :name, :params, :return_proxy
