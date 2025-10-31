@@ -22,7 +22,7 @@ RSpec.describe LowLocal do
     end
 
     context 'when the type is wrong' do
-      let(:error_message) { "Invalid variable type Array in 'LowLocal' on line 27. Valid types: '[Integer]'" }
+      let(:error_message) { "Invalid variable type Array in 'LowLocal' on line 29. Valid types: '[Integer]'" }
 
       it 'raises an argument type error' do
         expect { subject.invalid_local_type_array }.to raise_error(LowType::LocalTypeError, error_message)
@@ -37,7 +37,7 @@ RSpec.describe LowLocal do
 
     context 'when the type is wrong' do
       let(:error_message) do
-        "Invalid variable type Array in 'LowLocal' on line 35. Valid types: '[Integer, String, Symbol]'"
+        "Invalid variable type Array in 'LowLocal' on line 37. Valid types: '[Integer, String, Symbol]'"
       end
 
       it 'raises an argument type error' do

@@ -26,11 +26,11 @@ RSpec.describe LowType::TypeExpression do
     end
     let(:backtrace) do
       [
-        "    from /Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/redefiner.rb:29:in 'block (4 levels) in redefine_methods'",
+        "    from /Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/redefiner.rb:29:in 'block (4 levels) in redefine'",
         "    from /Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/redefiner.rb:24:in 'Array#each'",
-        "    from /Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/redefiner.rb:24:in 'block (3 levels) in redefine_methods'",
+        "    from /Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/redefiner.rb:24:in 'block (3 levels) in redefine'",
         "    from /Users/name/dev/app/lib/models/time_tree/trunk_cone.rb:45:in 'TrunkCone#grow'",
-        "    from /Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/redefiner.rb:42:in 'block (3 levels) in redefine_methods'",
+        "    from /Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/redefiner.rb:42:in 'block (3 levels) in redefine'",
         "    from /Users/name/dev/app/lib/models/time_tree/time_tree.rb:38:in 'TimeTree#grow'",
         "    from /Users/name/dev/app/lib/models/time_tree/time_tree.rb:50:in 'TimeTree#grow'",
         "    from /Users/name/dev/app/lib/layers/space_grid.rb:34:in 'block in SpaceGrid#plant'",
