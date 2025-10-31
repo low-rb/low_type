@@ -44,10 +44,7 @@ module LowType
 
           raise AllowedTypeError, 'Did you mean "Response.finish"?' if res.to_s == 'Response'
 
-          route = "#{request.request_method} #{request.path}"
-          if res && (method_proxy = self.class.low_methods[route]) && (proxy = method_proxy.return_proxy)
-            proxy.type_expression.types.each { |_type| proxy.type_expression.validate!(value: res, proxy:) }
-          end
+          low_validate!(value: res) if res
 
           res = [res] if res.is_a?(Integer) || res.is_a?(String)
           if res.is_a?(Array) && res.first.is_a?(Integer)
@@ -61,10 +58,15 @@ module LowType
 
           nil # avoid double setting the same response tuple twice
         end
+
+        def low_validate!(value:)
+          route = "#{request.request_method} #{request.path}"
+          if (method_proxy = self.class.low_methods[route]) && (proxy = method_proxy.return_proxy)
+            proxy.type_expression.validate!(value:, proxy:)
+          end
+        end
       end
     end
-
-    private
 
     def return_proxy(method_node:, pattern:, file:)
       return_type = Parser.return_type(method_node:)
