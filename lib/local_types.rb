@@ -9,7 +9,7 @@ module LocalTypes
   class AssignmentError < StandardError; end
 
   def type(type_expression)
-    referenced_object = type_expression.default_value
+    referenced_object = type_expression.default_value.dup
 
     raise AssignmentError, "Single-instance objects like #{referenced_object} are not supported" unless LowType.value?(referenced_object)
 
