@@ -9,7 +9,7 @@ require_relative 'value_expression'
 # Include this module into your class to define and check types.
 module LowType
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
-  def self.included(klass)
+  def self.included(klass) # rubocop:disable Metrics/AbcSize
     # Array[] and Hash[] class method returns a type expression only for the duration of this "included" hook.
     array_class_method = Array.method('[]').unbind
     hash_class_method = Hash.method('[]').unbind

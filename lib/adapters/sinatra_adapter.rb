@@ -17,7 +17,7 @@ module LowType
         @file_path = file_path
       end
 
-      def process
+      def process # rubocop:disable Metrics/AbcSize
         method_calls = @parser.method_calls(method_names: %i[get post patch put delete options query])
 
         # Type check return values.
@@ -27,13 +27,12 @@ module LowType
 
           pattern = arguments_node.arguments.first.content
 
-          line = method_call.respond_to?(:start_line) ? method_call.start_line : nil
+          line = Parser.line_number(node: method_call)
           file = FileProxy.new(path: @file_path, line:, scope: "#{@klass}##{method_call.name}")
-          params = [ParamProxy.new(type_expression: nil, name: :route, type: :req, position: 0, file:)]
-          return_proxy = return_proxy(method_node: method_call, pattern:, file:)
-          next unless return_proxy
+          next unless (return_proxy = return_proxy(method_node: method_call, pattern:, file:))
 
           route = "#{method_call.name.upcase} #{pattern}"
+          params = [ParamProxy.new(type_expression: nil, name: :route, type: :req, position: 0, file:)]
           @klass.low_methods[route] = MethodProxy.new(name: method_call.name, params:, return_proxy:)
         end
       end

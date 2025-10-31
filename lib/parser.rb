@@ -27,23 +27,29 @@ module LowType
       block_visitor.method_calls
     end
 
-    # Only a lambda defined immediately after a method's parameters/block is considered a return type expression.
-    def self.return_type(method_node:)
-      # Method statements.
-      statements_node = method_node.compact_child_nodes.find { |node| node.is_a?(Prism::StatementsNode) }
+    class << self
+      # Only a lambda defined immediately after a method's parameters/block is considered a return type expression.
+      def return_type(method_node:)
+        # Method statements.
+        statements_node = method_node.compact_child_nodes.find { |node| node.is_a?(Prism::StatementsNode) }
 
-      # Block statements.
-      if statements_node.nil?
-        block_node = method_node.compact_child_nodes.find { |node| node.is_a?(Prism::BlockNode) }
-        statements_node = block_node.compact_child_nodes.find { |node| node.is_a?(Prism::StatementsNode) } if block_node
+        # Block statements.
+        if statements_node.nil?
+          block_node = method_node.compact_child_nodes.find { |node| node.is_a?(Prism::BlockNode) }
+          statements_node = block_node.compact_child_nodes.find { |node| node.is_a?(Prism::StatementsNode) } if block_node
+        end
+
+        return nil if statements_node.nil? # Sometimes developers define methods without code inside them.
+
+        node = statements_node.body.first
+        return node if node.is_a?(Prism::LambdaNode)
+
+        nil
       end
 
-      return nil if statements_node.nil? # Sometimes developers define methods without code inside them.
-
-      node = statements_node.body.first
-      return node if node.is_a?(Prism::LambdaNode)
-
-      nil
+      def line_number(node:)
+        node.respond_to?(:start_line) ? node.start_line : nil
+      end
     end
   end
 

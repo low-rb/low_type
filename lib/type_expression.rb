@@ -37,7 +37,7 @@ module LowType
       @default_value == :LOW_TYPE_UNDEFINED
     end
 
-    def validate!(value:, proxy:)
+    def validate!(value:, proxy:) # rubocop:disable Metrics
       if value.nil?
         return true if @default_value.nil?
         raise proxy.error_type, proxy.error_message(value:) if required?

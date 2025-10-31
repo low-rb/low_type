@@ -31,3 +31,12 @@ Lint/MissingSuper:
 
 Naming/BinaryOperatorParameterName:
   Enabled: false
+
+Metrics/AbcSize:
+  Max: 20
+
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Metrics/CyclomaticComplexity:
+  Max: 10

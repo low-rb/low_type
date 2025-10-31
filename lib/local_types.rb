@@ -20,18 +20,7 @@ module LocalTypes
 
     type_expression.validate!(value: referenced_object, proxy: local_proxy)
 
-    def referenced_object.with_type=(value)
-      local_proxy = instance_variable_get('@local_proxy')
-      type_expression = local_proxy.type_expression
-      type_expression.validate!(value:, proxy: local_proxy)
-
-      # We can't reassign self in Ruby so we reassign instance variables instead.
-      value.instance_variables.each do |variable|
-        instance_variable_set(variable, value.instance_variable_get(variable))
-      end
-
-      self
-    end
+    define_with_type(referenced_object:)
 
     return referenced_object.value if referenced_object.is_a?(ValueExpression)
 
@@ -59,6 +48,23 @@ module LocalTypes
       return LowType::TypeExpression.new(type:) if LowType.type?(type)
 
       super
+    end
+  end
+
+  private
+
+  def define_with_type(referenced_object:)
+    def referenced_object.with_type=(value)
+      local_proxy = instance_variable_get('@local_proxy')
+      type_expression = local_proxy.type_expression
+      type_expression.validate!(value:, proxy: local_proxy)
+
+      # We can't reassign self in Ruby so we reassign instance variables instead.
+      value.instance_variables.each do |variable|
+        instance_variable_set(variable, value.instance_variable_get(variable))
+      end
+
+      self
     end
   end
 end

@@ -11,11 +11,11 @@ module LowType
   # Redefine methods to have their arguments and return values type checked.
   class Redefiner
     class << self
-      def redefine(method_nodes:, klass:, private_start_line:, file_path:)
+      def redefine(method_nodes:, klass:, private_start_line:, file_path:) # rubocop:disable Metrics
         Module.new do
           method_nodes.each do |method_node|
             name = method_node.name
-            line = method_node.respond_to?(:start_line) ? method_node.start_line : nil
+            line = Parser.line_number(node: method_node)
             file = FileProxy.new(path: file_path, line:, scope: "#{klass}##{method_node.name}")
             params = Redefiner.params_with_type_expressions(method_node:, file:)
             return_proxy = Redefiner.return_proxy(method_node:, file:)
