@@ -265,15 +265,15 @@ If you still want to access Rails' `HTML` sanitizer class while in the scope of 
 Because we're living in the future, Rubocop isn't ready for us. Put the following in your `.rubocop.yml`:
 
 ```yaml
+# Support LowType return value "-> { T }" syntax.
 Style/TrailingBodyOnMethodDefinition:
   Enabled: false
-
+Layout/IndentationConsistency:
+  Enabled: false
 Layout/MultilineBlockLayout:
   Enabled: false
-
 Style/DefWithParentheses:
   Enabled: false
-
 Lint/Void:
   Enabled: false
 ```
