@@ -13,7 +13,7 @@ module LowType
     # Array[] and Hash[] class method returns a type expression only for the duration of this "included" hook.
     array_class_method = Array.method('[]').unbind
     hash_class_method = Hash.method('[]').unbind
-    redefine(hash_class_method:)
+    LowType.redefine(hash_class_method:)
 
     class << klass
       def low_methods
@@ -63,9 +63,21 @@ module LowType
       caller.find { |callee| callee.end_with?("<class:#{class_name}>'") }.split(':').first
     end
 
-    # TODO: Unit test this.
+    # TODO: Unit test.
     def type?(type)
-      type.respond_to?(:new) || type == Integer || type == Symbol || typed_hash?(type:)
+      LowType.basic_type?(type:) || LowType.complex_type?(type:)
+    end
+
+    def basic_type?(type:)
+      type.respond_to?(:new) || type == Integer || type == Symbol
+    end
+
+    def complex_type?(type:)
+      !basic_type?(type:) && LowType.typed_hash?(type:)
+    end
+
+    def typed_hash?(type:)
+      type.is_a?(::Hash) && LowType.basic_type?(type: type.keys.first) && LowType.basic_type?(type: type.values.first)
     end
 
     def value?(expression)
@@ -75,29 +87,24 @@ module LowType
     def value(type:)
       TypeExpression.new(default_value: ValueExpression.new(value: type))
     end
-  end
 
-  private
-
-  def typed_hash?(type:)
-    type.is_a?(::Hash) && type.keys.first.respond_to?(:new) && type.values.first.respond_to?(:new)
-  end
-
-  def redefine(hash_class_method:)
-    Array.define_singleton_method('[]') do |*types|
-      TypeExpression.new(type: [*types])
-    end
-
-    Hash.define_singleton_method('[]') do |type|
-      # Support Pry which uses Hash[].
-      unless LowType.type?(type)
-        Hash.define_singleton_method('[]', hash_class_method)
-        result = Hash[type]
-        Hash.method('[]').unbind
-        return result
+    # TODO: Unit test.
+    def redefine(hash_class_method:)
+      Array.define_singleton_method('[]') do |*types|
+        TypeExpression.new(type: [*types])
       end
 
-      TypeExpression.new(type:)
+      Hash.define_singleton_method('[]') do |type|
+        # Support Pry which uses Hash[].
+        unless LowType.type?(type)
+          Hash.define_singleton_method('[]', hash_class_method)
+          result = Hash[type]
+          Hash.method('[]').unbind
+          return result
+        end
+
+        TypeExpression.new(type:)
+      end
     end
   end
 end

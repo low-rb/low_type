@@ -45,9 +45,9 @@ module LowType
 
       @types.each do |type|
         # Example: HTML is a subclass of String and should pass as a String.
-        return true if LowType.type?(type) && type <= value.class
+        return true if LowType.basic_type?(type:) && type <= value.class
         return true if type.is_a?(::Array) && value.is_a?(::Array) && array_types_match_values?(types: type, values: value)
-        return true if type.instance_of?(::Hash) && value.instance_of?(::Hash) && hash_types_match_values?(type:, value:)
+        return true if type.is_a?(::Hash) && value.is_a?(::Hash) && hash_types_match_values?(type:, value:)
       end
 
       raise proxy.error_type, proxy.error_message(value:)
