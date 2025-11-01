@@ -103,13 +103,17 @@ These replicate `attr_[reader, writer, accessor]` methods but also allow you to 
 
 ```ruby
 type_reader name: String # Creates a public method called `name` that gets the value of @name
+name # Get the value with type checking
+
 type_reader name: String | 'Cher' # Gets the value of @name with a default value if it's `nil`
+name # Get the value with type checking and return 'Cher' if the value is `nil`
 ```
 
 ### Type Writer
 
 ```ruby
 type_writer name: String # Creates a public method called `name=(arg)` that sets the value of @name
+name = 'Tim' # Set the value with type checking
 ```
 
 ### Type Accessor
@@ -120,6 +124,8 @@ name # Get the value with type checking
 name = 'Tim' # Set the value with type checking
 
 type_accessor name: String | 'Cher' # Get/set the value of @name with a default value if it's `nil`
+name # Get the value with type checking and return 'Cher' if the value is `nil`
+name = 'Tim' # Set the value with type checking
 ```
 
 ## Local variables [BETA]
