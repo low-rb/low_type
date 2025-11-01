@@ -132,14 +132,14 @@ name = 'Tim' # Set the value with type checking
 
 You can define multiple typed accessor methods just like you would with `attr_[reader, writer, accessor]`:
 ```ruby
-type_accessor name: String, occupation: String | 'Doctor', age: Integer | 33
+type_accessor name: String | nil, occupation: 'Doctor', age: Integer | 33
 name # => nil
 occupation # => Doctor
 age = 'old' # => Raises ArgumentTypeError
 age # => 33
 ```
 
-## Local variables [BETA]
+## Local variables [ADVANCED]
 
 ### `type()`
 
@@ -192,7 +192,7 @@ If no default value is defined then the argument will be required.
 
 ### `-> { T }` Return Type
 
-The `-> { T }` syntax is a lambda without an assignment to a local variable. This is valid Ruby that can be placed immediately after a method definition and on the same line as the method definition, to visually look like the output of that method, but technically it belongs to the body of the method definition. It's inert and doesn't run when the method is called, similar to how default values are never called if the argument is managed by LowType. Pretty cool stuff yeah? Your type expressions won't keep re-evaluating in the wild 🐴, only on class load.
+The `-> { T }` syntax is a lambda without an assignment to a local variable. This is valid Ruby that can be placed immediately after a method definition and on the same line as the method definition, to visually look like the output of that method. It's inert and doesn't run when the method is called, similar to how default values are never called if the argument is managed by LowType. Pretty cool stuff yeah? Your type expressions won't keep re-evaluating in the wild 🐴, only on class load.
 
 ### `value(T)` Value Expression
 
@@ -205,7 +205,7 @@ def my_method(my_arg: String | MyType | value(MyType)) # => MyType is the defaul
 
 ## Performance
 
-LowType evaluates type expressions on class load (just once) to be efficient and thread-safe. Then the defined types are checked per method call.
+LowType evaluates type expressions on class load (just once) to be efficient and thread-safe. Then the defined types are checked per method call. It's as light as runtime type checking can be, with performance issues only expected when using `type()` and `.with_type()` methods (disabled by default).
 
 ## Config
 
@@ -213,7 +213,7 @@ Copy and paste the following and change the defaults to configure LowType:
 
 ```ruby
 LowType.configure do |config|
-  config.local_types = false # Set to true to enable the type() method for local variables [BETA]
+  config.local_types = false # Set to true to enable the type() method for local variables [ADVANCED]
   config.severity_level = :error # [:error, :log] [UNRELEASED]
   config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
 end
