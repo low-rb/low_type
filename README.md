@@ -94,7 +94,7 @@ def say_farewell_with_a_long_method_name(farewell: String)
 end
 ```
 
-## Instance variables [UNRELEASED]
+## Instance variables
 
 To define typed `@instance` variables use the `type_[reader, writer, accessor]` methods.  
 These replicate `attr_[reader, writer, accessor]` methods but also allow you to define and check types.
