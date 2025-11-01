@@ -134,12 +134,20 @@ You can define multiple typed accessor methods just like you would with `attr_[r
 ```ruby
 type_accessor name: String | nil, occupation: 'Doctor', age: Integer | 33
 name # => nil
-occupation # => Doctor
+occupation # => Doctor (not type checked)
 age = 'old' # => Raises ArgumentTypeError
 age # => 33
 ```
 
 ## Local variables [ADVANCED]
+
+Types with `[]` and `|` next to them evaluate to a type expression, so you can define types anywhere:
+
+```ruby
+greeting = String | "Hello"
+```
+
+For a simple type without this syntax or if you want to make it more obvious that you're defining a type, give the type expression as an argument to the `type()` method:
 
 ### `type()`
 
@@ -152,7 +160,7 @@ my_var = type MyType | fetch_my_object(id: 123)
 
 `my_var` is now type checked to be of type `MyType` when first assigned to.
 
-### ⚠️ Important
+### Important
 
 The `type()` method must be manually enabled via `LowType.config` because of the following requirements:
 - `TypeExpression`s are evaluated at *runtime* per instance (not once on *class load*) and this will impact performance
