@@ -94,7 +94,7 @@ def say_farewell_with_a_long_method_name(farewell: String)
 end
 ```
 
-## Instance variables [UNRELEASED]
+## Instance variables
 
 To define typed `@instance` variables use the `type_[reader, writer, accessor]` methods.  
 These replicate `attr_[reader, writer, accessor]` methods but also allow you to define and check types.
@@ -102,24 +102,24 @@ These replicate `attr_[reader, writer, accessor]` methods but also allow you to 
 ### Type Reader
 
 ```ruby
-type_reader :name, String # Creates a public method called `name` that gets the value of @name
-type_reader :name, String | 'Cher' # Gets the value of @name with a default value if it's `nil`
+type_reader name: String # Creates a public method called `name` that gets the value of @name
+type_reader name: String | 'Cher' # Gets the value of @name with a default value if it's `nil`
 ```
 
 ### Type Writer
 
 ```ruby
-type_writer :name, String # Creates a public method called `name=(arg)` that sets the value of @name
+type_writer name: String # Creates a public method called `name=(arg)` that sets the value of @name
 ```
 
 ### Type Accessor
 
 ```ruby
-type_accessor :name, String # Creates public methods to get or set the value of @name
+type_accessor name: String # Creates public methods to get or set the value of @name
 name # Get the value with type checking
 name = 'Tim' # Set the value with type checking
 
-type_accessor :name, String | 'Cher' # Get/set the value of @name with a default value if it's `nil`
+type_accessor name: String | 'Cher' # Get/set the value of @name with a default value if it's `nil`
 ```
 
 ## Local variables [BETA]
@@ -173,7 +173,7 @@ The pipe symbol (`|`) is used in the context of type expressions to define multi
 
 If no default value is defined then the argument will be required.
 
-### Return Type
+### `-> { T }` Return Type
 
 The `-> { T }` syntax is a lambda without an assignment to a local variable. This is valid Ruby that can be placed immediately after a method definition and on the same line as the method definition, to visually look like the output of that method, but technically it belongs to the body of the method definition. It's inert and doesn't run when the method is called, similar to how default values are never called if the argument is managed by LowType. Pretty cool stuff yeah? Your type expressions won't keep re-evaluating in the wild 🐴, only on class load.
 
@@ -289,6 +289,6 @@ bundle install
 
 🦆 **Duck typing is beautiful.** Ruby is an amazing language **BECAUSE** it's not typed. I don't believe Ruby should ever be fully typed, but you should be able to sprinkle in types into some areas of your codebase where you'd like self-documentation and a little reassurance that the right values are coming in/out.
 
-🌀 **No DSL. Just types**. As much as possible LowType looks just like Ruby if it had types. There's no special method calls for the base functionality, and defining types at runtime simply uses a `type()` method which almost looks like a `type` keyword, had Ruby implemented types.
+🌀 **Less DSL. More types.** As much as possible LowType looks just like Ruby if it had types. There's no special method calls for the base functionality, and defining types at runtime simply uses a `type()` method which almost looks like a `type` keyword, had Ruby implemented types.
 
-🤖 **No AI**. AI is theoretically a cool concept but in practice capitalism just uses it to steal wealth. Chuck an [anti-AI variant](https://github.com/non-ai-licenses/non-ai-licenses) of your favourite license into your repo today!
+🤖 **AI makes you dumb.** AI is theoretically a cool concept but in practice capitalism just uses it to steal wealth. Chuck an [anti-AI variant](https://github.com/non-ai-licenses/non-ai-licenses) of your favourite license into your repo today!

@@ -2,6 +2,7 @@
 
 require_relative 'adapters/adapter_loader'
 require_relative 'basic_types'
+require_relative 'instance_types'
 require_relative 'redefiner'
 require_relative 'type_expression'
 require_relative 'value_expression'
@@ -25,6 +26,7 @@ module LowType
     parser = LowType::Parser.new(file_path:)
     private_start_line = parser.private_start_line
 
+    klass.extend InstanceTypes
     klass.prepend LowType::Redefiner.redefine(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
     klass.singleton_class.prepend LowType::Redefiner.redefine(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
 

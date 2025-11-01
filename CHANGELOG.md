@@ -7,16 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 1.0.0 [UNRELEASED]
 
+### Added
+
+- `Boolean` type support
+- Complex types suport
+
 ### Fixed
 
 - Bug fixes
 
-## 0.9.0 [UNRELEASED]
+## 0.9.0
 
 ### Added
 
-- `Boolean` type
-- Typed access methods
+- Typed accessor methods
 
 ## 0.8.0
 
