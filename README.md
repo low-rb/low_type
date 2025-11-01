@@ -128,6 +128,17 @@ name # Get the value with type checking and return 'Cher' if the value is `nil`
 name = 'Tim' # Set the value with type checking
 ```
 
+### ℹ️ Multiple Arguments
+
+You can define multiple typed accessor methods just like you would with `attr_[reader, writer, accessor]`:
+```ruby
+type_accessor name: String, occupation: String | 'Doctor', age: Integer | 33
+name # => nil
+occupation # => Doctor
+age = 'old' # => Raises ArgumentTypeError
+age # => 33
+```
+
 ## Local variables [BETA]
 
 ### `type()`
