@@ -50,7 +50,7 @@ module LowType
         end
       end
 
-      def params_with_type_expressions(method_node:, file:) # rubocop:disable Metrics/MethodLength
+      def params_with_type_expressions(method_node:, file:)
         return [] if method_node.parameters.nil?
 
         params = method_node.parameters.slice
