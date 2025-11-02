@@ -3,8 +3,6 @@
 require_relative '../lib/error_types'
 require_relative 'fixtures/low_local'
 
-LowType.configure { |config| config.local_types = true }
-
 RSpec.describe LowLocal do
   subject { described_class.new }
 
@@ -63,21 +61,4 @@ RSpec.describe LowLocal do
       expect(subject.typed_instance_variable.class).to eq(MyType)
     end
   end
-
-  describe '#reassign_local_type_instance_variable' do
-    it 're-assigns a typed instance variable' do
-      subject.local_type_instance_variable
-      subject.reassign_local_type_instance_variable
-      expect(subject.typed_instance_variable.id).to eq('reassigned')
-    end
-  end
-
-  describe '#reassign_invalid_typed_instance_variable' do
-    it 'raises a type error' do
-      subject.local_type_instance_variable
-      expect { subject.reassign_invalid_typed_instance_variable }.to raise_error(LowType::LocalTypeError)
-    end
-  end
 end
-
-LowType.configure { |config| config.local_types = false }

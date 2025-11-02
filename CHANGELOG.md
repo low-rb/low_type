@@ -5,17 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.0.0 [UNRELEASED]
+## 1.1.0 [UNRELEASED]
 
 ### Added
 
 - `Boolean` type support
-- Complex types suport
+- Complex types support
 - Severity level config
 
 ### Fixed
 
 - Bug fixes
+
+## 1.0.0
+
+### Changed
+
+- Use subclasses of `Array`/`Hash` for type expression enumerable syntax (`[]`) by default (scoped to the module, not global)
+
+### Removed
+
+- Remove `object.with_type=()` assignment method
 
 ## 0.9.0
 

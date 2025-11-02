@@ -44,12 +44,4 @@ class LowLocal
   def local_type_instance_variable
     @typed_instance_variable = type MyType | MyType.new(id: 'assigned')
   end
-
-  def reassign_local_type_instance_variable
-    @typed_instance_variable.with_type = type MyType | MyType.new(id: 'reassigned')
-  end
-
-  def reassign_invalid_typed_instance_variable
-    @typed_instance_variable.with_type = type MyType | 'Invalid String'
-  end
 end

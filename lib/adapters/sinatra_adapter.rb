@@ -50,13 +50,16 @@ module LowType
     end
 
     module Methods
+      # Unfortunately overriding invoke() is the best way to validate types for now. Though direct it's also very compute efficient.
+      # I originally tried an after filter and it mostly worked but it only had access to Response which isn't the raw return value.
+      # I suggest that Sinatra provide a hook that allows us to access the raw return value of a route before it becomes a Response.
       def invoke(&block)
         res = catch(:halt, &block)
 
         low_validate!(value: res) if res
 
         res = [res] if res.is_a?(Integer) || res.is_a?(String)
-        if res.is_a?(Array) && res.first.is_a?(Integer)
+        if res.is_a?(::Array) && res.first.is_a?(Integer)
           res = res.dup
           status(res.shift)
           body(res.pop)

@@ -31,7 +31,7 @@ RSpec.describe SinatraApp do
   # Integer.
 
   context 'with status response' do
-    it 'type checks and resturns response' do
+    it 'type checks and returns response' do
       get '/integer'
       expect(last_response.status).to eq(201)
     end
@@ -42,7 +42,7 @@ RSpec.describe SinatraApp do
   context 'with body response' do
     let(:valid_types) { String }
 
-    it 'type checks and resturns response' do
+    it 'type checks and returns response' do
       get '/string'
       expect(last_response.body).to eq('body')
     end
@@ -166,7 +166,7 @@ RSpec.describe SinatraApp do
   # Status, HTML
 
   context 'with status/html response' do
-    let(:valid_types) { [LowType::Status, LowType::HTML] }
+    let(:valid_types) { '[Status, HTML]' }
 
     it 'type checks and returns response' do
       get '/status-html'
@@ -188,7 +188,7 @@ RSpec.describe SinatraApp do
   # Status, Headers, HTML.
 
   context 'with status/headers/html response' do
-    let(:valid_types) { [LowType::Status, LowType::Headers, LowType::HTML] }
+    let(:valid_types) { '[Status, Headers, HTML]' }
 
     it 'type checks and returns response' do
       get '/status-headers-html'

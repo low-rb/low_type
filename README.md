@@ -139,15 +139,7 @@ age = 'old' # => Raises ArgumentTypeError
 age # => 33
 ```
 
-## Local variables [ADVANCED]
-
-Types with `[]` and `|` next to them evaluate to a type expression, so you can define types anywhere:
-
-```ruby
-greeting = String | "Hello"
-```
-
-For a simple type without this syntax or if you want to make it more obvious that you're defining a type, give the type expression as an argument to the `type()` method:
+## Local variables
 
 ### `type()`
 
@@ -160,35 +152,22 @@ my_var = type MyType | fetch_my_object(id: 123)
 
 `my_var` is now type checked to be of type `MyType` when first assigned to.
 
-### Important
-
-The `type()` method must be manually enabled via `LowType.config` because of the following requirements:
-- `TypeExpression`s are evaluated at *runtime* per instance (not once on *class load*) and this will impact performance
-- Class methods `Array[]`/`Hash[]` are subclassed at runtime for the enumerable type syntax to work (but only for the class the `LowType` module is included in).  
-  While `LowType::Array/Hash` behave just like `Array/Hash`, equality comparisons may be affected in some situations
-- The `type()` method dynamically adds a `.with_type=()` method to your referenced instance
-
-### `with_type=()`
-
-In Ruby you can still reassign `my_var` to reference another object of a different type, negating type checking.  
-If you feel that a variable referencing an object should also control the type of that object on reassignment, then use `with_type`:
-
-```ruby
-my_var = type MyType | fetch_my_object(id: 123)
-my_var.with_type = fetch_my_object(id: 456) # Raises TypeError if the new object is not of type MyType
-```
-
-### ⚠️ Important
-
-- Single-instance objects like `nil`, `true` and `false` aren't supported by `with_type`. Your object needs to be a unique instance
-- `with_type` updates the current object rather than referencing a new object. So all other variables referencing the current object will reference the updated object
-- Because we can't reassign `self` in Ruby we reassign the object's instance variables instead, impacting performance
-
 ## Syntax
 
 ### `[T]` Enumerables
 
-`Array[T]` and `Hash[T]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new`/`Hash.new` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have runtime types in Ruby. [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) also suggests `{}` over `Hash[]` syntax for creating hashes.
+`Array[T]` and `Hash[T]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new()`/`Hash.new()` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have runtime types in Ruby. [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) also suggests `{}` over `Hash[]` syntax for creating hashes.
+
+#### ℹ️ Equality comparisons
+
+Class methods `Array[]`/`Hash[]` are subclassed at runtime for the type expression enumerable syntax (`[]`) to work, but only for the scope of the class that the `LowType` module is `include`d in. While `LowType::Array`/`LowType::Hash` behave just like `Array`/`Hash`, equality comparisons are be affected in some situations, but only for code under your control. Your main gotcha is:
+```ruby
+[].is_a?(Array) # => false
+```
+Because `Array`/`Hash` now refers to `LowType::Array`/`LowType::Hash`. Instead prefix `Array`/`Hash` with the top-level namespace (`::`):
+```ruby
+[].is_a?(::Array) # => true
+```
 
 ### `|` Union Types / Default Value
 
@@ -213,7 +192,15 @@ def my_method(my_arg: String | MyType | value(MyType)) # => MyType is the defaul
 
 ## Performance
 
-LowType evaluates type expressions on class load (just once) to be efficient and thread-safe. Then the defined types are checked per method call. It's as light as runtime type checking can be, with performance issues only expected when using `type()` and `.with_type()` methods (disabled by default).
+LowType evaluates type expressions on *class load* (just once) to be efficient and thread-safe. Then the defined types are checked per method call.  
+However, `type()` type expressions are evaluated when they are called at *runtime* on an instance, and this may impact performance.
+
+|                         | **Evaluation** | **Validation** | ℹ️ *Example*            |
+|-------------------------|----------------|----------------|-------------------------|
+| **Method param types**  | 🟢 Class load   | 🟠 Runtime     | `method(name: T)`       |
+| **Method return types** | 🟢 Class load   | 🟠 Runtime     | `method() -> { T }`     |
+| **Instance types**      | 🟢 Class load   | 🟠 Runtime     | `type_accessor(name: T)`|
+| **Local types**         | 🟠 Runtime      | 🟠 Runtime     | `type(T)`               |
 
 ## Config
 
@@ -221,7 +208,6 @@ Copy and paste the following and change the defaults to configure LowType:
 
 ```ruby
 LowType.configure do |config|
-  config.local_types = false # Set to true to enable the type() method for local variables [ADVANCED]
   config.severity_level = :error # [:error, :log] [UNRELEASED]
   config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
 end

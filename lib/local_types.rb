@@ -6,25 +6,18 @@ require_relative 'type_expression'
 require_relative 'value_expression'
 
 module LocalTypes
-  class AssignmentError < StandardError; end
-
   def type(type_expression)
-    referenced_object = type_expression.default_value.dup
-
-    raise AssignmentError, "Single-instance objects like #{referenced_object} are not supported" unless LowType.value?(referenced_object)
+    value = type_expression.default_value
 
     last_caller = caller_locations(1, 1).first
     file = LowType::FileProxy.new(path: last_caller.path, line: last_caller.lineno, scope: 'local type')
-    local_proxy = LowType::LocalProxy.new(type_expression:, name: self, file:)
-    referenced_object.instance_variable_set('@local_proxy', local_proxy)
+    proxy = LowType::LocalProxy.new(type_expression:, name: self, file:)
 
-    type_expression.validate!(value: referenced_object, proxy: local_proxy)
+    type_expression.validate!(value:, proxy:)
 
-    define_with_type(referenced_object:)
+    return value.value if value.is_a?(ValueExpression)
 
-    return referenced_object.value if referenced_object.is_a?(ValueExpression)
-
-    referenced_object
+    value
   end
   alias low_type type
 
@@ -32,39 +25,4 @@ module LocalTypes
     LowType.value(type:)
   end
   alias low_value value
-
-  # Scoped to the class that includes LowTypes module.
-  class Array < ::Array
-    def self.[](*types)
-      return LowType::TypeExpression.new(type: [*types]) if types.all? { |type| LowType.type?(type) }
-
-      super
-    end
-  end
-
-  # Scoped to the class that includes LowTypes module.
-  class Hash < ::Hash
-    def self.[](type)
-      return LowType::TypeExpression.new(type:) if LowType.type?(type)
-
-      super
-    end
-  end
-
-  private
-
-  def define_with_type(referenced_object:)
-    def referenced_object.with_type=(value)
-      local_proxy = instance_variable_get('@local_proxy')
-      type_expression = local_proxy.type_expression
-      type_expression.validate!(value:, proxy: local_proxy)
-
-      # We can't reassign self in Ruby so we reassign instance variables instead.
-      value.instance_variables.each do |variable|
-        instance_variable_set(variable, value.instance_variable_get(variable))
-      end
-
-      self
-    end
-  end
 end
