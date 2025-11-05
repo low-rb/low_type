@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/LowType Logo.svg" alt="LowType logo" height="300" width="300"/></p>
+
 <a href="https://rubygems.org/gems/low_type" title="Install gem"><img src="https://badge.fury.io/rb/low_type.svg" alt="Gem version" height="18"></a>
 
 # LowType
