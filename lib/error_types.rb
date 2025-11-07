@@ -5,4 +5,5 @@ module LowType
   class LocalTypeError < TypeError; end
   class ReturnTypeError < TypeError; end
   class AllowedTypeError < TypeError; end
+  class ConfigError < TypeError; end
 end

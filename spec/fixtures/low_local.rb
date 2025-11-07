@@ -12,6 +12,7 @@ end
 
 class LowLocal
   include LowType
+  using LowType::Syntax
 
   attr_reader :typed_array, :typed_default_value, :typed_instance_variable
 
@@ -43,5 +44,13 @@ class LowLocal
 
   def local_type_instance_variable
     @typed_instance_variable = type MyType | MyType.new(id: 'assigned')
+  end
+end
+
+class LowLocalWithoutSyntax
+  include LowType
+
+  def local_type_array
+    type Array[Integer] | [1, 2, 3]
   end
 end

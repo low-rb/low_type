@@ -4,41 +4,57 @@ require_relative 'factories/proxy_factory'
 require_relative 'proxies/file_proxy'
 require_relative 'proxies/method_proxy'
 require_relative 'proxies/param_proxy'
+require_relative 'syntax'
 require_relative 'type_expression'
 
 module LowType
   # Redefine methods to have their arguments and return values type checked.
   class Redefiner
+    using Syntax
+
     class << self
-      def redefine(method_nodes:, klass:, private_start_line:, file_path:) # rubocop:disable Metrics
+      def redefine(method_nodes:, klass:, private_start_line:, file_path:)
+        create_proxies(method_nodes:, klass:, file_path:)
+        define_methods(method_nodes:, private_start_line:)
+      end
+
+      private
+
+      def create_proxies(method_nodes:, klass:, file_path:)
+        method_nodes.each do |method_node|
+          name = method_node.name
+          line = Parser.line_number(node: method_node)
+          file = FileProxy.new(path: file_path, line:, scope: "#{klass}##{name}")
+          params = param_proxies(method_node:, file:)
+          return_proxy = ProxyFactory.return_proxy(method_node:, file:)
+
+          klass.low_methods[name] = MethodProxy.new(name:, params:, return_proxy:)
+        end
+      end
+
+      def define_methods(method_nodes:, private_start_line:) # rubocop:disable Metrics
         Module.new do
           method_nodes.each do |method_node|
             name = method_node.name
-            line = Parser.line_number(node: method_node)
-            file = FileProxy.new(path: file_path, line:, scope: "#{klass}##{method_node.name}")
-            params = Redefiner.params_with_type_expressions(method_node:, file:)
-            return_proxy = ProxyFactory.return_proxy(method_node:, file:)
-
-            klass.low_methods[name] = MethodProxy.new(name:, params:, return_proxy:)
 
             define_method(name) do |*args, **kwargs|
-              klass.low_methods[name].params.each do |param_proxy|
+              method_proxy = instance_of?(Class) ? low_methods[name] : self.class.low_methods[name]
+
+              method_proxy.params.each do |param_proxy|
                 # Get argument value or default value.
                 value = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
                 if value.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
                   value = param_proxy.type_expression.default_value
                 end
-                # Validate argument type.
+
                 param_proxy.type_expression.validate!(value:, proxy: param_proxy)
-                # Handle value(type) special case.
                 value = value.value if value.is_a?(ValueExpression)
-                # Redefine argument value.
                 param_proxy.position ? args[param_proxy.position] = value : kwargs[param_proxy.name] = value
               end
 
-              if return_proxy
+              if (return_proxy = method_proxy.return_proxy)
                 return_value = super(*args, **kwargs)
-                return_proxy.type_expression.validate!(value: return_value, proxy: klass.low_methods[name].return_proxy)
+                return_proxy.type_expression.validate!(value: return_value, proxy: return_proxy)
                 return return_value
               end
 
@@ -50,12 +66,11 @@ module LowType
         end
       end
 
-      def params_with_type_expressions(method_node:, file:)
+      def param_proxies(method_node:, file:)
         return [] if method_node.parameters.nil?
 
         params = method_node.parameters.slice
-        # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
-        proxy_method = eval("-> (#{params}) {}", binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
+        proxy_method = proxy_method(method_node:)
         required_args, required_kwargs = required_args(proxy_method:)
 
         # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
@@ -87,7 +102,11 @@ module LowType
         raise ArgumentError, "Incorrect param syntax: #{e.message}"
       end
 
-      private
+      def proxy_method(method_node:)
+        params = method_node.parameters.slice
+        # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
+        eval("-> (#{params}) {}", binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
+      end
 
       def required_args(proxy_method:)
         required_args = []

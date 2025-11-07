@@ -1,42 +1,26 @@
+# frozen_string_literal: true
+
 module LowType
-  # Scoped to the class that includes LowType module.
-  class Array < ::Array
-    def self.[](*types)
-      return LowType::TypeExpression.new(type: [*types]) if types.all? { |type| LowType.type?(type) }
-      super
+  module Syntax
+    refine Array.singleton_class do
+      def [](*types)
+        return LowType::TypeExpression.new(type: [*types]) if types.all? { |type| LowType.type?(type) }
+
+        super
+      end
     end
 
-    def self.===(other)
-      return true if other == ::Array
-      super
-    end
+    refine Hash.singleton_class do
+      def [](type)
+        return LowType::TypeExpression.new(type:) if LowType.type?(type)
 
-    def ==(other)
-      return true if other.class == ::Array
-      super
-    end
-  end
-
-  # Scoped to the class that includes LowType module.
-  class Hash < ::Hash
-    def self.[](type)
-      return LowType::TypeExpression.new(type:) if LowType.type?(type)
-      super
-    end
-
-    def self.===(other)
-      return true if other == ::Hash
-      super
-    end
-
-    def ==(other)
-      return true if other.class == ::Hash
-      super
+        super
+      end
     end
   end
 end
 
-# Scoped to the top-level for method type expressions to work. Could we bind/unbind? Yes. Should we? Probably not.
+# Refine doesn't support inheritence.
 class Object
   # For "Type | [type_expression/type/value]" situations, redirecting to or generating a type expression from types.
   # "|" is not defined on Object class and this is the most compute-efficient way to achieve our goal (world peace).

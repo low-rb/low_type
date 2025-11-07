@@ -13,9 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complex types support
 - Severity level config
 
+## 1.0.1
+
 ### Changed
 
-- Use refinements instead of subclasses (rename sublasses.rb to refinements.rb, remove "Equality Comparision" from README)
+- Use refinements instead of subclasses (rename sublasses.rb to syntax.rb, remove "Equality Comparision" from README)
 
 ## 1.0.0
 

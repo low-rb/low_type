@@ -57,9 +57,9 @@ module LowType
 
     def valid_types
       types = @types.map do |type|
-        # Remove 'LowType::' namespaces in subtypes.
+        # Remove 'LowType::' namespace in subtypes.
         if type.is_a?(::Array)
-          '[' + type.map { |subtype| subtype.to_s.delete_prefix('LowType::') }.join(', ') + ']'
+          "[#{type.map { |subtype| subtype.to_s.delete_prefix('LowType::') }.join(', ')}]"
         else
           type.inspect.to_s.delete_prefix('LowType::')
         end

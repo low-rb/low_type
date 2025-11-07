@@ -5,14 +5,13 @@ require_relative 'basic_types'
 require_relative 'instance_types'
 require_relative 'local_types'
 require_relative 'redefiner'
-require_relative 'subclasses'
+require_relative 'syntax'
 require_relative 'type_expression'
 require_relative 'value_expression'
 
-# Include this module into your class to define and check types.
 module LowType
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
-  def self.included(klass) # rubocop:disable Metrics/AbcSize
+  def self.included(klass)
     class << klass
       def low_methods
         @low_methods ||= {}
@@ -20,7 +19,7 @@ module LowType
     end
 
     file_path = LowType.file_path(klass:)
-    parser = LowType::Parser.new(file_path:)
+    parser = Parser.new(file_path:)
     private_start_line = parser.private_start_line
 
     klass.extend InstanceTypes

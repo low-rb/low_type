@@ -138,24 +138,21 @@ To define typed `local` variables at runtime use the `type()` method:
 my_var = type MyType | fetch_my_object(id: 123)
 ```
 
-`my_var` is now type checked to be of type `MyType` when first assigned to.
+`my_var` is now type checked to be of type `MyType` when assigned to.
+
+### ℹ️ Enumerables
+
+To use the `Array[]`/`Hash[]` enumerable syntax with `type()` you must add `using LowType::Syntax` when including LowType:
+```ruby
+include LowType
+using LowType::Syntax
+```
 
 ## Syntax
 
 ### `[T]` Enumerables
 
 `Array[T]` and `Hash[T]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new()`/`Hash.new()` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have runtime types in Ruby. [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) also suggests `{}` over `Hash[]` syntax for creating hashes.
-
-#### ℹ️ Equality comparisons
-
-Class methods `Array[]`/`Hash[]` are subclassed at runtime for the type expression enumerable syntax (`[]`) to work, but only for the scope of the class that the `LowType` module is `include`d in. While `LowType::Array`/`LowType::Hash` behave just like `Array`/`Hash`, equality comparisons are be affected in some situations, but only for code under your control. Your main gotcha is:
-```ruby
-[].is_a?(Array) # => false
-```
-Because `Array`/`Hash` now refers to `LowType::Array`/`LowType::Hash`. Instead prefix `Array`/`Hash` with the top-level namespace (`::`):
-```ruby
-[].is_a?(::Array) # => true
-```
 
 ### `|` Union Types / Default Value
 
@@ -189,6 +186,10 @@ However, `type()` type expressions are evaluated when they are called at *runtim
 | **Method return types** | 🟢 Class load   | 🟠 Runtime     | `method() -> { T }`     |
 | **Instance types**      | 🟢 Class load   | 🟠 Runtime     | `type_accessor(name: T)`|
 | **Local types**         | 🟠 Runtime      | 🟠 Runtime     | `type(T)`               |
+
+## Architecture
+
+LowType only affects the class that it's `include`d into. Class methods `Array[]`/`Hash[]` are modified for the type expression enumerable syntax (`[]`) to work, but only for LowType's internals (using Refinements) and not the `include`d class. However the `type()` method may require `using LowType::Syntax` (only for enumerable syntax) and will affect the `Array[]`/`Hash[]` class methods of the `include`d class.
 
 ## Config
 
