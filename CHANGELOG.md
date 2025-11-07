@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Use refinements instead of subclasses (rename sublasses.rb to syntax.rb, remove "Equality Comparision" from README)
+- Use refinements instead of subclasses
 
 ## 1.0.0
 
