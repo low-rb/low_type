@@ -23,7 +23,7 @@ module LowType
       def create_proxies(method_nodes:, klass:, file_path:)
         method_nodes.each do |method_node|
           name = method_node.name
-          line = Parser.line_number(node: method_node)
+          line = FileParser.line_number(node: method_node)
           file = FileProxy.new(path: file_path, line:, scope: "#{klass}##{name}")
           params = param_proxies(method_node:, file:)
           return_proxy = ProxyFactory.return_proxy(method_node:, file:)

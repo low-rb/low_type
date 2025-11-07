@@ -3,7 +3,7 @@
 require 'prism'
 
 module LowType
-  class Parser
+  class FileParser
     attr_reader :parent_map, :instance_methods, :class_methods, :private_start_line
 
     def initialize(file_path:)

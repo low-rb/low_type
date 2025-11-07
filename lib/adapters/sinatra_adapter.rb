@@ -27,7 +27,7 @@ module LowType
 
           pattern = arguments_node.arguments.first.content
 
-          line = Parser.line_number(node: method_call)
+          line = FileParser.line_number(node: method_call)
           file = FileProxy.new(path: @file_path, line:, scope: "#{@klass}##{method_call.name}")
           next unless (return_proxy = return_proxy(method_node: method_call, pattern:, file:))
 
@@ -38,7 +38,7 @@ module LowType
       end
 
       def return_proxy(method_node:, pattern:, file:)
-        return_type = Parser.return_type(method_node:)
+        return_type = FileParser.return_type(method_node:)
         return nil if return_type.nil?
 
         # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?

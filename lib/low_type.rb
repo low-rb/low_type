@@ -19,7 +19,7 @@ module LowType
     end
 
     file_path = LowType.file_path(klass:)
-    parser = Parser.new(file_path:)
+    parser = FileParser.new(file_path:)
     private_start_line = parser.private_start_line
 
     klass.extend InstanceTypes
