@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'adapters/adapter_loader'
-require_relative 'basic_types'
+require_relative 'types/complex_types'
 require_relative 'instance_types'
 require_relative 'local_types'
 require_relative 'redefiner'

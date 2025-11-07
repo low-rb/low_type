@@ -4,7 +4,7 @@ require 'cgi'
 require 'rack/test'
 require_relative '../../lib/adapters/sinatra_adapter'
 require_relative '../../lib/low_type'
-require_relative '../../lib/basic_types'
+require_relative '../../lib/types/complex_types'
 require_relative '../fixtures/sinatra_app'
 
 ENV['APP_ENV'] = 'test'

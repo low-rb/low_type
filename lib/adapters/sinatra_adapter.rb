@@ -5,7 +5,7 @@ require 'prism'
 require_relative '../interfaces/adapter_interface'
 require_relative '../proxies/file_proxy'
 require_relative '../proxies/return_proxy'
-require_relative '../error_types'
+require_relative '../types/error_types'
 
 module LowType
   module Adapter

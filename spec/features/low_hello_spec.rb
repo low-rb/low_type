@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/error_types'
+require_relative '../../lib/types/error_types'
 require_relative '../fixtures/low_hello'
 
 RSpec.describe LowHello do

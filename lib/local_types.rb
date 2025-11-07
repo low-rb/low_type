@@ -2,7 +2,7 @@
 
 require_relative 'proxies/file_proxy'
 require_relative 'proxies/local_proxy'
-require_relative 'error_types'
+require_relative 'types/error_types'
 require_relative 'type_expression'
 require_relative 'value_expression'
 

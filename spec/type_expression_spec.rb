@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../lib/proxies/param_proxy'
-require_relative '../lib/error_types'
+require_relative '../lib/types/error_types'
 require_relative '../lib/type_expression'
 
 RSpec.describe LowType::TypeExpression do
