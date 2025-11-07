@@ -32,20 +32,6 @@ def say_hello(greeting: String | 'Hello')
 end
 ```
 
-If you want to populate the argument from a variable by another name:
-```ruby
-def say_hello(greeting: String | @saved_greeting)
-  puts greeting
-end
-```
-
-Don't forget that these are just Ruby expressions and you can do more conditional logic as long as the last expression evaluates to a value:
-```ruby
-def say_hello(greeting: String | (@saved_greeting || 'Hello'))
-  puts greeting
-end
-```
-
 ## Enumerables
 
 Wrap your type in an `Array[T]` or `Hash[T]` enumerable type. An `Array` of `String`s looks like:
