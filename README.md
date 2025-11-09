@@ -1,10 +1,8 @@
-<p align="center"><img src="assets/LowType Logo.svg" alt="LowType logo" height="300" width="300"/></p>
-
 <a href="https://rubygems.org/gems/low_type" title="Install gem"><img src="https://badge.fury.io/rb/low_type.svg" alt="Gem version" height="18"></a>
 
 # LowType
 
-LowType introduces the concept of "type expressions" in method arguments. When an argument's default value resolves to a type instead of a value then it's treated as a type expression. Now you can have types in Ruby in the simplest syntax possible, only adding them as needed:
+LowType introduces the concept of "type expressions" in method arguments. When an argument's default value resolves to a type instead of a value then it's treated as a type expression. Now you can have types in Ruby in the simplest syntax possible:
 
 ```ruby
 class MyClass
