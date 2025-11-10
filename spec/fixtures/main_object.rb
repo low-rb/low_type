@@ -2,7 +2,7 @@
 
 require_relative '../../lib/low_type'
 
-include LowType
+include LowType # rubocop:disable Style/MixinUsage
 
 def arg(greeting)
   greeting
@@ -22,7 +22,7 @@ class << self
   end
 end
 
-private
+private # rubocop:disable Lint/UselessAccessModifier
 
 # All methods defined on main object are private so this makes no difference.
 def private_arg

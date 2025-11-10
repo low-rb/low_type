@@ -18,7 +18,7 @@ module LowType
       end
     end
 
-    file_path = LowType.file_path(klass:)
+    file_path = LowType.file_path
     parser = FileParser.new(klass:, file_path:)
     line_numbers = parser.line_numbers
 
@@ -47,7 +47,7 @@ module LowType
 
     # Internal API.
 
-    def file_path(klass:)
+    def file_path
       includer_file = caller.find { |callee| callee.end_with?("in 'Module#include'") || callee.end_with?("in 'include'") }
       includer_file.split(':').first
     end
