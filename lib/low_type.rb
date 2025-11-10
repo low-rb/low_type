@@ -19,13 +19,13 @@ module LowType
     end
 
     file_path = LowType.file_path(klass:)
-    parser = FileParser.new(file_path:)
-    private_start_line = parser.private_start_line
+    parser = FileParser.new(klass:, file_path:)
+    line_numbers = parser.line_numbers
 
     klass.extend InstanceTypes
     klass.include LocalTypes
-    klass.prepend LowType::Redefiner.redefine(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
-    klass.singleton_class.prepend LowType::Redefiner.redefine(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
+    klass.prepend LowType::Redefiner.redefine(method_nodes: parser.instance_methods, klass:, line_numbers:, file_path:)
+    klass.singleton_class.prepend LowType::Redefiner.redefine(method_nodes: parser.class_methods, klass:, line_numbers:, file_path:)
 
     if (adapter = Adapter::Loader.load(klass:, parser:, file_path:))
       adapter.process

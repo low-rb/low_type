@@ -13,9 +13,9 @@ module LowType
     using Syntax
 
     class << self
-      def redefine(method_nodes:, klass:, private_start_line:, file_path:)
+      def redefine(method_nodes:, klass:, line_numbers:, file_path:)
         create_proxies(method_nodes:, klass:, file_path:)
-        define_methods(method_nodes:, private_start_line:)
+        define_methods(method_nodes:, line_numbers:)
       end
 
       private
@@ -32,9 +32,16 @@ module LowType
         end
       end
 
-      def define_methods(method_nodes:, private_start_line:) # rubocop:disable Metrics
+      def define_methods(method_nodes:, line_numbers:) # rubocop:disable Metrics
+        class_start = line_numbers[:class_start]
+        class_end = line_numbers[:class_end]
+        private_start = line_numbers[:private_start]
+
         Module.new do
           method_nodes.each do |method_node|
+            method_start = method_node.start_line
+            next unless method_start > class_start && method_node.end_line < class_end
+
             name = method_node.name
 
             define_method(name) do |*args, **kwargs|
@@ -61,7 +68,7 @@ module LowType
               super(*args, **kwargs)
             end
 
-            private name if private_start_line && method_node.start_line > private_start_line
+            private name if private_start && method_start > private_start
           end
         end
       end
