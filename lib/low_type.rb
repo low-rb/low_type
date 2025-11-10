@@ -19,13 +19,13 @@ module LowType
     end
 
     file_path = LowType.file_path(klass:)
-    parser = FileParser.new(file_path:)
-    private_start_line = parser.private_start_line
+    parser = FileParser.new(klass:, file_path:)
+    line_numbers = parser.line_numbers
 
     klass.extend InstanceTypes
     klass.include LocalTypes
-    klass.prepend LowType::Redefiner.redefine(method_nodes: parser.instance_methods, klass:, private_start_line:, file_path:)
-    klass.singleton_class.prepend LowType::Redefiner.redefine(method_nodes: parser.class_methods, klass:, private_start_line:, file_path:)
+    klass.prepend LowType::Redefiner.redefine(method_nodes: parser.instance_methods, klass:, line_numbers:, file_path:)
+    klass.singleton_class.prepend LowType::Redefiner.redefine(method_nodes: parser.class_methods, klass:, line_numbers:, file_path:)
 
     if (adapter = Adapter::Loader.load(klass:, parser:, file_path:))
       adapter.process
@@ -48,10 +48,8 @@ module LowType
     # Internal API.
 
     def file_path(klass:)
-      # Remove module namespaces from class.
-      class_name = klass.to_s.split(':').last
-      # The first class found regardless of namespace will be the class that did the include.
-      caller.find { |callee| callee.end_with?("<class:#{class_name}>'") }.split(':').first
+      includer_file = caller.find { |callee| callee.end_with?("in 'Module#include'") || callee.end_with?("in 'include'") }
+      includer_file.split(':').first
     end
 
     # TODO: Unit test.

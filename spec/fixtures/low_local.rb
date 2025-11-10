@@ -2,55 +2,57 @@
 
 require_relative '../../lib/low_type'
 
-class MyType
-  attr_reader :id
-
-  def initialize(id:)
-    @id = id
-  end
-end
-
 class LowLocal
   include LowType
   using LowType::Syntax
 
-  attr_reader :typed_array, :typed_default_value, :typed_instance_variable
-
-  def initialize
-    @typed_array = nil
-    @typed_default_value = nil
-    @typed_instance_variable = nil
+  def default_string
+    type String | 'Hello'
   end
 
-  def local_type_array
-    @typed_array = type Array[Integer] | [1, 2, 3]
+  def default_method
+    type String | fetch_method
   end
 
-  def invalid_local_type_array
-    @typed_array = type Array[Integer] | %w[a b c]
+  def default_string_again
+    type String | (nil_method || 'Hello Again')
+  end
+
+  def default_typed_value
+    type String | value(String)
+  end
+
+  def subtype_array
+    type Array[Integer] | [1, 2, 3]
+  end
+
+  def invalid_subtype_array
+    type Array[Integer] | %w[a b c]
   end
 
   def array_multiple_subtypes
-    @typed_array = type Array[Integer, String, Symbol] | [1, '2', :three]
+    type Array[Integer, String, Symbol] | [1, '2', :three]
   end
 
   def invalid_array_multiple_subtypes
-    @typed_array = type Array[Integer, String, Symbol] | [:one, 2, '3']
+    type Array[Integer, String, Symbol] | [:one, 2, '3']
   end
 
-  def local_type_default_value
-    @typed_default_value = type String | value(String)
+  private
+
+  def fetch_method
+    'Goodbye'
   end
 
-  def local_type_instance_variable
-    @typed_instance_variable = type MyType | MyType.new(id: 'assigned')
+  def nil_method
+    nil
   end
 end
 
-class LowLocalWithoutSyntax
+class LowLocalWithoutRefinements
   include LowType
 
-  def local_type_array
+  def subtype_array
     type Array[Integer] | [1, 2, 3]
   end
 end

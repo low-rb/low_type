@@ -4,25 +4,25 @@ require 'prism'
 
 module LowType
   class FileParser
-    attr_reader :parent_map, :instance_methods, :class_methods, :private_start_line
+    attr_reader :parent_map, :instance_methods, :class_methods, :line_numbers
 
-    def initialize(file_path:)
+    def initialize(klass:, file_path:)
       @root_node = Prism.parse_file(file_path).value
 
       parent_mapper = ParentMapper.new
       parent_mapper.visit(@root_node)
       @parent_map = parent_mapper.parent_map
 
-      method_visitor = MethodDefVisitor.new(@parent_map)
+      method_visitor = MethodDefVisitor.new(root_node: @root_node, parent_map:, klass:)
       @root_node.accept(method_visitor)
 
       @instance_methods = method_visitor.instance_methods
       @class_methods = method_visitor.class_methods
-      @private_start_line = method_visitor.private_start_line
+      @line_numbers = method_visitor.line_numbers
     end
 
     def method_calls(method_names:)
-      block_visitor = MethodCallVisitor.new(parent_map: @parent_map, method_names:)
+      block_visitor = MethodCallVisitor.new(parent_map:, method_names:)
       @root_node.accept(block_visitor)
       block_visitor.method_calls
     end
@@ -54,14 +54,15 @@ module LowType
   end
 
   class MethodDefVisitor < Prism::Visitor
-    attr_reader :class_methods, :instance_methods, :private_start_line
+    attr_reader :class_methods, :instance_methods, :line_numbers
 
-    def initialize(parent_map)
+    def initialize(root_node:, parent_map:, klass:)
       @parent_map = parent_map
+      @klass = klass
 
       @instance_methods = []
       @class_methods = []
-      @private_start_line = nil
+      @line_numbers = { class_start: 0, class_end: root_node.end_line }
     end
 
     def visit_def_node(node)
@@ -75,7 +76,23 @@ module LowType
     end
 
     def visit_call_node(node)
-      @private_start_line = node.start_line if node.name == :private && node.respond_to?(:start_line)
+      start_line = node.name == :private && node.respond_to?(:start_line) && node.start_line || nil
+      class_start = @line_numbers[:class_start]
+      class_end = @line_numbers[:class_end]
+
+      if start_line && class_start && class_end && start_line > class_start && start_line < class_end
+        @line_numbers[:private_start] = node.start_line
+      end
+
+      super
+    end
+
+    def visit_class_node(node)
+      if node.name == @klass.to_s.to_sym
+        @line_numbers = { class_start: node.class_keyword_loc.start_line, class_end: node.end_keyword_loc.end_line }
+      end
+
+      super
     end
 
     private
