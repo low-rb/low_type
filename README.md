@@ -138,6 +138,11 @@ my_var = type MyType | fetch_my_object(id: 123)
 
 `my_var` is now type checked to be of type `MyType` when assigned to.
 
+Don't forget that these are just Ruby expressions and you can do more conditional logic as long as the last expression evaluates to a value:
+```ruby
+my_var = String | (say_goodbye || 'Hello Again')
+```
+
 ### ℹ️ Enumerables
 
 To use the `Array[]`/`Hash[]` enumerable syntax with `type()` you must add `using LowType::Syntax` when including LowType:

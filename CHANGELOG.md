@@ -9,9 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support dynamic expressions in methods and return types at runtimem (like `type()` already does)
 - `Boolean` type support
 - Complex types support
 - Severity level config
+
+## 1.0.2
+
+### Changed
+
+- Handle multiple classes per file
+- Support main object
 
 ## 1.0.1
 
