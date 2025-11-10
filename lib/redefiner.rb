@@ -40,12 +40,12 @@ module LowType
         Module.new do
           method_nodes.each do |method_node|
             method_start = method_node.start_line
-            next unless method_start > class_start && method_node.end_line < class_end
+            next unless method_start > class_start && method_node.end_line <= class_end
 
             name = method_node.name
 
             define_method(name) do |*args, **kwargs|
-              method_proxy = instance_of?(Class) ? low_methods[name] : self.class.low_methods[name]
+              method_proxy = instance_of?(Class) ? low_methods[name] : self.class.low_methods[name] || Object.low_methods[name]
 
               method_proxy.params.each do |param_proxy|
                 # Get argument value or default value.

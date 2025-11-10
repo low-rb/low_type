@@ -13,11 +13,10 @@ module LowType
       parent_mapper.visit(@root_node)
       @parent_map = parent_mapper.parent_map
 
-      method_visitor = MethodDefVisitor.new(parent_map:, klass:)
+      method_visitor = MethodDefVisitor.new(root_node: @root_node, parent_map:, klass:)
       @root_node.accept(method_visitor)
 
       @instance_methods = method_visitor.instance_methods
-
       @class_methods = method_visitor.class_methods
       @line_numbers = method_visitor.line_numbers
     end
@@ -57,13 +56,13 @@ module LowType
   class MethodDefVisitor < Prism::Visitor
     attr_reader :class_methods, :instance_methods, :line_numbers
 
-    def initialize(parent_map:, klass:)
+    def initialize(root_node:, parent_map:, klass:)
       @parent_map = parent_map
       @klass = klass
 
       @instance_methods = []
       @class_methods = []
-      @line_numbers = {}
+      @line_numbers = { class_start: 0, class_end: root_node.end_line }
     end
 
     def visit_def_node(node)
