@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'proxies/param_proxy'
+require_relative 'queries/type_query'
 
 module LowType
   root_path = File.expand_path(__dir__)
@@ -24,7 +25,7 @@ module LowType
       if expression.instance_of?(::LowType::TypeExpression)
         @types += expression.types
         @default_value = expression.default_value
-      elsif ::LowType.value?(expression)
+      elsif ::LowType::TypeQuery.value?(expression)
         @default_value = expression
       else
         @types << expression
@@ -45,7 +46,7 @@ module LowType
 
       @types.each do |type|
         # Example: HTML is a subclass of String and should pass as a String.
-        return true if LowType.basic_type?(type:) && type <= value.class
+        return true if LowType::TypeQuery.basic_type?(type:) && type <= value.class
         return true if type.is_a?(::Array) && value.is_a?(::Array) && array_types_match_values?(types: type, values: value)
         return true if type.is_a?(::Hash) && value.is_a?(::Hash) && hash_types_match_values?(type:, value:)
       end

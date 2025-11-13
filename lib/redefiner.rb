@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
+require_relative 'factories/expression_factory'
 require_relative 'factories/proxy_factory'
 require_relative 'proxies/file_proxy'
 require_relative 'proxies/method_proxy'
 require_relative 'proxies/param_proxy'
 require_relative 'syntax/syntax'
+require_relative 'queries/type_query'
 require_relative 'type_expression'
+require_relative 'value_expression'
 
 module LowType
   # Redefine methods to have their arguments and return values type checked.
@@ -96,7 +99,7 @@ module LowType
 
               if expression.is_a?(TypeExpression)
                 param_proxies << ParamProxy.new(type_expression: expression, name:, type:, position:, file:)
-              elsif ::LowType.type?(expression)
+              elsif ::LowType::TypeQuery.type?(expression)
                 param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: expression), name:, type:, position:, file:)
               end
             end
@@ -139,7 +142,7 @@ module LowType
 
       # Value expressions are eval()'d in the context of this module class (the instance doesn't exist yet) so alias API.
       def value(type)
-        LowType.value(type:)
+        ExpressionFactory.type_expression_with_value(type:)
       end
     end
   end

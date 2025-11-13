@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../proxies/return_proxy'
-require_relative '../file_parser'
+require_relative '../queries/file_parser'
 require_relative '../type_expression'
 
 module LowType

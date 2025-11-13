@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'proxies/return_proxy'
+require_relative 'queries/type_query'
 require_relative 'type_expression'
 
 module LowType
@@ -50,7 +51,7 @@ module LowType
     def type_expression(expression)
       if expression.instance_of?(TypeExpression)
         expression
-      elsif ::LowType.type?(expression)
+      elsif ::LowType::TypeQuery.type?(expression)
         TypeExpression.new(type: expression)
       end
     end

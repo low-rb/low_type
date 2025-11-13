@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
+require_relative 'factories/expression_factory'
 require_relative 'proxies/file_proxy'
 require_relative 'proxies/local_proxy'
 require_relative 'types/error_types'
-require_relative 'type_expression'
-require_relative 'value_expression'
 
 module LowType
   module LocalTypes
@@ -26,7 +25,7 @@ module LowType
     alias low_type type
 
     def value(type)
-      LowType.value(type:)
+      ExpressionFactory.type_expression_with_value(type:)
     end
     alias low_value value
   end
