@@ -279,6 +279,10 @@ Style/DefWithParentheses:
   Enabled: false
 Lint/Void:
   Enabled: false
+
+# Support Array[]/Hash[] syntax.
+Style/RedundantArrayConstructor:
+  Enabled: false
 ```
 
 ## Installation
