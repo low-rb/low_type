@@ -50,7 +50,7 @@ module LowType
     # Internal API.
 
     def file_path
-      includer_file = caller.find { |callee| callee.end_with?("in 'Module#include'") || callee.end_with?("in 'include'") }
+      includer_file = caller.find { |callee| callee.end_with?("include'") }
       includer_file.split(':').first
     end
 
