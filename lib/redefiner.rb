@@ -39,8 +39,12 @@ module LowType
 
         Module.new do
           method_nodes.each do |method_node|
-            method_start = method_node.start_line
-            next unless method_start > class_start && method_node.end_line <= class_end
+            method_start = method_node.respond_to?(:start_line) ? method_node.start_line : nil
+            method_end = method_node.respond_to?(:end_line) ? method_node.end_line : nil
+
+            if method_start && method_end && class_end
+              next unless method_start > class_start && method_end <= class_end
+            end
 
             name = method_node.name
 

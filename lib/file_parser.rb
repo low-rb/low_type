@@ -62,7 +62,7 @@ module LowType
 
       @instance_methods = []
       @class_methods = []
-      @line_numbers = { class_start: 0, class_end: root_node.respond_to?(:end_line) ? root_node.end_line : 1}
+      @line_numbers = { class_start: 0, class_end: root_node.respond_to?(:end_line) ? root_node.end_line : nil}
     end
 
     def visit_def_node(node)
