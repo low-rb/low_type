@@ -200,8 +200,16 @@ Copy and paste the following and change the defaults to configure LowType:
 
 ```ruby
 LowType.configure do |config|
-  config.severity_level = :error # [:error, :log] [UNRELEASED]
-  config.deep_type_check = false # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
+  # [:error, :log, :none] [UNRELEASED]
+  config.severity_level = :error
+
+  # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
+  config.deep_type_check = false
+
+  # The "|" pipe syntax requires a monkey-patch but can be disabled if you don't need union types with default values.
+  # This is the only monkey-patch in the entire library and is a relatively harmless one, see "syntax/union_types.rb".
+  # Set to false and a param with a type will always be required but you can just leave out the type to make optional.
+  config.union_type_expressions = true
 end
 ```
 

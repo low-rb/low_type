@@ -4,7 +4,7 @@ require_relative 'factories/proxy_factory'
 require_relative 'proxies/file_proxy'
 require_relative 'proxies/method_proxy'
 require_relative 'proxies/param_proxy'
-require_relative 'syntax'
+require_relative 'syntax/syntax'
 require_relative 'type_expression'
 
 module LowType

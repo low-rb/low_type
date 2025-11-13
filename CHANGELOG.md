@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complex types support
 - Severity level config
 
+## 1.0.3
+
+### Changed
+
+- Disable union type expressions via config
+
 ## 1.0.2
 
 ### Changed

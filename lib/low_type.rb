@@ -5,13 +5,15 @@ require_relative 'types/complex_types'
 require_relative 'instance_types'
 require_relative 'local_types'
 require_relative 'redefiner'
-require_relative 'syntax'
+require_relative 'syntax/syntax'
 require_relative 'type_expression'
 require_relative 'value_expression'
 
 module LowType
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
   def self.included(klass)
+    require_relative 'syntax/union_types' if LowType.config.union_type_expressions
+
     class << klass
       def low_methods
         @low_methods ||= {}
@@ -37,8 +39,8 @@ module LowType
     # Public API.
 
     def config
-      config = Struct.new(:deep_type_check, :severity_level)
-      @config ||= config.new(false, :error)
+      config = Struct.new(:deep_type_check, :severity_level, :union_type_expressions)
+      @config ||= config.new(false, :error, true)
     end
 
     def configure

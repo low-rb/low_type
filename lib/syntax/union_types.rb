@@ -1,26 +1,10 @@
-# frozen_string_literal: true
-
-module LowType
-  module Syntax
-    refine Array.singleton_class do
-      def [](*types)
-        return LowType::TypeExpression.new(type: [*types]) if types.all? { |type| LowType.type?(type) }
-
-        super
-      end
-    end
-
-    refine Hash.singleton_class do
-      def [](type)
-        return LowType::TypeExpression.new(type:) if LowType.type?(type)
-
-        super
-      end
-    end
-  end
-end
-
-# Refine doesn't support inheritence.
+###
+# Type expressions from union types.
+#
+# The "|" pipe syntax requires a monkey-patch but can be disabled if you don't need union types with default values.
+# This is the only monkey-patch in the entire library and is a relatively harmless one.
+# @see LowType.config.union_type_expressions
+###
 class Object
   # For "Type | [type_expression/type/value]" situations, redirecting to or generating a type expression from types.
   # "|" is not defined on Object class and this is the most compute-efficient way to achieve our goal (world peace).
