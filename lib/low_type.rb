@@ -58,7 +58,7 @@ module LowType
     end
 
     def basic_type?(type:)
-      type.respond_to?(:new) || type == Integer || type == Symbol
+      type.class == Class
     end
 
     def complex_type?(type:)
