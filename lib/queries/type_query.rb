@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LowType
   # TODO: Unit test.
   class TypeQuery
@@ -7,7 +9,7 @@ module LowType
       end
 
       def basic_type?(type:)
-        type.class == Class
+        type.instance_of?(Class)
       end
 
       def complex_type?(type:)

@@ -5,8 +5,8 @@ require_relative 'factories/proxy_factory'
 require_relative 'proxies/file_proxy'
 require_relative 'proxies/method_proxy'
 require_relative 'proxies/param_proxy'
-require_relative 'syntax/syntax'
 require_relative 'queries/type_query'
+require_relative 'syntax/syntax'
 require_relative 'type_expression'
 require_relative 'value_expression'
 
@@ -45,9 +45,7 @@ module LowType
             method_start = method_node.respond_to?(:start_line) ? method_node.start_line : nil
             method_end = method_node.respond_to?(:end_line) ? method_node.end_line : nil
 
-            if method_start && method_end && class_end
-              next unless method_start > class_start && method_end <= class_end
-            end
+            next if method_start && method_end && class_end && !(method_start > class_start && method_end <= class_end)
 
             name = method_node.name
 
