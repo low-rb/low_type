@@ -13,6 +13,7 @@ module LowType
     def output(value:)
       case @output_mode
       when :type
+        # TODO: Show full type structure in error output instead of just the type of the supertype.
         value.class
       when :value
         value.inspect[0...@output_size]
