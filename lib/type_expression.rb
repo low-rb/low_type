@@ -5,10 +5,10 @@ require_relative 'queries/type_query'
 
 module LowType
   root_path = File.expand_path(__dir__)
-  file_path = File.expand_path(__FILE__)
   adapter_paths = Dir.chdir(root_path) { Dir.glob('adapters/*') }.map { |path| File.join(root_path, path) }
+  module_paths = %w[instance_types local_types redefiner].map { |path| File.join(root_path, "#{path}.rb") }
 
-  HIDDEN_PATHS = [file_path, *adapter_paths, File.join(root_path, 'redefiner.rb')].freeze
+  HIDDEN_PATHS = [File.expand_path(__FILE__), *adapter_paths, *module_paths].freeze
 
   # Represent types and default values as a series of chainable expressions.
   class TypeExpression
