@@ -200,15 +200,20 @@ Copy and paste the following and change the defaults to configure LowType:
 
 ```ruby
 LowType.configure do |config|
-  # [:error, :log, :none] [UNRELEASED]
-  config.severity_level = :error
+  # Set to :log or :none to disable the raising of an exception when types are invalid. [UNRELEASED]
+  config.error_mode = :error
+
+  # Set to :value to show a concatenated inspect of the invalid param when an error is raised. Or :none to redact.
+  # Great for debugging, bad for security, and makes tests harder to write when the error messages are so dynamic.
+  config.output_mode = :type
+  config.output_size = 100
 
   # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
   config.deep_type_check = false
 
   # The "|" pipe syntax requires a monkey-patch but can be disabled if you don't need union types with default values.
   # This is the only monkey-patch in the entire library and is a relatively harmless one, see "syntax/union_types.rb".
-  # Set to false and a param with a type will always be required but you can just leave out the type to make optional.
+  # Set to false and typed params will always be required, as there's no "| nil" syntax (remove type to make optional)
   config.union_type_expressions = true
 end
 ```

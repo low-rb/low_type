@@ -1,9 +1,9 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Minor features that don't break backwards compatibiliy are released as patches.
 
 ## 1.1.0 [UNRELEASED]
 
@@ -12,7 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support dynamic expressions in methods and return types at runtimem (like `type()` already does)
 - `Boolean` type support
 - Complex types support
-- Severity level config
+- Error mode config
+
+## 1.0.8
+
+### Added
+
+- Add `output_mode` and `output_size` config options
+
+### Changed
+
+- Rename `severity_level` config to `error_mode`
 
 ## 1.0.3
 

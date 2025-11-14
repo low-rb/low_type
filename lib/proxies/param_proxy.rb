@@ -8,6 +8,8 @@ module LowType
     attr_reader :type_expression, :name, :type, :position
 
     def initialize(type_expression:, name:, type:, file:, position: nil)
+      super()
+
       @type_expression = type_expression
       @name = name
       @type = type
@@ -20,7 +22,7 @@ module LowType
     end
 
     def error_message(value:)
-      "Invalid argument type '#{value.class}' for parameter '#{@name}'. Valid types: '#{@type_expression.valid_types}'"
+      "Invalid argument type '#{output(value:)}' for parameter '#{@name}'. Valid types: '#{@type_expression.valid_types}'"
     end
   end
 end
