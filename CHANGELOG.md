@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Minor features that don't break backwards compatibiliy are released as patches.
 
-## 1.1.0 [UNRELEASED]
+## 1.2.0 [UNRELEASED]
 
 ### Added
 
@@ -13,6 +13,13 @@ Minor features that don't break backwards compatibiliy are released as patches.
 - `Boolean` type support
 - Complex types support
 - Error mode config
+
+## 1.1.0
+
+### Added
+
+- Deep type checking
+- Array subtype expressions
 
 ## 1.0.8
 

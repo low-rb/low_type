@@ -19,6 +19,8 @@ module LowType
       @types = []
       @types << type unless type.nil?
       @default_value = default_value
+      # TODO: Override per type expression with a config expression.
+      @deep_type_check = LowType.config.deep_type_check
     end
 
     def |(expression)
@@ -45,10 +47,9 @@ module LowType
       end
 
       @types.each do |type|
-        # Example: HTML is a subclass of String and should pass as a String.
-        return true if LowType::TypeQuery.basic_type?(type:) && type <= value.class
-        return true if type.is_a?(::Array) && value.is_a?(::Array) && array_types_match_values?(types: type, values: value)
-        return true if type.is_a?(::Hash) && value.is_a?(::Hash) && hash_types_match_values?(type:, value:)
+        return true if type_matches_value?(type:, value:, proxy:)
+        return true if type.is_a?(Array) && value.is_a?(Array) && array_types_match_values?(types: type, values: value, proxy:)
+        return true if type.is_a?(Hash) && value.is_a?(Hash) && hash_types_match_values?(types: type, values: value)
       end
 
       raise proxy.error_type, proxy.error_message(value:)
@@ -59,38 +60,82 @@ module LowType
     def valid_types
       types = @types.map do |type|
         # Remove 'LowType::' namespace in subtypes.
-        if type.is_a?(::Array)
-          "[#{type.map { |subtype| subtype.to_s.delete_prefix('LowType::') }.join(', ')}]"
+        if type.is_a?(Array)
+          "[#{type.map { |subtype| valid_subtype(subtype:) }.join(', ')}]"
         else
           type.inspect.to_s.delete_prefix('LowType::')
         end
       end
 
-      types += ['nil'] if @default_value.nil?
+      types << 'nil' if @default_value.nil?
       types.join(' | ')
     end
 
     private
 
-    def array_types_match_values?(types:, values:)
-      # [T, T, T]
-      if types.length > 1
-        types.each_with_index do |type, index|
-          # Example: HTML is a subclass of String and should pass as a String.
-          return false unless type <= values[index].class
-        end
-      # [T]
-      elsif types.length == 1
-        return false unless types.first == values.first.class
+    def valid_subtype(subtype:)
+      if subtype.is_a?(TypeExpression)
+        types = subtype.types
+        types << 'nil' if subtype.default_value.nil?
+        types.join(' | ')
+      else
+        subtype.to_s.delete_prefix('LowType::')
       end
-      # TODO: Deep type check (all elements for [T]).
+    end
+
+    def array_types_match_values?(types:, values:, proxy:)
+      # [X, Y, Z] An arbitrary amount of elements are arbitrary types in an arbitrary order.
+      if types.length > 1
+        return multiple_types_match_values?(types:, values:, proxy:)
+      # [T] All elements are the same type.
+      elsif types.length == 1
+        return single_type_matches_values?(type: types.first, values:, proxy:)
+      end
+
+      # [] Misconfigured empty Array[] type.
+      true
+    end
+
+    def multiple_types_match_values?(types:, values:, proxy:)
+      types.each_with_index do |type, index|
+        return false unless type_matches_value?(type:, value: values[index], proxy:)
+      end
 
       true
     end
 
-    def hash_types_match_values?(type:, value:)
+    def single_type_matches_values?(type:, values:, proxy:)
+      # [V, ...] Type check all elements.
+      if deep_type_check?
+        return false if values.any? { |value| !type_matches_value?(type:, value:, proxy:) }
+      # [V] Type check the first element.
+      else
+        return false unless type_matches_value?(type:, value: values.first, proxy:)
+      end
+
+      true
+    end
+
+    def hash_types_match_values?(types:, values:)
       # TODO: Shallow validation of hash could be made deeper with user config.
-      type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
+      types.keys[0] == values.keys[0].class && types.values[0] == values.values[0].class
+    end
+
+    def type_matches_value?(type:, value:, proxy:)
+      if type.instance_of?(Class)
+        return type.match?(value:) if LowType::TypeQuery.complex_type?(type:)
+
+        return type == value.class
+      elsif type.instance_of?(::LowType::TypeExpression)
+        type.validate!(value:, proxy:)
+        return true
+      end
+
+      false
+    end
+
+    def deep_type_check?
+      @deep_type_check || LowType.config.deep_type_check || false
     end
 
     def backtrace_with_proxy(proxy:, backtrace:)
