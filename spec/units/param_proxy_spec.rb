@@ -1,23 +1,22 @@
 # frozen_string_literal: true
 
-require_relative '../lib/proxies/param_proxy'
-require_relative '../lib/types/error_types'
-require_relative '../lib/type_expression'
+require_relative '../../lib/proxies/param_proxy'
+require_relative '../../lib/types/error_types'
+require_relative '../../lib/type_expression'
 
-RSpec.describe LowType::TypeExpression do
-  subject(:type_expression) { described_class.new(default_value: nil) }
+RSpec.describe LowType::ParamProxy do
+  subject(:param_proxy) { described_class.new(type_expression:, name: :dummy_method, type: :req, file:, position: nil) }
 
-  # TODO: Use FactoryBot.
-  let(:proxy) { LowType::ParamProxy.new(type_expression:, name: 'greetings', type: :req, file:) }
+  let(:type_expression) { LowType::TypeExpression.new(default_value: nil) }
   let(:file) { LowType::FileProxy.new(path: '/Users/name/dev/app/lib/my_class', line: 123, scope: 'MyClass#my_method') }
 
   describe '#initialize' do
     it 'instantiates a class' do
-      expect { type_expression }.not_to raise_error
+      expect { param_proxy }.not_to raise_error
     end
   end
 
-  describe '#backtrace_with_proxy' do
+  describe '#backtrace' do
     let(:hidden_paths) do
       [
         '/Users/name/dev/app/vendor/bundle/ruby/3.4.0/gems/low_type/lib/redefiner.rb',
@@ -48,8 +47,7 @@ RSpec.describe LowType::TypeExpression do
     end
 
     it 'returns filtered backtrace with proxy' do
-      stub_const('LowType::HIDDEN_PATHS', hidden_paths)
-      expect(type_expression.send(:backtrace_with_proxy, backtrace:, proxy:)).to eq(
+      expect(param_proxy.backtrace(backtrace:, hidden_paths:)).to eq(
         [
           "    from /Users/name/dev/app/lib/my_class:123:in 'MyClass#my_method'",
           "    from /Users/name/dev/app/lib/models/time_tree/trunk_cone.rb:45:in 'TrunkCone#grow'",

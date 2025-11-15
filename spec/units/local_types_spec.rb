@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../lib/types/error_types'
-require_relative 'fixtures/low_local'
+require_relative '../../lib/types/error_types'
+require_relative '../fixtures/low_local'
 
 RSpec.describe 'LocalTypes' do
   subject { LowLocal.new }

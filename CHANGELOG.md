@@ -11,7 +11,7 @@ Minor features that don't break backwards compatibility are released as patches.
 
 - Support dynamic expressions in methods and return types at runtimem (like `type()` already does)
 - `Boolean` type support
-- Complex types support
+- Complex types validation
 - Error mode config
 
 ## 1.1.0
@@ -20,6 +20,7 @@ Minor features that don't break backwards compatibility are released as patches.
 
 - Deep type checking
 - Array subtype expressions `Array[String | nil]`
+- Complex types support
 
 ## 1.0.8
 

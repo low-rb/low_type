@@ -54,12 +54,11 @@ module LowType
 
       raise proxy.error_type, proxy.error_message(value:)
     rescue proxy.error_type => e
-      raise proxy.error_type, e.message, backtrace_with_proxy(backtrace: e.backtrace, proxy:)
+      raise proxy.error_type, e.message, proxy.backtrace(backtrace: e.backtrace, hidden_paths: HIDDEN_PATHS)
     end
 
     def valid_types
       types = @types.map do |type|
-        # Remove 'LowType::' namespace in subtypes.
         if type.is_a?(Array)
           "[#{type.map { |subtype| valid_subtype(subtype:) }.join(', ')}]"
         else
@@ -136,18 +135,6 @@ module LowType
 
     def deep_type_check?
       @deep_type_check || LowType.config.deep_type_check || false
-    end
-
-    def backtrace_with_proxy(proxy:, backtrace:)
-      # Remove LowType defined method file paths from the backtrace.
-      filtered_backtrace = backtrace.reject { |line| HIDDEN_PATHS.find { |file_path| line.include?(file_path) } }
-
-      # Add the proxied file to the backtrace.
-      proxy_file_backtrace = "#{proxy.file.path}:#{proxy.file.line}:in '#{proxy.file.scope}'"
-      from_prefix = filtered_backtrace.first.match(/\s+from /)
-      proxy_file_backtrace = "#{from_prefix}#{proxy_file_backtrace}" if from_prefix
-
-      [proxy_file_backtrace, *filtered_backtrace]
     end
   end
 end
