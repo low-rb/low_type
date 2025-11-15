@@ -122,7 +122,7 @@ module LowType
 
     def type_matches_value?(type:, value:, proxy:)
       if type.instance_of?(Class)
-        return type.match?(value:) if LowType::TypeQuery.complex_type?(type:)
+        return type.match?(value:) if LowType::TypeQuery.complex_type?(expression: type)
 
         return type == value.class
       elsif type.instance_of?(::LowType::TypeExpression)

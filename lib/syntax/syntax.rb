@@ -5,8 +5,8 @@ require_relative '../queries/type_query'
 module LowType
   module Syntax
     refine Array.singleton_class do
-      def [](*types)
-        return TypeExpression.new(type: [*types]) if types.all? { |type| TypeQuery.type?(type) }
+      def [](*expression)
+        return TypeExpression.new(type: [*expression]) if TypeQuery.type?(expression.first) || TypeQuery.typed_array?(expression:)
 
         super
       end

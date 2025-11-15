@@ -263,6 +263,48 @@ RSpec.describe LowHello do
     end
   end
 
+  describe '#typed_nilable_array_arg_and_default_nil' do
+    let(:greetings) { ['Hi', nil, 'Howdy'] }
+
+    it 'passes through the argument' do
+      expect(hello.typed_nilable_array_arg_and_default_nil(greetings)).to eq(greetings)
+    end
+
+    context 'when no arg provided' do
+      it 'provides the default nil' do
+        expect(hello.typed_nilable_array_arg_and_default_nil).to eq(nil)
+      end
+    end
+  end
+
+  describe '#typed_array_arg_and_default_nil' do
+    let(:greetings) { %w[Hi Hey Howdy] }
+
+    it 'passes through the argument' do
+      expect(hello.typed_array_arg_and_default_nil(greetings)).to eq(greetings)
+    end
+
+    context 'when no arg provided' do
+      it 'provides the default nil' do
+        expect(hello.typed_array_arg_and_default_nil).to eq(nil)
+      end
+    end
+  end
+
+  describe '#typed_array_arg_and_default_value' do
+    let(:greetings) { %w[Hi Hey Howdy] }
+
+    it 'passes through the argument' do
+      expect(hello.typed_array_arg_and_default_value(greetings)).to eq(greetings)
+    end
+
+    context 'when no arg provided' do
+      it 'provides the default value' do
+        expect(hello.typed_array_arg_and_default_value).to eq(greetings)
+      end
+    end
+  end
+
   describe '#typed_hash_arg' do
     it 'passes through the argument' do
       expect(hello.typed_hash_arg({ 'Hello' => 'Goodbye' })).to eq({ 'Hello' => 'Goodbye' })

@@ -58,6 +58,18 @@ class LowHello
     goodbyes
   end
 
+  def typed_nilable_array_arg_and_default_nil(greetings = Array[String | nil] | nil)
+    greetings
+  end
+
+  def typed_array_arg_and_default_nil(greetings = Array[String] | nil)
+    greetings
+  end
+
+  def typed_array_arg_and_default_value(greetings = Array[String] | %w[Hi Hey Howdy])
+    greetings
+  end
+
   def typed_hash_arg(greetings = Hash[String => String])
     greetings
   end
