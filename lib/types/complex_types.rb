@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
+require_relative '../factories/type_factory'
+
 module LowType
-  # TrueClass or FalseClass
-  class Boolean; end
-  class Tuple < Array; end
-  class Status < Integer; end
-  class Headers < Hash; end
-  class HTML < String; end
-  class JSON < String; end
-  class XML < String; end
+  COMPLEX_TYPES = [
+    Boolean = TypeFactory.complex_type(Object),
+    Headers = TypeFactory.complex_type(Hash),
+    HTML = TypeFactory.complex_type(String),
+    JSON = TypeFactory.complex_type(String),
+    Status = TypeFactory.complex_type(Integer),
+    Tuple = TypeFactory.complex_type(Array),
+    XML = TypeFactory.complex_type(String)
+  ].freeze
 end

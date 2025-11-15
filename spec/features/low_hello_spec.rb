@@ -110,7 +110,7 @@ RSpec.describe LowHello do
 
   describe '#typed_arg_and_typed_default_value' do
     it 'passes through the value(Type) argument' do
-      expect(hello.typed_arg_and_typed_default_value('Howdy')).to eq('Howdy')
+      expect(hello.typed_arg_and_typed_default_value('Wassup')).to eq('Wassup')
     end
 
     context 'when no arg provided' do
@@ -122,7 +122,7 @@ RSpec.describe LowHello do
 
   describe '#typed_arg_and_invalid_default_typed_value' do
     it 'passes through the argument' do
-      expect(hello.typed_arg_and_invalid_default_typed_value('Howdy')).to eq('Howdy')
+      expect(hello.typed_arg_and_invalid_default_typed_value('Wassup')).to eq('Wassup')
     end
 
     context 'when no arg provided' do
@@ -205,6 +205,60 @@ RSpec.describe LowHello do
 
       it 'raises an argument error' do
         expect { hello.typed_array_arg }.to raise_error(LowType::ArgumentTypeError, error_message)
+      end
+    end
+
+    context 'when nil is not the first element' do
+      let(:error_message) { "Invalid argument type 'Array' for parameter 'greetings'. Valid types: '[String]'" }
+      let(:greetings) { ['Hi', nil, 'Howdy'] }
+
+      context 'without deep type check' do
+        it 'passes through the argument' do
+          expect(hello.typed_array_arg(greetings)).to eq(greetings)
+        end
+      end
+
+      context 'with deep type check' do
+        before { LowType.configure { |config| config.deep_type_check = true } }
+        after { LowType.configure { |config| config.deep_type_check = false } }
+
+        it 'raises an argument error' do
+          expect { hello.typed_array_arg(greetings) }.to raise_error(LowType::ArgumentTypeError, error_message)
+        end
+      end
+    end
+  end
+
+  describe '#typed_nilable_array_arg' do
+    it 'passes through the argument' do
+      expect(hello.typed_nilable_array_arg([nil, 'Farwell', 'See ya'])).to eq([nil, 'Farwell', 'See ya'])
+    end
+
+    context 'when no arg provided' do
+      let(:error_message) { "Invalid argument type 'NilClass' for parameter 'goodbyes'. Valid types: '[String | nil]'" }
+
+      it 'raises an argument error' do
+        expect { hello.typed_nilable_array_arg }.to raise_error(LowType::ArgumentTypeError, error_message)
+      end
+    end
+
+    context 'when nil is not the first element' do
+      let(:error_message) { "Invalid argument type 'Array' for parameter 'goodbyes'. Valid types: '[String]'" }
+      let(:goodbyes) { ['Farewell', nil, 'See ya'] }
+
+      context 'without deep type check' do
+        it 'passes through the argument' do
+          expect(hello.typed_nilable_array_arg(goodbyes)).to eq(goodbyes)
+        end
+      end
+
+      context 'with deep type check' do
+        before { LowType.configure { |config| config.deep_type_check = true } }
+        after { LowType.configure { |config| config.deep_type_check = false } }
+
+        it 'passes through the argument' do
+          expect(hello.typed_nilable_array_arg(goodbyes)).to eq(goodbyes)
+        end
       end
     end
   end
@@ -310,6 +364,8 @@ RSpec.describe LowHello do
       end
     end
   end
+
+  # TODO: Return type that is literally a type (should probably pass). Test both basic type and complex type.
 
   # Class methods.
 

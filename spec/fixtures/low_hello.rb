@@ -54,6 +54,10 @@ class LowHello
     greetings
   end
 
+  def typed_nilable_array_arg(goodbyes = Array[String | nil])
+    goodbyes
+  end
+
   def typed_hash_arg(greetings = Hash[String => String])
     greetings
   end

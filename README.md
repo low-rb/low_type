@@ -208,7 +208,7 @@ LowType.configure do |config|
   config.output_mode = :type
   config.output_size = 100
 
-  # Set to true to type check all elements of an Array/Hash (not just the first) [UNRELEASED]
+  # Set to true to type check all elements of an Array/Hash (not just the first)
   config.deep_type_check = false
 
   # The "|" pipe syntax requires a monkey-patch but can be disabled if you don't need union types with default values.

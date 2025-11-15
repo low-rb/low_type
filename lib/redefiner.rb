@@ -106,7 +106,7 @@ module LowType
           }
         RUBY
 
-        # Called with only required args (as nil) and optional args omitted, to evaluate type expressions (stored as default values).
+        # Called with only required args (as nil) and optional args omitted, to evaluate type expressions (from default values).
         eval(typed_method, binding, __FILE__, __LINE__).call(*required_args, **required_kwargs) # rubocop:disable Security/Eval
 
       # TODO: Write spec for this.

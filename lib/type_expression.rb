@@ -5,10 +5,10 @@ require_relative 'queries/type_query'
 
 module LowType
   root_path = File.expand_path(__dir__)
-  file_path = File.expand_path(__FILE__)
   adapter_paths = Dir.chdir(root_path) { Dir.glob('adapters/*') }.map { |path| File.join(root_path, path) }
+  module_paths = %w[instance_types local_types redefiner].map { |path| File.join(root_path, "#{path}.rb") }
 
-  HIDDEN_PATHS = [file_path, *adapter_paths, File.join(root_path, 'redefiner.rb')].freeze
+  HIDDEN_PATHS = [File.expand_path(__FILE__), *adapter_paths, *module_paths].freeze
 
   # Represent types and default values as a series of chainable expressions.
   class TypeExpression
@@ -19,6 +19,8 @@ module LowType
       @types = []
       @types << type unless type.nil?
       @default_value = default_value
+      # TODO: Override per type expression with a config expression.
+      @deep_type_check = LowType.config.deep_type_check
     end
 
     def |(expression)
@@ -45,64 +47,94 @@ module LowType
       end
 
       @types.each do |type|
-        # Example: HTML is a subclass of String and should pass as a String.
-        return true if LowType::TypeQuery.basic_type?(type:) && type <= value.class
-        return true if type.is_a?(::Array) && value.is_a?(::Array) && array_types_match_values?(types: type, values: value)
-        return true if type.is_a?(::Hash) && value.is_a?(::Hash) && hash_types_match_values?(type:, value:)
+        return true if type_matches_value?(type:, value:, proxy:)
+        return true if type.is_a?(Array) && value.is_a?(Array) && array_types_match_values?(types: type, values: value, proxy:)
+        return true if type.is_a?(Hash) && value.is_a?(Hash) && hash_types_match_values?(types: type, values: value)
       end
 
       raise proxy.error_type, proxy.error_message(value:)
     rescue proxy.error_type => e
-      raise proxy.error_type, e.message, backtrace_with_proxy(backtrace: e.backtrace, proxy:)
+      raise proxy.error_type, e.message, proxy.backtrace(backtrace: e.backtrace, hidden_paths: HIDDEN_PATHS)
     end
 
     def valid_types
       types = @types.map do |type|
-        # Remove 'LowType::' namespace in subtypes.
-        if type.is_a?(::Array)
-          "[#{type.map { |subtype| subtype.to_s.delete_prefix('LowType::') }.join(', ')}]"
+        if type.is_a?(Array)
+          "[#{type.map { |subtype| valid_subtype(subtype:) }.join(', ')}]"
         else
           type.inspect.to_s.delete_prefix('LowType::')
         end
       end
 
-      types += ['nil'] if @default_value.nil?
+      types << 'nil' if @default_value.nil?
       types.join(' | ')
     end
 
     private
 
-    def array_types_match_values?(types:, values:)
-      # [T, T, T]
-      if types.length > 1
-        types.each_with_index do |type, index|
-          # Example: HTML is a subclass of String and should pass as a String.
-          return false unless type <= values[index].class
-        end
-      # [T]
-      elsif types.length == 1
-        return false unless types.first == values.first.class
+    def valid_subtype(subtype:)
+      if subtype.is_a?(TypeExpression)
+        types = subtype.types
+        types << 'nil' if subtype.default_value.nil?
+        types.join(' | ')
+      else
+        subtype.to_s.delete_prefix('LowType::')
       end
-      # TODO: Deep type check (all elements for [T]).
+    end
+
+    def array_types_match_values?(types:, values:, proxy:)
+      # [X, Y, Z] An arbitrary amount of elements are arbitrary types in an arbitrary order.
+      if types.length > 1
+        return multiple_types_match_values?(types:, values:, proxy:)
+      # [T] All elements are the same type.
+      elsif types.length == 1
+        return single_type_matches_values?(type: types.first, values:, proxy:)
+      end
+
+      # [] Misconfigured empty Array[] type.
+      true
+    end
+
+    def multiple_types_match_values?(types:, values:, proxy:)
+      types.each_with_index do |type, index|
+        return false unless type_matches_value?(type:, value: values[index], proxy:)
+      end
 
       true
     end
 
-    def hash_types_match_values?(type:, value:)
-      # TODO: Shallow validation of hash could be made deeper with user config.
-      type.keys[0] == value.keys[0].class && type.values[0] == value.values[0].class
+    def single_type_matches_values?(type:, values:, proxy:)
+      # [V, ...] Type check all elements.
+      if deep_type_check?
+        return false if values.any? { |value| !type_matches_value?(type:, value:, proxy:) }
+      # [V] Type check the first element.
+      else
+        return false unless type_matches_value?(type:, value: values.first, proxy:)
+      end
+
+      true
     end
 
-    def backtrace_with_proxy(proxy:, backtrace:)
-      # Remove LowType defined method file paths from the backtrace.
-      filtered_backtrace = backtrace.reject { |line| HIDDEN_PATHS.find { |file_path| line.include?(file_path) } }
+    def hash_types_match_values?(types:, values:)
+      # TODO: Shallow validation of hash could be made deeper with user config.
+      types.keys[0] == values.keys[0].class && types.values[0] == values.values[0].class
+    end
 
-      # Add the proxied file to the backtrace.
-      proxy_file_backtrace = "#{proxy.file.path}:#{proxy.file.line}:in '#{proxy.file.scope}'"
-      from_prefix = filtered_backtrace.first.match(/\s+from /)
-      proxy_file_backtrace = "#{from_prefix}#{proxy_file_backtrace}" if from_prefix
+    def type_matches_value?(type:, value:, proxy:)
+      if type.instance_of?(Class)
+        return type.match?(value:) if LowType::TypeQuery.complex_type?(type:)
 
-      [proxy_file_backtrace, *filtered_backtrace]
+        return type == value.class
+      elsif type.instance_of?(::LowType::TypeExpression)
+        type.validate!(value:, proxy:)
+        return true
+      end
+
+      false
+    end
+
+    def deep_type_check?
+      @deep_type_check || LowType.config.deep_type_check || false
     end
   end
 end
