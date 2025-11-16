@@ -5,11 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Minor features that don't break backwards compatibility are released as patches.
 
+## 1.3.0 [UNRELEASED]
+
+### Added
+
+- Repository pattern for loading `low_methods` and exporting to RBS
+
 ## 1.2.0 [UNRELEASED]
 
 ### Added
 
-- Support dynamic expressions in methods and return types at runtimem (like `type()` already does)
+- Support dynamic expressions in methods and return types at runtime (like `type()` already does)
 - `Boolean` type support
 - Complex types validation
 - Error mode config
