@@ -3,7 +3,7 @@
 require_relative '../../lib/types/error_types'
 require_relative '../fixtures/low_instance'
 
-RSpec.describe 'InstanceTypes' do
+RSpec.describe 'TypeAccessors' do
   describe '#type_reader' do
     subject { LowReader.new }
 

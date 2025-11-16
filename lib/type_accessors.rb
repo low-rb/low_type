@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
+require_relative 'expressions/type_expression'
 require_relative 'proxies/return_proxy'
 require_relative 'queries/type_query'
-require_relative 'expressions/type_expression'
 
 module LowType
-  module InstanceTypes
+  module TypeAccessors
     def type_reader(named_expressions)
       named_expressions.each do |name, expression|
         last_caller = caller_locations(1, 1).first
