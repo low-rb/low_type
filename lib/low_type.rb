@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require_relative 'adapters/adapter_loader'
+require_relative 'expressions/expressions'
 require_relative 'syntax/syntax'
 require_relative 'types/complex_types'
 require_relative 'queries/file_parser'
 require_relative 'queries/file_query'
 require_relative 'instance_types'
-require_relative 'local_types'
 require_relative 'redefiner'
 
 module LowType
@@ -25,7 +25,7 @@ module LowType
     line_numbers = parser.line_numbers
 
     klass.extend InstanceTypes
-    klass.include LocalTypes
+    klass.include Expressions
     klass.prepend Redefiner.redefine(method_nodes: parser.instance_methods, klass:, line_numbers:, file_path:)
     klass.singleton_class.prepend Redefiner.redefine(method_nodes: parser.class_methods, klass:, line_numbers:, file_path:)
 

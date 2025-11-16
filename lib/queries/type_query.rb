@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../type_expression'
+require_relative '../expressions/type_expression'
 
 module LowType
   # TODO: Unit test.

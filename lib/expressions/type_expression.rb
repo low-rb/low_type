@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative 'proxies/param_proxy'
-require_relative 'queries/type_query'
+require_relative '../proxies/param_proxy'
+require_relative '../queries/type_query'
 
 module LowType
   root_path = File.expand_path(__dir__)
   adapter_paths = Dir.chdir(root_path) { Dir.glob('adapters/*') }.map { |path| File.join(root_path, path) }
-  module_paths = %w[instance_types local_types redefiner].map { |path| File.join(root_path, "#{path}.rb") }
+  module_paths = %w[expressions/expressions instance_types redefiner].map { |path| File.join(root_path, "#{path}.rb") }
 
   HIDDEN_PATHS = [File.expand_path(__FILE__), *adapter_paths, *module_paths].freeze
 

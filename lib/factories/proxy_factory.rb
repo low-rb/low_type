@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
+require_relative '../expressions/type_expression'
 require_relative '../proxies/return_proxy'
 require_relative '../queries/file_parser'
-require_relative '../type_expression'
 
 module LowType
   class ProxyFactory

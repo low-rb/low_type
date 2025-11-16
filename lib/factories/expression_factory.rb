@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../type_expression'
-require_relative '../value_expression'
+require_relative '../expressions/type_expression'
+require_relative '../expressions/value_expression'
 
 module LowType
   class ExpressionFactory

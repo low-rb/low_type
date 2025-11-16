@@ -3,7 +3,7 @@
 require_relative '../../lib/types/error_types'
 require_relative '../fixtures/low_local'
 
-RSpec.describe 'LocalTypes' do
+RSpec.describe 'Expressions' do
   subject { LowLocal.new }
 
   describe '#initialize' do

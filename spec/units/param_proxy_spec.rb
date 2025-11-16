@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
+require_relative '../../lib/expressions/type_expression'
 require_relative '../../lib/proxies/param_proxy'
 require_relative '../../lib/types/error_types'
-require_relative '../../lib/type_expression'
 
 RSpec.describe LowType::ParamProxy do
   subject(:param_proxy) { described_class.new(type_expression:, name: :dummy_method, type: :req, file:, position: nil) }
