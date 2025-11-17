@@ -10,6 +10,7 @@ require_relative 'proxies/method_proxy'
 require_relative 'proxies/param_proxy'
 require_relative 'queries/type_query'
 require_relative 'syntax/syntax'
+require_relative 'repository'
 
 module LowType
   # Redefine methods to have their arguments and return values type checked.
@@ -21,7 +22,7 @@ module LowType
 
       def redefine(method_nodes:, klass:, line_numbers:, file_path:)
         create_proxies(method_nodes:, klass:, file_path:)
-        define_methods(method_nodes:, line_numbers:)
+        define_methods(method_nodes:, klass:, line_numbers:)
       end
 
       private
@@ -38,22 +39,24 @@ module LowType
         end
       end
 
-      def define_methods(method_nodes:, line_numbers:) # rubocop:disable Metrics
+      def define_methods(method_nodes:, klass:, line_numbers:) # rubocop:disable Metrics
         class_start = line_numbers[:class_start]
         class_end = line_numbers[:class_end]
         private_start = line_numbers[:private_start]
 
         Module.new do
           method_nodes.each do |method_node|
-            method_start = method_node.respond_to?(:start_line) ? method_node.start_line : nil
-            method_end = method_node.respond_to?(:end_line) ? method_node.end_line : nil
-
-            next if method_start && method_end && class_end && !(method_start > class_start && method_end <= class_end)
-
             name = method_node.name
 
+            method_proxy = LowType::Repository.method_proxy(name:, object: klass)
+            next if method_proxy.params == [] && method_proxy.return_proxy.nil?
+
+            method_start = method_node.respond_to?(:start_line) ? method_node.start_line : nil
+            method_end = method_node.respond_to?(:end_line) ? method_node.end_line : nil
+            next if method_start && method_end && class_end && !(method_start > class_start && method_end <= class_end)
+
             define_method(name) do |*args, **kwargs|
-              method_proxy = instance_of?(Class) ? low_methods[name] : self.class.low_methods[name] || Object.low_methods[name]
+              method_proxy = LowType::Repository.method_proxy(name:, object: self)
 
               method_proxy.params.each do |param_proxy|
                 # Get argument value or default value.
