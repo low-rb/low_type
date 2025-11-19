@@ -60,16 +60,16 @@ module LowType
       @parent_map = parent_map
       @klass = klass
 
-      @instance_methods = []
-      @class_methods = []
+      @instance_methods = {}
+      @class_methods = {}
       @line_numbers = { class_start: 0, class_end: root_node.respond_to?(:end_line) ? root_node.end_line : nil }
     end
 
     def visit_def_node(node)
       if class_method?(node)
-        @class_methods << node
+        @class_methods[node.name] = node
       else
-        @instance_methods << node
+        @instance_methods[node.name] = node
       end
 
       super # Continue walking the tree.

@@ -9,7 +9,8 @@ Minor features that don't break backwards compatibility are released as patches.
 
 ### Added
 
-- Repository pattern for loading `low_methods` and exporting to RBS
+- Use repository pattern to `export` method definitions to RBS
+- Dynamically redefefine includer class methods when `binding.pry` called to avoid `step`ing through this code
 
 ## 1.2.0 [UNRELEASED]
 
@@ -19,6 +20,12 @@ Minor features that don't break backwards compatibility are released as patches.
 - `Boolean` type support
 - Complex types validation
 - Error mode config
+
+## 1.1.2
+
+### Added
+
+- Repository pattern for loading `low_methods`
 
 ## 1.1.0
 

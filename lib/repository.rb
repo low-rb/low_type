@@ -3,8 +3,24 @@
 module LowType
   class Repository
     class << self
-      def method_proxy(name:, object:)
-        object.instance_of?(Class) ? object.low_methods[name] : object.class.low_methods[name] || Object.low_methods[name]
+      def save(method:, klass:)
+        klass.low_methods[method.name] = method
+      end
+
+      def delete(name:, klass:)
+        klass.low_methods.delete(name)
+      end
+
+      def load(name:, object:)
+        singleton(object:).low_methods[name]
+      end
+
+      # TODO: export() to RBS
+
+      private
+
+      def singleton(object:)
+        object.instance_of?(Class) ? object : object.class || Object
       end
     end
   end

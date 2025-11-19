@@ -25,6 +25,28 @@ module LowType
         define_methods(method_nodes:, klass:, line_numbers:)
       end
 
+      def redefinable?(name:, method_node:, klass:, line_numbers:)
+        method_proxy = LowType::Repository.load(name:, object: klass)
+        binding.pry if method_proxy.nil?
+
+        if method_proxy.params == [] && method_proxy.return_proxy.nil?
+          LowType::Repository.delete(name:, klass:)
+          return false
+        end
+
+        class_start = line_numbers[:class_start]
+        class_end = line_numbers[:class_end]
+        private_start = line_numbers[:private_start]
+
+        method_start = method_node.respond_to?(:start_line) ? method_node.start_line : nil
+        method_end = method_node.respond_to?(:end_line) ? method_node.end_line : nil
+
+        if method_start && method_end && class_end && !(method_start > class_start && method_end <= class_end)
+          LowType::Repository.delete(name:, klass:)
+          return false
+        end
+      end
+
       private
 
       def create_proxies(method_nodes:, klass:, file_path:)
@@ -35,31 +57,21 @@ module LowType
           params = param_proxies(method_node:, file:)
           return_proxy = ProxyFactory.return_proxy(method_node:, file:)
 
-          klass.low_methods[name] = MethodProxy.new(name:, params:, return_proxy:)
+          Repository.save(method: MethodProxy.new(name:, params:, return_proxy:), klass:)
         end
       end
 
       def define_methods(method_nodes:, klass:, line_numbers:) # rubocop:disable Metrics
-        class_start = line_numbers[:class_start]
-        class_end = line_numbers[:class_end]
-        private_start = line_numbers[:private_start]
-
         Module.new do
           method_nodes.each do |method_node|
             name = method_node.name
 
-            method_proxy = LowType::Repository.method_proxy(name:, object: klass)
-            next if method_proxy.params == [] && method_proxy.return_proxy.nil?
-
-            method_start = method_node.respond_to?(:start_line) ? method_node.start_line : nil
-            method_end = method_node.respond_to?(:end_line) ? method_node.end_line : nil
-            next if method_start && method_end && class_end && !(method_start > class_start && method_end <= class_end)
+            next unless LowType::Redefiner.redefinable?(name:, method_node:, klass:, line_numbers:)
 
             define_method(name) do |*args, **kwargs|
-              method_proxy = LowType::Repository.method_proxy(name:, object: self)
+              method_proxy = LowType::Repository.load(name:, object: self)
 
               method_proxy.params.each do |param_proxy|
-                # Get argument value or default value.
                 value = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
                 if value.nil? && param_proxy.type_expression.default_value != :LOW_TYPE_UNDEFINED
                   value = param_proxy.type_expression.default_value
