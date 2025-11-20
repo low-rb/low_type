@@ -2,8 +2,8 @@
 
 require 'prism'
 
+require_relative '../factories/proxy_factory'
 require_relative '../interfaces/adapter_interface'
-require_relative '../proxies/file_proxy'
 require_relative '../proxies/return_proxy'
 require_relative '../types/error_types'
 
@@ -27,8 +27,7 @@ module LowType
 
           pattern = arguments_node.arguments.first.content
 
-          line = FileParser.line_number(node: method_call)
-          file = FileProxy.new(path: @file_path, line:, scope: "#{@klass}##{method_call.name}")
+          file = ProxyFactory.file_proxy(node: method_call, path: @file_path, scope: "#{@klass}##{method_call.name}")
           next unless (return_proxy = return_proxy(method_node: method_call, pattern:, file:))
 
           route = "#{method_call.name.upcase} #{pattern}"

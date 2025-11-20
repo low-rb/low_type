@@ -20,56 +20,53 @@ module LowType
     class << self
       include Expressions
 
-      def redefine(method_nodes:, klass:, line_numbers:, file_path:)
-        create_proxies(method_nodes:, klass:, file_path:)
-        define_methods(method_nodes:, klass:, line_numbers:)
+      def redefine(method_nodes:, class_proxy:, file_path:)
+        method_proxies = create_method_proxies(method_nodes:, klass: class_proxy.klass, file_path:)
+        define_methods(method_proxies:, class_proxy:)
       end
 
-      def redefinable?(name:, method_node:, klass:, line_numbers:)
-        method_proxy = LowType::Repository.load(name:, object: klass)
-        binding.pry if method_proxy.nil?
-
+      def redefinable?(method_proxy:, class_proxy:)
+        # Method has no types.
         if method_proxy.params == [] && method_proxy.return_proxy.nil?
-          LowType::Repository.delete(name:, klass:)
+          LowType::Repository.delete(name: method_proxy.name, klass: class_proxy.klass)
           return false
         end
 
-        class_start = line_numbers[:class_start]
-        class_end = line_numbers[:class_end]
-        private_start = line_numbers[:private_start]
-
-        method_start = method_node.respond_to?(:start_line) ? method_node.start_line : nil
-        method_end = method_node.respond_to?(:end_line) ? method_node.end_line : nil
-
-        if method_start && method_end && class_end && !(method_start > class_start && method_end <= class_end)
-          LowType::Repository.delete(name:, klass:)
+        # Method outside class bounds.
+        within_bounds = method_proxy.start_line > class_proxy.start_line && method_proxy.end_line <= class_proxy.end_line
+        if method_proxy.lines? && class_proxy.lines? && !within_bounds
+          LowType::Repository.delete(name: method_proxy.name, klass: class_proxy.klass)
           return false
         end
+
+        true
       end
 
       private
 
-      def create_proxies(method_nodes:, klass:, file_path:)
-        method_nodes.each do |method_node|
-          name = method_node.name
-          line = FileParser.line_number(node: method_node)
-          file = FileProxy.new(path: file_path, line:, scope: "#{klass}##{name}")
-          params = param_proxies(method_node:, file:)
-          return_proxy = ProxyFactory.return_proxy(method_node:, file:)
+      def create_method_proxies(method_nodes:, klass:, file_path:)
+        method_nodes.each do |name, method_node|
+          file = ProxyFactory.file_proxy(path: file_path, node: method_node, scope: "#{klass}##{name}")
 
-          Repository.save(method: MethodProxy.new(name:, params:, return_proxy:), klass:)
+          param_proxies = param_proxies(method_node:, file:)
+          return_proxy = ProxyFactory.return_proxy(method_node:, file:)
+          method_proxy = MethodProxy.new(name:, params: param_proxies, return_proxy:, file:)
+
+          Repository.save(method: method_proxy, klass:)
         end
+
+        Repository.all(klass:)
       end
 
-      def define_methods(method_nodes:, klass:, line_numbers:) # rubocop:disable Metrics
+      def define_methods(method_proxies:, class_proxy:) # rubocop:disable Metrics
         Module.new do
-          method_nodes.each do |method_node|
-            name = method_node.name
+          method_proxies.each do |name, method_proxy|
+            next unless LowType::Redefiner.redefinable?(method_proxy:, class_proxy:)
 
-            next unless LowType::Redefiner.redefinable?(name:, method_node:, klass:, line_numbers:)
-
+            # NOTE: You are now in the binding of the includer class (`name` is also available here).
             define_method(name) do |*args, **kwargs|
-              method_proxy = LowType::Repository.load(name:, object: self)
+              # Inlined version of Repository.load() for performance increase.
+              method_proxy = instance_of?(Class) ? low_methods[name] : self.class.low_methods[name] || Object.low_methods[name]
 
               method_proxy.params.each do |param_proxy|
                 value = param_proxy.position ? args[param_proxy.position] : kwargs[param_proxy.name]
@@ -91,7 +88,7 @@ module LowType
               super(*args, **kwargs)
             end
 
-            private name if private_start && method_start > private_start
+            private name if class_proxy.private_start_line && method_proxy.start_line > class_proxy.private_start_line
           end
         end
       end

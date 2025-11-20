@@ -35,7 +35,7 @@ module LowType
       filtered_backtrace = backtrace.reject { |line| hidden_paths.find { |file_path| line.include?(file_path) } }
 
       # Add the proxied file to the backtrace.
-      proxy_file_backtrace = "#{file.path}:#{file.line}:in '#{file.scope}'"
+      proxy_file_backtrace = "#{file.path}:#{file.start_line}:in '#{file.scope}'"
       from_prefix = filtered_backtrace.first.match(/\s+from /)
       proxy_file_backtrace = "#{from_prefix}#{proxy_file_backtrace}" if from_prefix
 

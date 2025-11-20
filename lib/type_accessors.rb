@@ -10,7 +10,7 @@ module LowType
       named_expressions.each do |name, expression|
         last_caller = caller_locations(1, 1).first
         type_expression = type_expression(expression)
-        file = FileProxy.new(path: last_caller.path, line: last_caller.lineno, scope: "#{self}##{name}")
+        file = FileProxy.new(path: last_caller.path, start_line: last_caller.lineno, scope: "#{self}##{name}")
 
         @low_methods[name] = MethodProxy.new(name:, return_proxy: ReturnProxy.new(type_expression:, name:, file:))
 
@@ -27,7 +27,7 @@ module LowType
       named_expressions.each do |name, expression|
         last_caller = caller_locations(1, 1).first
         type_expression = type_expression(expression)
-        file = FileProxy.new(path: last_caller.path, line: last_caller.lineno, scope: "#{self}##{name}")
+        file = FileProxy.new(path: last_caller.path, start_line: last_caller.lineno, scope: "#{self}##{name}")
 
         @low_methods["#{name}="] = MethodProxy.new(name:, params: [ParamProxy.new(type_expression:, name:, type: :hashreq, file:)])
 

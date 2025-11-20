@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 require 'prism'
+require_relative '../proxies/class_proxy'
 
 module LowType
   class FileParser
-    attr_reader :parent_map, :instance_methods, :class_methods, :line_numbers
+    attr_reader :parent_map, :instance_methods, :class_methods, :class_proxy
 
     def initialize(klass:, file_path:)
       @root_node = Prism.parse_file(file_path).value
@@ -13,12 +14,12 @@ module LowType
       parent_mapper.visit(@root_node)
       @parent_map = parent_mapper.parent_map
 
-      method_visitor = MethodDefVisitor.new(root_node: @root_node, parent_map:, klass:)
+      method_visitor = MethodDefVisitor.new(root_node: @root_node, parent_map:, klass:, file_path:)
       @root_node.accept(method_visitor)
 
       @instance_methods = method_visitor.instance_methods
       @class_methods = method_visitor.class_methods
-      @line_numbers = method_visitor.line_numbers
+      @class_proxy = ClassProxy.new(klass:, file: method_visitor.file_proxy, private_start_line: method_visitor.private_start_line)
     end
 
     def method_calls(method_names:)
@@ -46,23 +47,22 @@ module LowType
 
         nil
       end
-
-      def line_number(node:)
-        node.respond_to?(:start_line) ? node.start_line : nil
-      end
     end
   end
 
   class MethodDefVisitor < Prism::Visitor
-    attr_reader :class_methods, :instance_methods, :line_numbers
+    attr_reader :class_methods, :instance_methods, :file_proxy, :private_start_line
 
-    def initialize(root_node:, parent_map:, klass:)
+    def initialize(root_node:, parent_map:, klass:, file_path:)
       @parent_map = parent_map
       @klass = klass
 
       @instance_methods = {}
       @class_methods = {}
-      @line_numbers = { class_start: 0, class_end: root_node.respond_to?(:end_line) ? root_node.end_line : nil }
+
+      end_line = root_node.respond_to?(:end_line) ? root_node.end_line : nil
+      @file_proxy = FileProxy.new(path: file_path, start_line: 0, end_line:, scope: klass.to_s)
+      @private_start_line = nil
     end
 
     def visit_def_node(node)
@@ -76,20 +76,17 @@ module LowType
     end
 
     def visit_call_node(node)
-      start_line = node.name == :private && node.respond_to?(:start_line) && node.start_line || nil
-      class_start = @line_numbers[:class_start]
-      class_end = @line_numbers[:class_end]
+      return super unless node.name == :private && node.respond_to?(:start_line) && file_proxy.start_line && file_proxy.end_line
 
-      if start_line && class_start && class_end && start_line > class_start && start_line < class_end
-        @line_numbers[:private_start] = node.start_line
-      end
+      @private_start_line = node.start_line if node.start_line > file_proxy.start_line && node.start_line < file_proxy.end_line
 
       super
     end
 
     def visit_class_node(node)
       if node.name == @klass.to_s.to_sym
-        @line_numbers = { class_start: node.class_keyword_loc.start_line, class_end: node.end_keyword_loc.end_line }
+        file_proxy.start_line = node.class_keyword_loc.start_line
+        file_proxy.end_line = node.end_keyword_loc.end_line
       end
 
       super

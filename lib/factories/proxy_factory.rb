@@ -1,12 +1,20 @@
 # frozen_string_literal: true
 
 require_relative '../expressions/type_expression'
+require_relative '../proxies/file_proxy'
 require_relative '../proxies/return_proxy'
 require_relative '../queries/file_parser'
 
 module LowType
   class ProxyFactory
     class << self
+      def file_proxy(node:, path:, scope:)
+        start_line = node.respond_to?(:start_line) ? node.start_line : nil
+        end_line = node.respond_to?(:end_line) ? node.end_line : nil
+
+        FileProxy.new(path:, start_line:, end_line:, scope:)
+      end
+
       def return_proxy(method_node:, file:)
         return_type = FileParser.return_type(method_node:)
         return nil if return_type.nil?

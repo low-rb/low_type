@@ -22,12 +22,11 @@ module LowType
 
     file_path = FileQuery.file_path(klass:)
     parser = FileParser.new(klass:, file_path:)
-    line_numbers = parser.line_numbers
 
     klass.extend TypeAccessors
     klass.include Expressions
-    klass.prepend Redefiner.redefine(method_nodes: parser.instance_methods, klass:, line_numbers:, file_path:)
-    klass.singleton_class.prepend Redefiner.redefine(method_nodes: parser.class_methods, klass:, line_numbers:, file_path:)
+    klass.prepend Redefiner.redefine(method_nodes: parser.instance_methods, class_proxy: parser.class_proxy, file_path:)
+    klass.singleton_class.prepend Redefiner.redefine(method_nodes: parser.class_methods, class_proxy: parser.class_proxy, file_path:)
 
     if (adapter = Adapter::Loader.load(klass:, parser:, file_path:))
       adapter.process

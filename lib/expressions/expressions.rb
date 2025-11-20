@@ -11,7 +11,7 @@ module LowType
       value = type_expression.default_value
 
       last_caller = caller_locations(1, 1).first
-      file = FileProxy.new(path: last_caller.path, line: last_caller.lineno, scope: 'local type')
+      file = FileProxy.new(path: last_caller.path, start_line: last_caller.lineno, scope: 'local type')
       proxy = LocalProxy.new(type_expression:, name: self, file:)
 
       type_expression.validate!(value:, proxy:)
