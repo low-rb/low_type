@@ -50,8 +50,8 @@ end
 
 After your method's parameters add `-> { T }` to define a return value:
 ```ruby
-def say_hello(greetings: Array[String]) -> { String }
-  greetings # Raises exception if the returned value is not a String.
+def say_hello() -> { String }
+  'Hello' # Raises exception if the returned value is not a String.
 end
 ```
 
@@ -59,13 +59,6 @@ Return values can also be defined as `nil`able:
 ```ruby
 def say_hello(greetings: Array[String]) -> { String | nil }
   return nil if greetings.first == 'Goodbye'
-end
-```
-
-A method that takes no arguments must include empty parameters `()` for the `-> { T }` syntax to be valid:
-```ruby
-def say_hello() -> { String }
-  'Hello'
 end
 ```
 
@@ -161,13 +154,15 @@ using LowType::Syntax
 
 The pipe symbol (`|`) is used in the context of type expressions to define multiple types as well as provide the default value:
 - To allow multiple types separate them between pipes: `my_variable = TypeOne | TypeTwo`
-- The last *value* defined becomes the default value: `my_variable = TypeOne | TypeTwo | nil`
+- The last *value*/`nil` defined becomes the default value: `my_variable = TypeOne | TypeTwo | nil`
 
 If no default value is defined then the argument will be required.
 
 ### `-> { T }` Return Type
 
 The `-> { T }` syntax is a lambda without an assignment to a local variable. This is valid Ruby that can be placed immediately after a method definition and on the same line as the method definition, to visually look like the output of that method. It's inert and doesn't run when the method is called, similar to how default values are never called if the argument is managed by LowType. Pretty cool stuff yeah? Your type expressions won't keep re-evaluating in the wild 🐴, only on class load.
+
+ℹ️ **Note:** A method that takes no arguments must include empty parameters `()` for the `-> { T }` syntax to be valid; `def method() -> { T }`.
 
 ### `value(T)` Value Expression
 
@@ -185,14 +180,14 @@ However, `type()` type expressions are evaluated when they are called at *runtim
 
 |                         | **Evaluation** | **Validation** | ℹ️ *Example*            |
 |-------------------------|----------------|----------------|-------------------------|
-| **Method param types**  | 🟢 Class load   | 🟠 Runtime     | `method(name: T)`       |
-| **Method return types** | 🟢 Class load   | 🟠 Runtime     | `method() -> { T }`     |
+| **Method param types**  | 🟢 Class load   | 🟠 Runtime     | `def method(name: T)`   |
+| **Method return types** | 🟢 Class load   | 🟠 Runtime     | `def method() -> { T }` |
 | **Instance types**      | 🟢 Class load   | 🟠 Runtime     | `type_accessor(name: T)`|
 | **Local types**         | 🟠 Runtime      | 🟠 Runtime     | `type(T)`               |
 
 ## Architecture
 
-LowType only affects the class that it's `include`d into. Class methods `Array[]`/`Hash[]` are modified for the type expression enumerable syntax (`[]`) to work, but only for LowType's internals (using Refinements) and not the `include`d class. However the `type()` method may require `using LowType::Syntax` (only for enumerable syntax) and will affect the `Array[]`/`Hash[]` class methods of the `include`d class.
+LowType only affects the class that it's `include`d into. Class methods `Array[]`/`Hash[]` are modified for the type expression enumerable syntax (`[]`) to work, but only for LowType's internals (using refinements) and not the `include`d class. The `type()` method requires `using LowType::Syntax` if you want to use the enumerable syntax but will still only affect the `Array[]`/`Hash[]` class methods of the `include`d class.
 
 ## Config
 
@@ -226,6 +221,7 @@ end
 - `Integer`
 - `Array`
 - `Hash`
+- `nil` represents an optional value
 
 ### Complex types
 
@@ -236,8 +232,6 @@ end
 - `HTML` (subclass of `String`) - TODO: Check that string is HTML
 - `JSON` (subclass of `String`) - TODO: Check that string is JSON
 - `XML` (subclass of `String`) - TODO: Check that string is XML
-
-`nil` represents an optional value.
 
 ## Integrations
 
