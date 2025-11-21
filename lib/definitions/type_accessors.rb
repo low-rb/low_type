@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'expressions/type_expression'
-require_relative 'proxies/return_proxy'
-require_relative 'queries/type_query'
+require_relative '../expressions/type_expression'
+require_relative '../proxies/return_proxy'
+require_relative '../queries/type_query'
 
 module LowType
   module TypeAccessors

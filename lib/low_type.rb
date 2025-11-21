@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 require_relative 'adapters/adapter_loader'
+require_relative 'definitions/redefiner'
+require_relative 'definitions/type_accessors'
 require_relative 'expressions/expressions'
 require_relative 'queries/file_parser'
 require_relative 'queries/file_query'
 require_relative 'syntax/syntax'
 require_relative 'types/complex_types'
-require_relative 'redefiner'
-require_relative 'type_accessors'
 
 module LowType
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.

@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require_relative 'expressions/expressions'
-require_relative 'expressions/type_expression'
-require_relative 'expressions/value_expression'
-require_relative 'factories/expression_factory'
-require_relative 'factories/proxy_factory'
-require_relative 'proxies/file_proxy'
-require_relative 'proxies/method_proxy'
-require_relative 'proxies/param_proxy'
-require_relative 'queries/type_query'
-require_relative 'syntax/syntax'
+require_relative '../expressions/expressions'
+require_relative '../expressions/type_expression'
+require_relative '../expressions/value_expression'
+require_relative '../factories/expression_factory'
+require_relative '../factories/proxy_factory'
+require_relative '../proxies/file_proxy'
+require_relative '../proxies/method_proxy'
+require_relative '../proxies/param_proxy'
+require_relative '../queries/type_query'
+require_relative '../syntax/syntax'
 require_relative 'repository'
 
 module LowType
