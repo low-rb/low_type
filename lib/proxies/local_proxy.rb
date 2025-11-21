@@ -20,7 +20,7 @@ module LowType
     end
 
     def error_message(value:)
-      "Invalid variable type #{output(value:)} in '#{@name.class}' on line #{@file.line}. Valid types: '#{@type_expression.valid_types}'"
+      "Invalid variable type #{output(value:)} in '#{name.class}:#{@file.start_line}'. Valid types: '#{type_expression.valid_types}'"
     end
   end
 end

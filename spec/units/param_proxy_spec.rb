@@ -8,7 +8,7 @@ RSpec.describe LowType::ParamProxy do
   subject(:param_proxy) { described_class.new(type_expression:, name: :dummy_method, type: :req, file:, position: nil) }
 
   let(:type_expression) { LowType::TypeExpression.new(default_value: nil) }
-  let(:file) { LowType::FileProxy.new(path: '/Users/name/dev/app/lib/my_class', line: 123, scope: 'MyClass#my_method') }
+  let(:file) { LowType::FileProxy.new(path: '/Users/name/dev/app/lib/my_class', start_line: 123, scope: 'MyClass#my_method') }
 
   describe '#initialize' do
     it 'instantiates a class' do

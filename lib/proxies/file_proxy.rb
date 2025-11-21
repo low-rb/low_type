@@ -2,12 +2,18 @@
 
 module LowType
   class FileProxy
-    attr_reader :path, :line, :scope
+    attr_reader :path, :scope
+    attr_accessor :start_line, :end_line
 
-    def initialize(path:, line:, scope:)
+    def initialize(path:, scope:, start_line:, end_line: nil)
       @path = path
-      @line = line
+      @start_line = start_line
+      @end_line = end_line || start_line
       @scope = scope
+    end
+
+    def lines?
+      start_line && end_line
     end
   end
 end

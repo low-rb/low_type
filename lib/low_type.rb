@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 require_relative 'adapters/adapter_loader'
+require_relative 'definitions/redefiner'
+require_relative 'definitions/type_accessors'
 require_relative 'expressions/expressions'
 require_relative 'queries/file_parser'
 require_relative 'queries/file_query'
 require_relative 'syntax/syntax'
 require_relative 'types/complex_types'
-require_relative 'redefiner'
-require_relative 'type_accessors'
 
 module LowType
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
@@ -22,12 +22,11 @@ module LowType
 
     file_path = FileQuery.file_path(klass:)
     parser = FileParser.new(klass:, file_path:)
-    line_numbers = parser.line_numbers
 
     klass.extend TypeAccessors
     klass.include Expressions
-    klass.prepend Redefiner.redefine(method_nodes: parser.instance_methods, klass:, line_numbers:, file_path:)
-    klass.singleton_class.prepend Redefiner.redefine(method_nodes: parser.class_methods, klass:, line_numbers:, file_path:)
+    klass.prepend Redefiner.redefine(method_nodes: parser.instance_methods, class_proxy: parser.class_proxy, file_path:)
+    klass.singleton_class.prepend Redefiner.redefine(method_nodes: parser.class_methods, class_proxy: parser.class_proxy, file_path:)
 
     if (adapter = Adapter::Loader.load(klass:, parser:, file_path:))
       adapter.process

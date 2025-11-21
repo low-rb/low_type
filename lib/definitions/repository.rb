@@ -3,6 +3,10 @@
 module LowType
   class Repository
     class << self
+      def all(klass:)
+        klass.low_methods
+      end
+
       def save(method:, klass:)
         klass.low_methods[method.name] = method
       end
@@ -11,6 +15,7 @@ module LowType
         klass.low_methods.delete(name)
       end
 
+      # Redefiner inlines this method in define_method() for better performance. TODO: Test this assumption.
       def load(name:, object:)
         singleton(object:).low_methods[name]
       end

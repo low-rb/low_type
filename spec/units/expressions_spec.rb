@@ -43,7 +43,7 @@ RSpec.describe 'Expressions' do
     end
 
     context 'when the type is wrong' do
-      let(:error_message) { /Invalid variable type Array in 'LowLocal' on line \d+. Valid types: '\[Integer\]'/ }
+      let(:error_message) { /Invalid variable type Array in 'LowLocal:\d+'. Valid types: '\[Integer\]'/ }
 
       it 'raises an argument type error' do
         expect { subject.invalid_subtype_array }.to raise_error(LowType::LocalTypeError, error_message)
@@ -68,7 +68,7 @@ RSpec.describe 'Expressions' do
 
     context 'when the type is wrong' do
       let(:error_message) do
-        /Invalid variable type Array in 'LowLocal' on line \d+. Valid types: '\[Integer, String, Symbol\]'/
+        /Invalid variable type Array in 'LowLocal:\d+'. Valid types: '\[Integer, String, Symbol\]'/
       end
 
       it 'raises an argument type error' do
