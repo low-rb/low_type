@@ -219,9 +219,12 @@ end
 
 - `String`
 - `Integer`
+- `Float`
 - `Array`
 - `Hash`
 - `nil` represents an optional value
+
+ℹ️ Any class/type that's available to Ruby is available to LowType, you just might need to `require` it.
 
 ### Complex types
 
