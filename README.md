@@ -308,4 +308,4 @@ bundle install
 
 🌀 **Less DSL. More types.** As much as possible LowType looks just like Ruby if it had types. There's no special method calls for the base functionality, and defining types at runtime simply uses a `type()` method which almost looks like a `type` keyword, had Ruby implemented types.
 
-🤖 **AI makes you dumb.** AI is theoretically a cool concept but in practice capitalism just uses it to steal wealth. Chuck an [anti-AI variant](https://github.com/non-ai-licenses/non-ai-licenses) of your favourite license into your repo today!
+🤖 **AI makes you dumb.** AI is theoretically a cool concept but in practice capitalism just uses it to steal wealth.
