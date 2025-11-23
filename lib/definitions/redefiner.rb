@@ -101,28 +101,31 @@ module LowType
         required_args, required_kwargs = required_args(proxy_method:)
 
         # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
+        # All local variable names are prefixed with __low_type_ to avoid conflicts with the method parameters.
         typed_method = <<~RUBY
-          -> (#{params}) {
-            param_proxies = []
+          -> (#{params}, __low_type_proxy_method:, __low_type_file:) {
+            __low_type_param_proxies = []
 
-            proxy_method.parameters.each_with_index do |param, position|
-              type, name = param
-              position = nil unless [:opt, :req, :rest].include?(type)
-              expression = binding.local_variable_get(name)
+            __low_type_proxy_method.parameters.each_with_index do |__low_type_param, __low_type_position|
+              __low_type_type, __low_type_name = __low_type_param
+              __low_type_position = nil unless [:opt, :req, :rest].include?(__low_type_type)
+              __low_type_expression = binding.local_variable_get(__low_type_name)
 
-              if expression.is_a?(TypeExpression)
-                param_proxies << ParamProxy.new(type_expression: expression, name:, type:, position:, file:)
-              elsif ::LowType::TypeQuery.type?(expression)
-                param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: expression), name:, type:, position:, file:)
+              if __low_type_expression.is_a?(TypeExpression)
+                __low_type_param_proxies << ParamProxy.new(type_expression: __low_type_expression, name: __low_type_name, type: __low_type_type, position: __low_type_position, file: __low_type_file)
+              elsif ::LowType::TypeQuery.type?(__low_type_expression)
+                __low_type_param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: __low_type_expression), name: __low_type_name, type: __low_type_type, position: __low_type_position, file: __low_type_file)
               end
             end
 
-            param_proxies
+            __low_type_param_proxies
           }
         RUBY
 
         # Called with only required args (as nil) and optional args omitted, to evaluate type expressions (from default values).
-        eval(typed_method, binding, __FILE__, __LINE__).call(*required_args, **required_kwargs) # rubocop:disable Security/Eval
+        # Also pass the proxy method and file with appropriate names to avoid conflicts with the method parameters.
+        eval(typed_method, binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
+          .call(*required_args, **required_kwargs, __low_type_proxy_method: proxy_method, __low_type_file: file)
 
       # TODO: Write spec for this.
       rescue ArgumentError => e
