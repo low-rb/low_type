@@ -133,7 +133,7 @@ my_var = type MyType | fetch_my_object(id: 123)
 
 Don't forget that these are just Ruby expressions and you can do more conditional logic as long as the last expression evaluates to a value:
 ```ruby
-my_var = String | (say_goodbye || 'Hello Again')
+my_var = type String | (say_goodbye || 'Hello Again')
 ```
 
 ### ℹ️ Enumerables
@@ -148,13 +148,13 @@ using LowType::Syntax
 
 ### `[T]` Enumerables
 
-`Array[T]` and `Hash[T]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new()`/`Hash.new()` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have runtime types in Ruby. [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) also suggests `{}` over `Hash[]` syntax for creating hashes.
+`Array[T]` and `Hash[T]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new()`/`Hash.new()` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have inline types in Ruby. [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) also suggests `{}` over `Hash[]` syntax for creating hashes.
 
 ### `|` Union Types / Default Value
 
 The pipe symbol (`|`) is used in the context of type expressions to define multiple types as well as provide the default value:
-- To allow multiple types separate them between pipes: `my_variable = TypeOne | TypeTwo`
-- The last *value*/`nil` defined becomes the default value: `my_variable = TypeOne | TypeTwo | nil`
+- To allow multiple types separate them between pipes: `my_var = TypeOne | TypeTwo`
+- The last *value*/`nil` defined becomes the default value: `my_var = TypeOne | TypeTwo | nil`
 
 If no default value is defined then the argument will be required.
 
