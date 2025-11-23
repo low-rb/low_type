@@ -20,7 +20,13 @@ module LowType
         return nil if return_type.nil?
 
         # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
-        expression = eval(return_type.slice, binding, __FILE__, __LINE__).call # rubocop:disable Security/Eval
+        begin
+          expression = eval(return_type.slice, binding, __FILE__, __LINE__).call # rubocop:disable Security/Eval
+        rescue NameError => e
+          raise NameError,
+                "Unknown return type '#{return_type.slice}' for #{file.scope} at #{file.path}:#{file.start_line}"
+        end
+
         expression = TypeExpression.new(type: expression) unless expression.is_a?(TypeExpression)
 
         ReturnProxy.new(type_expression: expression, name: method_node.name, file:)
