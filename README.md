@@ -59,6 +59,7 @@ Return values can also be defined as `nil`able:
 ```ruby
 def say_hello(greetings: Array[String]) -> { String | nil }
   return nil if greetings.first == 'Goodbye'
+  greetings.first
 end
 ```
 
