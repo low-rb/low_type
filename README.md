@@ -137,19 +137,17 @@ Don't forget that these are just Ruby expressions and you can do more conditiona
 my_var = type String | (say_goodbye || 'Hello Again')
 ```
 
-### ℹ️ Enumerables
-
-To use the `Array[]`/`Hash[]` enumerable syntax with `type()` you must add `using LowType::Syntax` when including LowType:
-```ruby
-include LowType
-using LowType::Syntax
-```
-
 ## Syntax
 
 ### `[T]` Enumerables
 
 `Array[T]` and `Hash[T]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new()`/`Hash.new()` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have inline types in Ruby. [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) also suggests `{}` over `Hash[]` syntax for creating hashes.
+
+ℹ️ **Note:** To use the `Array[]`/`Hash[]` enumerable syntax with `type()` you must add `using LowType::Syntax` when including LowType:
+```ruby
+include LowType
+using LowType::Syntax
+```
 
 ### `|` Union Types / Default Value
 
@@ -157,7 +155,7 @@ The pipe symbol (`|`) is used in the context of type expressions to define multi
 - To allow multiple types separate them between pipes: `my_var = TypeOne | TypeTwo`
 - The last *value*/`nil` defined becomes the default value: `my_var = TypeOne | TypeTwo | nil`
 
-If no default value is defined then the argument will be required.
+ℹ️ **Note:** If no default value is defined then the argument will be required.
 
 ### `-> { T }` Return Type
 
@@ -186,9 +184,9 @@ However, `type()` type expressions are evaluated when they are called at *runtim
 | **Instance types**      | 🟢 Class load   | 🟠 Runtime     | `type_accessor(name: T)`|
 | **Local types**         | 🟠 Runtime      | 🟠 Runtime     | `type(T)`               |
 
-## Architecture
+## Scope
 
-LowType only affects the class that it's `include`d into. Class methods `Array[]`/`Hash[]` are modified for the type expression enumerable syntax (`[]`) to work, but only for LowType's internals (using refinements) and not the `include`d class. The `type()` method requires `using LowType::Syntax` if you want to use the enumerable syntax but will still only affect the `Array[]`/`Hash[]` class methods of the `include`d class.
+LowType only affects the class that it's `include`d into. Class methods `Array[]`/`Hash[]` are modified for the type expression enumerable syntax (`[]`) to work, but only for LowType's internals (using refinements) and not the `include`d class. The `type()` method requires `using LowType::Syntax` if you want to use the enumerable syntax and will affect all `Array[]`/`Hash[]` class methods of the `include`d class.
 
 ## Config
 
