@@ -19,7 +19,7 @@ class Object
         expression | self
         expression
       else
-        # We turn our type into a type expression and pass in their [type_expression/type/value].
+        # We turn our type into a type expression and pass in their type/value.
         type_expression = ::LowType::TypeExpression.new(type: self)
         type_expression | expression
       end
