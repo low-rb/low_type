@@ -111,11 +111,19 @@ module LowType
               __low_type_position = nil unless [:opt, :req, :rest].include?(__low_type_type)
               __low_type_expression = binding.local_variable_get(__low_type_name)
 
-              if __low_type_expression.is_a?(TypeExpression)
-                __low_type_param_proxies << ParamProxy.new(type_expression: __low_type_expression, name: __low_type_name, type: __low_type_type, position: __low_type_position, file: __low_type_file)
+              __low_type_expression = if __low_type_expression.is_a?(TypeExpression)
+                __low_type_expression
               elsif ::LowType::TypeQuery.type?(__low_type_expression)
-                __low_type_param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: __low_type_expression), name: __low_type_name, type: __low_type_type, position: __low_type_position, file: __low_type_file)
+                TypeExpression.new(type: __low_type_expression)
               end
+
+              __low_type_param_proxies << ParamProxy.new(
+                type_expression: __low_type_expression,
+                name: __low_type_name,
+                type: __low_type_type,
+                position: __low_type_position,
+                file: __low_type_file
+              )
             end
 
             __low_type_param_proxies
