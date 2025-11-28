@@ -1,25 +1,15 @@
 # frozen_string_literal: true
 
-require_relative '../expressions/expressions'
-require_relative '../expressions/type_expression'
 require_relative '../expressions/value_expression'
-require_relative '../factories/expression_factory'
 require_relative '../factories/proxy_factory'
-require_relative '../proxies/file_proxy'
 require_relative '../proxies/method_proxy'
-require_relative '../proxies/param_proxy'
 require_relative '../queries/type_query'
-require_relative '../syntax/syntax'
 require_relative 'repository'
 
 module LowType
   # Redefine methods to have their arguments and return values type checked.
   class Redefiner
-    using Syntax
-
     class << self
-      include Expressions
-
       def redefine(method_nodes:, class_proxy:, file_path:)
         method_proxies = create_method_proxies(method_nodes:, klass: class_proxy.klass, file_path:)
         define_methods(method_proxies:, class_proxy:)
@@ -48,7 +38,7 @@ module LowType
         method_nodes.each do |name, method_node|
           file = ProxyFactory.file_proxy(path: file_path, node: method_node, scope: "#{klass}##{name}")
 
-          param_proxies = param_proxies(method_node:, file:)
+          param_proxies = ProxyFactory.param_proxies(method_node:, file:)
           return_proxy = ProxyFactory.return_proxy(method_node:, file:)
           method_proxy = MethodProxy.new(name:, params: param_proxies, return_proxy:, file:)
 
@@ -91,66 +81,6 @@ module LowType
             private name if class_proxy.private_start_line && method_proxy.start_line > class_proxy.private_start_line
           end
         end
-      end
-
-      def param_proxies(method_node:, file:)
-        return [] if method_node.parameters.nil?
-
-        params = method_node.parameters.slice
-        proxy_method = proxy_method(method_node:)
-        required_args, required_kwargs = required_args(proxy_method:)
-
-        # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
-        typed_method = <<~RUBY
-          -> (#{params}) {
-            param_proxies = []
-
-            proxy_method.parameters.each_with_index do |param, position|
-              type, name = param
-              position = nil unless [:opt, :req, :rest].include?(type)
-              expression = binding.local_variable_get(name)
-
-              if expression.is_a?(TypeExpression)
-                param_proxies << ParamProxy.new(type_expression: expression, name:, type:, position:, file:)
-              elsif ::LowType::TypeQuery.type?(expression)
-                param_proxies << ParamProxy.new(type_expression: TypeExpression.new(type: expression), name:, type:, position:, file:)
-              end
-            end
-
-            param_proxies
-          }
-        RUBY
-
-        # Called with only required args (as nil) and optional args omitted, to evaluate type expressions (from default values).
-        eval(typed_method, binding, __FILE__, __LINE__).call(*required_args, **required_kwargs) # rubocop:disable Security/Eval
-
-      # TODO: Write spec for this.
-      rescue ArgumentError => e
-        raise ArgumentError, "Incorrect param syntax: #{e.message}"
-      end
-
-      def proxy_method(method_node:)
-        params = method_node.parameters.slice
-        # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
-        eval("-> (#{params}) {}", binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
-      end
-
-      def required_args(proxy_method:)
-        required_args = []
-        required_kwargs = {}
-
-        proxy_method.parameters.each do |param|
-          param_type, param_name = param
-
-          case param_type
-          when :req
-            required_args << nil
-          when :keyreq
-            required_kwargs[param_name] = nil
-          end
-        end
-
-        [required_args, required_kwargs]
       end
     end
   end
