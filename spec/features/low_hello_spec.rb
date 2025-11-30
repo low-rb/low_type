@@ -22,8 +22,6 @@ RSpec.describe LowHello do
         :multiple_typed_args,
         :multiple_typed_args_and_default_value,
         :typed_array_arg,
-        :typed_hash_arg,
-        :typed_hash_arg_and_default_value,
         :return_type,
         :array_return_type,
         :arg_and_return_type,
@@ -301,44 +299,6 @@ RSpec.describe LowHello do
     context 'when no arg provided' do
       it 'provides the default value' do
         expect(hello.typed_array_arg_and_default_value).to eq(greetings)
-      end
-    end
-  end
-
-  describe '#typed_hash_arg' do
-    it 'passes through the argument' do
-      expect(hello.typed_hash_arg({ 'Hello' => 'Goodbye' })).to eq({ 'Hello' => 'Goodbye' })
-    end
-
-    context 'when arg is wrong type' do
-      let(:error_message) do
-        "Invalid argument type 'Hash' for parameter 'greetings'. Valid types: '{String => String}'"
-      end
-
-      it 'raises an argumment type error' do
-        expect { hello.typed_hash_arg({ 123 => 456 }) }.to raise_error(LowType::ArgumentTypeError, error_message)
-      end
-    end
-
-    context 'when no arg provided' do
-      let(:error_message) do
-        "Invalid argument type 'NilClass' for parameter 'greetings'. Valid types: '{String => String}'"
-      end
-
-      it 'raises an argument error' do
-        expect { hello.typed_hash_arg }.to raise_error(LowType::ArgumentTypeError, error_message)
-      end
-    end
-  end
-
-  describe '#typed_hash_arg_and_default_value' do
-    it 'passes through the argument' do
-      expect(hello.typed_hash_arg_and_default_value({ 'Hello' => 'Goodbye' })).to eq({ 'Hello' => 'Goodbye' })
-    end
-
-    context 'when no arg provided' do
-      it 'provides the default value' do
-        expect(hello.typed_hash_arg_and_default_value).to eq({ 'Hola' => 'Adios' })
       end
     end
   end

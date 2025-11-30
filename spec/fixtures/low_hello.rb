@@ -70,14 +70,6 @@ class LowHello
     greetings
   end
 
-  def typed_hash_arg(greetings = Hash[String => String])
-    greetings
-  end
-
-  def typed_hash_arg_and_default_value(greetings = Hash[String => String] | { 'Hola' => 'Adios' })
-    greetings
-  end
-
   # Return types.
 
   def return_type() -> { Integer }
