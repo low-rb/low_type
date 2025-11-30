@@ -36,8 +36,8 @@ module LowType
 
   class << self
     def config
-      config = Struct.new(:error_mode, :output_mode, :output_size, :deep_type_check, :union_type_expressions)
-      @config ||= config.new(:error, :type, 100, false, true)
+      config = Struct.new(:type_checking, :error_mode, :output_mode, :output_size, :deep_type_check, :union_type_expressions)
+      @config ||= config.new(true, :error, :type, 100, false, true)
     end
 
     def configure

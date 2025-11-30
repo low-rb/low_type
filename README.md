@@ -193,7 +193,12 @@ LowType only affects the class that it's `include`d into. Class methods `Array[]
 Copy and paste the following and change the defaults to configure LowType:
 
 ```ruby
+# Call before the class that includes LowType is required.
 LowType.configure do |config|
+  # Set to "false" to disable type checking, which you may like to do in a production environment for example.
+  # There will still be a shim method to convert typed args to untyped args but performance will be near 100%.
+  config.type_checking = true
+
   # Set to :log or :none to disable the raising of an exception when types are invalid. [UNRELEASED]
   config.error_mode = :error
 
@@ -223,7 +228,7 @@ end
 - `Hash`
 - `nil` represents an optional value
 
-ℹ️ Any class/type that's available to Ruby is available to LowType, you just might need to `require` it.
+ℹ️ **Note:** Any class/type that's available to Ruby is available to LowType, you just might need to `require` it.
 
 ### Complex types
 
@@ -261,7 +266,7 @@ class MyApp < Sinatra::Base
     [200, {}, '<h1>Hello!</h1>']    
   end
 
-  # Types specifically for Sinatra.
+  # Specific types for Sinatra.
   get '/' do -> { Tuple[Status, Headers, HTML] }
     [200, {}, '<h1>Hello!</h1>']    
   end

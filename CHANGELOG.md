@@ -21,6 +21,17 @@ Minor features that don't break backwards compatibility are released as patches.
 - Complex types validation
 - Error mode config
 
+## 1.1.3
+
+### Added
+
+- Enable/disable type checking via `LowType.config.type_checking`
+
+### Fixed
+
+- [Add prefix to lambda locals to avoid name conflicts](https://github.com/low-rb/low_type/pull/2)
+- [Improved error message with unknown return type](https://github.com/low-rb/low_type/pull/1)
+
 ## 1.1.2
 
 ### Added
