@@ -5,6 +5,10 @@ require_relative '../../lib/low_type'
 class LowHash
   include LowType
 
+  def initialize(hash: Hash[String => String])
+    hash
+  end
+
   def typed_hash_arg(greetings = Hash[String => String])
     greetings
   end

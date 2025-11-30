@@ -3,7 +3,8 @@
 require_relative '../fixtures/low_hash'
 
 RSpec.describe 'Hash[T]' do
-  subject(:low_hash) { LowHash.new }
+  subject(:low_hash) { LowHash.new(hash:) }
+  let(:hash) { { 'Hello' => 'Goodbye' } }
 
   describe '.included' do
     it 'redefines methods on class load' do
@@ -11,6 +12,21 @@ RSpec.describe 'Hash[T]' do
         :typed_hash_arg,
         :typed_hash_arg_and_default_value
       )
+    end
+  end
+
+  describe '#initialize' do
+    it 'instantiates a typed class' do
+      expect { low_hash }.not_to raise_error
+    end
+
+    context 'when the arg type is incorrect' do
+      let(:hash) { 123 }
+      let(:error_message) { "Invalid argument type 'Integer' for parameter 'hash'. Valid types: '{String => String}'" }
+
+      it 'raises an invalid type error' do
+        expect { low_hash }.to raise_error(LowType::ArgumentTypeError, error_message)
+      end
     end
   end
 
