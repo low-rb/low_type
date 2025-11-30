@@ -17,6 +17,10 @@ module LowType
       @file = file
     end
 
+    def required?
+      @type_expression.default_value == :LOW_TYPE_UNDEFINED
+    end
+
     def error_type
       ArgumentTypeError
     end
