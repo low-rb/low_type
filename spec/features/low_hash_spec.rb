@@ -40,6 +40,32 @@ RSpec.describe 'Hash[T]' do
     end
   end
 
+  describe '#typed_hash_kwarg' do
+    it 'passes through the argument' do
+      expect(low_hash.typed_hash_kwarg(greetings: { 'Hello' => 'Goodbye' })).to eq({ 'Hello' => 'Goodbye' })
+    end
+
+    context 'when arg is wrong type' do
+      let(:error_message) do
+        "Invalid argument type 'Hash' for parameter 'greetings'. Valid types: '{String => String}'"
+      end
+
+      it 'raises an argumment type error' do
+        expect { low_hash.typed_hash_kwarg(greetings: { 123 => 456 }) }.to raise_error(LowType::ArgumentTypeError, error_message)
+      end
+    end
+
+    context 'when no arg provided' do
+      let(:error_message) do
+        "Invalid argument type 'NilClass' for parameter 'greetings'. Valid types: '{String => String}'"
+      end
+
+      it 'raises an argument error' do
+        expect { low_hash.typed_hash_kwarg }.to raise_error(LowType::ArgumentTypeError, error_message)
+      end
+    end
+  end
+
   describe '#typed_hash_arg_and_default_value' do
     it 'passes through the argument' do
       expect(low_hash.typed_hash_arg_and_default_value({ 'Hello' => 'Goodbye' })).to eq({ 'Hello' => 'Goodbye' })
@@ -48,6 +74,32 @@ RSpec.describe 'Hash[T]' do
     context 'when no arg provided' do
       it 'provides the default value' do
         expect(low_hash.typed_hash_arg_and_default_value).to eq({ 'Hola' => 'Adios' })
+      end
+    end
+  end
+
+  describe '#typed_hash_kwarg' do
+    it 'passes through the argument' do
+      expect(low_hash.typed_hash_kwarg(greetings: { 'Hello' => 'Goodbye' })).to eq({ 'Hello' => 'Goodbye' })
+    end
+
+    context 'when arg is wrong type' do
+      let(:error_message) do
+        "Invalid argument type 'Hash' for parameter 'greetings'. Valid types: '{String => String}'"
+      end
+
+      it 'raises an argumment type error' do
+        expect { low_hash.typed_hash_kwarg(greetings: { 123 => 456 }) }.to raise_error(LowType::ArgumentTypeError, error_message)
+      end
+    end
+
+    context 'when no arg provided' do
+      let(:error_message) do
+        "Invalid argument type 'NilClass' for parameter 'greetings'. Valid types: '{String => String}'"
+      end
+
+      it 'raises an argument error' do
+        expect { low_hash.typed_hash_kwarg }.to raise_error(LowType::ArgumentTypeError, error_message)
       end
     end
   end
