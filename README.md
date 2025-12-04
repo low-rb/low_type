@@ -10,6 +10,7 @@ class MyClass
 
   def say_hello(greeting: String)
     # Raises exception at runtime if greeting is not a String.
+    # Or `config.type_checking = false` to annotate your code.
   end
 end
 ```
