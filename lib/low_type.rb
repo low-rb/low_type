@@ -21,6 +21,8 @@ module LowType
     end
 
     file_path = FileQuery.file_path(klass:)
+    return unless File.exist?(file_path)
+
     parser = FileParser.new(klass:, file_path:)
 
     klass.extend TypeAccessors
