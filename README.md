@@ -200,15 +200,16 @@ LowType.configure do |config|
   # There will still be a shim method to convert typed args to untyped args but performance will be near 100%.
   config.type_checking = true
 
-  # Set to :log or :none to disable the raising of an exception when types are invalid. [UNRELEASED]
+  # Set to :log to log instead of raising of an exception when a type is invalid. [UNRELEASED]
   config.error_mode = :error
+  config.error_callback = nil # Or a lambda like "-> (error) { MyLogger.log(error) }"
 
   # Set to :value to show a concatenated inspect of the invalid param when an error is raised. Or :none to redact.
   # Great for debugging, bad for security, and makes tests harder to write when the error messages are so dynamic.
   config.output_mode = :type
   config.output_size = 100
 
-  # Set to true to type check all elements of an Array/Hash (not just the first)
+  # Set to "true" to type check all elements of an Array/Hash (not just the first)
   config.deep_type_check = false
 
   # The "|" pipe syntax requires a monkey-patch but can be disabled if you don't need union types with default values.
@@ -233,7 +234,8 @@ end
 
 ### Complex types
 
-- `Boolean` (accepts `true`/`false`) [UNRELEASED]
+- `Boolean` - Accepts `true`/`false`) [UNRELEASED]
+- `Enum` - Usage: `Enum[1, 2, 3]` [[CONCEPT STAGE](https://github.com/low-rb/low_type/issues/6)]
 - `Tuple` (subclass of `Array`)
 - `Status` (subclass of `Integer`) - TODO: Check integer to be a valid HTTP status code
 - `Headers` (subclass of `Hash`)
