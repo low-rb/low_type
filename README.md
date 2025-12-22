@@ -309,6 +309,24 @@ Add `gem 'low_type'` to your Gemfile then:
 bundle install
 ```
 
+## Advanced Techniques
+
+### Inheritance
+
+You must `include LowType` in every class that you'd like to have type checking/annotations for.  
+However you can eliminate the need for this `include` in every child class of a parent via the `inherited` hook:
+```ruby
+class Parent
+  def self.inherited(child)
+    child.include LowType
+  end
+end
+
+class Child < Parent
+  # LowType available here.
+end
+```
+
 ## Philosophy
 
 🦆 **Duck typing is beautiful.** Ruby is an amazing language **BECAUSE** it's not typed. I don't believe Ruby should ever be fully typed, but you should be able to sprinkle in types into some areas of your codebase where you'd like self-documentation and a little reassurance that the right values are coming in/out.
