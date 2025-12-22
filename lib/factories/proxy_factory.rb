@@ -25,13 +25,15 @@ module LowType
       def param_proxies(method_node:, file:)
         return [] if method_node.parameters.nil?
 
+        params_without_block = method_node.parameters.slice.delete_suffix(', &block')
+
         # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
-        ruby_method = eval("-> (#{method_node.parameters.slice}) {}", binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
+        ruby_method = eval("-> (#{params_without_block}) {}", binding, __FILE__, __LINE__) # rubocop:disable Security/Eval
 
         # Not a security risk because the code comes from a trusted source; the file that did the include. Does the file trust itself?
         # Local variable names are prefixed with __lt or __rb where necessary to avoid being overridden by method parameters.
         typed_method = <<~RUBY
-          -> (#{method_node.parameters.slice}, __rb_method:, __lt_file:) {
+          -> (#{params_without_block}, __rb_method:, __lt_file:) {
             param_proxies_for_type_expressions(ruby_method: __rb_method, file: __lt_file, method_binding: binding)
           }
         RUBY
