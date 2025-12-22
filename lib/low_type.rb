@@ -11,7 +11,7 @@ require_relative 'types/complex_types'
 
 module LowType
   # We do as much as possible on class load rather than on instantiation to be thread-safe and efficient.
-  def self.included(klass)
+  def self.included(klass) # rubocop:disable Metrics/AbcSize
     require_relative 'syntax/union_types' if LowType.config.union_type_expressions
 
     class << klass
