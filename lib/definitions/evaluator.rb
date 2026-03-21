@@ -58,8 +58,7 @@ module Low
             param_proxy.expression = cast_type_expression(expression:, method_proxy:)
           end
         rescue NameError
-          mp = method_proxy
-          raise NameError, "Unknown type '#{mp.value}' for #{mp.scope} at #{mp.file_path}:#{mp.start_line}"
+          raise NameError, "Unknown type '#{param_proxy.value}' for #{method_proxy.scope} at #{param_proxy.file_path}:#{param_proxy.start_line}"
         end
       end
 

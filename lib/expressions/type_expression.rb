@@ -128,6 +128,9 @@ module Low
     end
 
     def type_matches_value?(type:, value:, proxy:)
+      # Enum::Definition and other type structures with match? (non-Class)
+      return type.match?(value:) if type.respond_to?(:match?) && !type.instance_of?(Class)
+
       if type.instance_of?(Class)
         return type.match?(value:) if Low::TypeQuery.complex_type?(expression: type)
 
