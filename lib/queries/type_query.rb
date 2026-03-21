@@ -7,7 +7,11 @@ module Low
   class TypeQuery
     class << self
       def type?(expression)
-        basic_type?(expression:) || complex_type?(expression:)
+        basic_type?(expression:) || complex_type?(expression:) || enum_definition?(expression:)
+      end
+
+      def enum_definition?(expression:)
+        expression.is_a?(Low::Types::Enum::Definition)
       end
 
       def typed_array?(expression:)

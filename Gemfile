@@ -6,9 +6,12 @@ source 'https://gem.coop'
 gemspec
 
 group :development do
-  gem 'expressions', path: '../expressions'
-  gem 'low_dependency', path: '../low_dependency'
-  gem 'lowkey', path: '../lowkey'
+  # gem 'expressions', path: '../expressions'
+  gem 'expressions'
+  gem 'lowkey'
+  # gem 'low_dependency', path: '../low_dependency'
+  gem 'low_dependency'
+  # gem 'lowkey', path: '../lowkey'
 
   gem 'pry'
   gem 'pry-nav'
