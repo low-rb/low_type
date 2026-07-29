@@ -27,11 +27,11 @@ module Low
   class Redefiner
     class << self
       # TODO: Pass in "klass" and use it to class_eval/eval methods in the binding of the class that included LowType.
-      def redefine(method_proxies:, class_proxy:)
+      def redefine(method_proxies:, class_proxy:, klass: nil)
         if LowType.config.type_checking
           typed_methods(method_proxies:, class_proxy:)
         else
-          untyped_methods(method_proxies:, class_proxy:)
+          rewrite_methods(method_proxies:, class_proxy:, klass:)
         end
       end
 
@@ -51,6 +51,20 @@ module Low
       end
 
       private
+
+      def rewrite_methods(method_proxies:, class_proxy:, klass:)
+        method_proxies.values.filter(&:expressions?).each do |method_proxy|
+          method_proxy.rewrite_signature
+
+          klass.class_eval(method_proxy.export, method_proxy.file_path, method_proxy.start_line)
+
+          if class_proxy.private_start_line && method_proxy.start_line > class_proxy.private_start_line
+            klass.send(:private, method_proxy.name)
+          end
+        end
+
+        nil
+      end
 
       def typed_methods(method_proxies:, class_proxy:) # rubocop:disable Metrics
         Module.new do
