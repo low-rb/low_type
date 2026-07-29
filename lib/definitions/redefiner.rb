@@ -62,6 +62,8 @@ module Low
             klass.send(:private, method_proxy.name)
           end
         end
+
+        nil
       end
 
       def typed_methods(method_proxies:, class_proxy:) # rubocop:disable Metrics
