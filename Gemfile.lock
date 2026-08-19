@@ -12,7 +12,7 @@ PATH
 PATH
   remote: ../lowkey
   specs:
-    lowkey (0.4.1)
+    lowkey (0.4.3)
       prism
 
 PATH
@@ -27,6 +27,7 @@ GEM
   specs:
     ast (2.4.3)
     base64 (0.3.0)
+    benchmark-ips (2.15.1)
     coderay (1.1.3)
     diff-lcs (1.6.2)
     json (2.19.3)
@@ -36,6 +37,7 @@ GEM
     method_source (1.1.0)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
+    ostruct (0.6.3)
     parallel (1.28.0)
     parser (3.3.11.1)
       ast (~> 2.4.1)
@@ -103,13 +105,16 @@ GEM
 
 PLATFORMS
   ruby
+  x64-mingw-ucrt
   x86_64-darwin-22
 
 DEPENDENCIES
+  benchmark-ips
   expressions!
   low_dependency!
   low_type!
   lowkey!
+  ostruct
   pry
   pry-nav
   rack

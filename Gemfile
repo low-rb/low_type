@@ -12,6 +12,8 @@ group :development do
 
   gem 'pry'
   gem 'pry-nav'
+  gem 'ostruct' # required by pry on Ruby 4.0+
+  gem 'benchmark-ips'
   gem 'rack'
   gem 'rack-test'
   gem 'rake', '~> 13.0'
