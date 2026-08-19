@@ -18,6 +18,7 @@ end
 ## Default values
 
 Place `|` after the type definition to provide a default value when the argument is `nil`:
+
 ```ruby
 def say_hello(greeting = String | 'Hello')
   puts greeting
@@ -25,6 +26,7 @@ end
 ```
 
 Or with keyword arguments:
+
 ```ruby
 def say_hello(greeting: String | 'Hello')
   puts greeting
@@ -34,6 +36,7 @@ end
 ## Enumerables
 
 Wrap your type in an `Array[T]` or `Hash[T]` enumerable type. An `Array` of `String`s looks like:
+
 ```ruby
 def say_hello(greetings: Array[String])
   greetings # => ['Hello', 'Howdy', 'Hey']
@@ -41,6 +44,7 @@ end
 ```
 
 Represent a `Hash` with `key => value` syntax:
+
 ```ruby
 def say_hello(greetings: Hash[String => Integer])
   greetings # => {'Hello' => 123, 'Howdy' => 456, 'Hey' => 789})
@@ -50,6 +54,7 @@ end
 ## Return values
 
 After your method's parameters add `-> { T }` to define a return value:
+
 ```ruby
 def say_hello() -> { String }
   'Hello' # Raises exception if the returned value is not a String.
@@ -57,6 +62,7 @@ end
 ```
 
 Return values can also be defined as `nil`able:
+
 ```ruby
 def say_hello(greetings: Array[String]) -> { String | nil }
   return nil if greetings.first == 'Goodbye'
@@ -65,6 +71,7 @@ end
 ```
 
 If you need a multi-line return type/value then I'll even let you put the `-> { T }` on multiple lines, okay? I won't judge. You are a unique flower 🌸 with your own style, your own needs. You have purpose in this world and though you may never find it, your loved ones will cherish knowing you and wish you were never gone:
+
 ```ruby
 def say_farewell_with_a_long_method_name(farewell: String)
   -> {
@@ -112,6 +119,7 @@ name = 'Tim' # Set the value with type checking
 ### ℹ️ Multiple Arguments
 
 You can define multiple typed accessor methods just like you would with `attr_[reader, writer, accessor]`:
+
 ```ruby
 type_accessor name: String | nil, occupation: 'Doctor', age: Integer | 33
 name # => nil
@@ -124,9 +132,10 @@ age # => 33
 
 ### `type()`
 
-*alias: `low_type()`*
+_alias: `low_type()`_
 
 To define typed `local` variables at runtime use the `type()` method:
+
 ```ruby
 my_var = type MyType | fetch_my_object(id: 123)
 ```
@@ -134,6 +143,7 @@ my_var = type MyType | fetch_my_object(id: 123)
 `my_var` is now type checked to be of type `MyType` when assigned to.
 
 Don't forget that these are just Ruby expressions and you can do more conditional logic as long as the last expression evaluates to a value:
+
 ```ruby
 my_var = type String | (say_goodbye || 'Hello Again')
 ```
@@ -145,6 +155,7 @@ my_var = type String | (say_goodbye || 'Hello Again')
 `Array[T]` and `Hash[T]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new()`/`Hash.new()` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have inline types in Ruby. [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) also suggests `{}` over `Hash[]` syntax for creating hashes.
 
 ℹ️ **Note:** To use the `Array[]`/`Hash[]` enumerable syntax with `type()` you must add `using LowType::Syntax` when including LowType:
+
 ```ruby
 include LowType
 using LowType::Syntax
@@ -153,8 +164,9 @@ using LowType::Syntax
 ### `|` Union Types / Default Value
 
 The pipe symbol (`|`) is used in the context of type expressions to define multiple types as well as provide the default value:
+
 - To allow multiple types separate them between pipes: `my_var = TypeOne | TypeTwo`
-- The last *value*/`nil` defined becomes the default value: `my_var = TypeOne | TypeTwo | nil`
+- The last _value_/`nil` defined becomes the default value: `my_var = TypeOne | TypeTwo | nil`
 
 ℹ️ **Note:** If no default value is defined then the argument will be required.
 
@@ -166,24 +178,25 @@ The `-> { T }` syntax is a lambda without an assignment to a local variable. Thi
 
 ### `value(T)` Value Expression
 
-*alias: `low_value()`*
+_alias: `low_value()`_
 
 To treat a type as if it were a value, pass it through `value()` first:
+
 ```ruby
 def my_method(my_arg: String | MyType | value(MyType)) # => MyType is the default value
 ```
 
 ## Performance
 
-LowType evaluates type expressions on *class load* (just once) to be efficient and thread-safe. Then the defined types are checked per method call.  
-However, `type()` type expressions are evaluated when they are called at *runtime* on an instance, and this may impact performance.
+LowType evaluates type expressions on _class load_ (just once) to be efficient and thread-safe. Then the defined types are checked per method call.  
+However, `type()` type expressions are evaluated when they are called at _runtime_ on an instance, and this may impact performance.
 
-|                         | **Evaluation**  | **Validation** | ℹ️ *Example*            |
-|-------------------------|-----------------|----------------|-------------------------|
-| **Method param types**  | 🟢 Class load   | 🟠 Runtime     | `def method(name: T)`   |
-| **Method return types** | 🟢 Class load   | 🟠 Runtime     | `def method() -> { T }` |
-| **Instance types**      | 🟢 Class load   | 🟠 Runtime     | `type_accessor(name: T)`|
-| **Local types**         | 🟠 Runtime      | 🟠 Runtime     | `type(T)`               |
+|                         | **Evaluation** | **Validation** | ℹ️ _Example_             |
+| ----------------------- | -------------- | -------------- | ------------------------ |
+| **Method param types**  | 🟢 Class load  | 🟠 Runtime     | `def method(name: T)`    |
+| **Method return types** | 🟢 Class load  | 🟠 Runtime     | `def method() -> { T }`  |
+| **Instance types**      | 🟢 Class load  | 🟠 Runtime     | `type_accessor(name: T)` |
+| **Local types**         | 🟠 Runtime     | 🟠 Runtime     | `type(T)`                |
 
 ## Scope
 
@@ -197,7 +210,8 @@ Copy and paste the following and change the defaults to configure LowType:
 # This configuration should be set before the class that includes LowType is required.
 LowType.configure do |config|
   # Set to "false" to disable type checking, which you may like to do in a production environment for example.
-  # There will still be a shim method to convert typed args to untyped args but performance will be near 100%.
+  # When disabled, methods are rewritten directly via class_eval to strip type annotations from signatures.
+  # Performance is near plain Ruby.
   config.type_checking = true
 
   # Set to :log to log instead of raising of an exception when a type is invalid. [UNRELEASED]
@@ -266,12 +280,12 @@ class MyApp < Sinatra::Base
 
   # Standard types Sinatra uses.
   get '/' do -> { Array[Integer, Hash, String] }
-    [200, {}, '<h1>Hello!</h1>']    
+    [200, {}, '<h1>Hello!</h1>']
   end
 
   # Specific types for Sinatra.
   get '/' do -> { Tuple[Status, Headers, HTML] }
-    [200, {}, '<h1>Hello!</h1>']    
+    [200, {}, '<h1>Hello!</h1>']
   end
 end
 ```
@@ -279,6 +293,7 @@ end
 ### LowDependency
 
 With [LowDependency](https://github.com/low-rb/low_dependency) you can inject your dependencies automatically via the constructor:
+
 ```ruby
 class MyClass
   include LowType
@@ -314,6 +329,7 @@ Style/RedundantArrayConstructor:
 ## Installation
 
 Add `gem 'low_type'` to your Gemfile then:
+
 ```
 bundle install
 ```
@@ -324,6 +340,7 @@ bundle install
 
 You must `include LowType` in every class that you'd like to have type checking/annotations for.  
 However you can eliminate the need for this `include` in every child class of a parent via the `inherited` hook:
+
 ```ruby
 class Parent
   def self.inherited(child)
@@ -362,6 +379,7 @@ sequenceDiagram
 ```
 
 Three distinct phases isolate concerns:
+
 1. **File Load:** Code is parsed into an Abstract Syntax Tree but not evaluated (see [Lowkey](https://github.com/low-rb/lowkey))
 2. **Class Load:** Constants and expressions are evaluated into real Ruby objects and methods redefined
 3. **Runtime:** Method argument types and return types are optionally validated
