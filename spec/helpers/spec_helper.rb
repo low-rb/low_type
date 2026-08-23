@@ -19,4 +19,7 @@ RSpec.configure do |config|
     # Large diff when expected objects don't match.
     expectations.max_formatted_output_length = 10_000
   end
+
+  # Reset type_checking to true after each example to prevent config leaking between specs
+  config.after(:each) { LowType.configure { |c| c.type_checking = true } }
 end

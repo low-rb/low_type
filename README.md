@@ -212,6 +212,10 @@ LowType.configure do |config|
   # Set to "false" to disable type checking, which you may like to do in a production environment for example.
   # When disabled, methods are rewritten directly via class_eval to strip type annotations from signatures.
   # Performance is near plain Ruby.
+  # Valid values:
+  #   true     -- type checking on (default)
+  #   false    -- type checking off, untyped shim (define_method + super)
+  #   :rewrite -- type checking off, methods rewritten directly via class_eval
   config.type_checking = true
 
   # Set to :log to log instead of raising of an exception when a type is invalid. [UNRELEASED]

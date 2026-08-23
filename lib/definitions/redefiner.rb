@@ -26,12 +26,14 @@ module Low
   #      │              │                 │                 │               │
   class Redefiner
     class << self
-      # TODO: Pass in "klass" and use it to class_eval/eval methods in the binding of the class that included LowType.
       def redefine(method_proxies:, class_proxy:, klass: nil)
-        if LowType.config.type_checking
+        case LowType.config.type_checking
+        when true
           typed_methods(method_proxies:, class_proxy:)
-        else
+        when :rewrite
           rewrite_methods(method_proxies:, class_proxy:, klass:)
+        else
+          untyped_methods(method_proxies:, class_proxy:)
         end
       end
 

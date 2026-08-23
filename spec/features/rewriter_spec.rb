@@ -2,8 +2,10 @@
 
 require_relative '../fixtures/rewriter'
 
-RSpec.describe 'rewrite_methods (type_checking: false)' do
+RSpec.describe 'rewrite_methods (type_checking: :rewrite)' do
   subject(:instance) { RewriterFixture.new }
+
+  after(:all) { LowType.configure { |c| c.type_checking = true } }
 
   # -------------------------------------------------------------------------
   # Required positional

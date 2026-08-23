@@ -2,7 +2,7 @@
 
 require_relative '../../lib/low_type'
 
-LowType.configure { |c| c.type_checking = false }
+LowType.configure { |c| c.type_checking = :rewrite }
 
 class RewriterFixture
   include LowType
@@ -44,3 +44,5 @@ class RewriterFixture
     secret
   end
 end
+
+LowType.configure { |c| c.type_checking = true }
