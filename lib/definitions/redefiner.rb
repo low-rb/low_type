@@ -25,6 +25,10 @@ module Low
   #      │              │                 │◄┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┤
   #      │              │                 │                 │               │
   class Redefiner
+    # Array literals (unlike frozen string literals) aren't cached by Ruby -- this was being
+    # reallocated on every param, every call, in both typed_methods and untyped_args below.
+    POSITIONAL_PARAM_TYPES = %i[pos_req pos_opt].freeze
+
     class << self
       # TODO: Pass in "klass" and use it to class_eval/eval methods in the binding of the class that included LowType.
       def redefine(method_proxies:, class_proxy:)
@@ -35,9 +39,13 @@ module Low
         end
       end
 
+      # Mutates args/kwargs in place -- callers already hold the same Array/Hash references
+      # they passed in, so there's nothing useful to return (previously returned [args, kwargs],
+      # which callers reassigned into their own args/kwargs -- redundant, since the mutation was
+      # already visible to them; removed the array allocation and the reassignment together).
       def untyped_args(args:, kwargs:, method_proxy:) # rubocop:disable Metrics/AbcSize
         method_proxy.params_with_expressions.each do |param_proxy|
-          positional = %i[pos_req pos_opt].include?(param_proxy.type)
+          positional = POSITIONAL_PARAM_TYPES.include?(param_proxy.type)
 
           value = positional ? args[param_proxy.position] : kwargs[param_proxy.name]
 
@@ -49,7 +57,7 @@ module Low
           positional ? args[param_proxy.position] = value : kwargs[param_proxy.name] = value
         end
 
-        [args, kwargs]
+        nil
       end
 
       private
@@ -59,7 +67,7 @@ module Low
           method_proxies.values.filter(&:expressions?).each do |method_proxy|
             define_method(method_proxy.name) do |*args, **kwargs|
               method_proxy.params_with_expressions.each do |param_proxy|
-                positional = %i[pos_req pos_opt].include?(param_proxy.type)
+                positional = POSITIONAL_PARAM_TYPES.include?(param_proxy.type)
 
                 value = positional ? args[param_proxy.position] : kwargs[param_proxy.name]
                 value = param_proxy.expression.default_value if value.nil? && !param_proxy.expression.required?
@@ -92,7 +100,7 @@ module Low
               # NOTE: Type checking is currently disabled. See 'config.type_checking'.
               method_proxy = Lowkey[class_proxy.file_path][class_proxy.namespace][__method__]
 
-              args, kwargs = Low::Redefiner.untyped_args(args:, kwargs:, method_proxy:)
+              Low::Redefiner.untyped_args(args:, kwargs:, method_proxy:)
               super(*args, **kwargs)
             end
 
