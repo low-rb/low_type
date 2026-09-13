@@ -10,6 +10,7 @@ group :development do
   gem 'lowkey', path: '../lowkey'
   gem 'providers', path: '../providers'
 
+  gem 'benchmark-ips'
   gem 'irb'
   gem 'rack'
   gem 'rack-test'

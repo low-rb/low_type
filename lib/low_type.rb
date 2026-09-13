@@ -52,8 +52,11 @@ module LowType
 
       Low::Evaluator.evaluate(method_proxies: class_proxy.keyed_methods, class_binding: class_proxy.class_binding)
 
-      klass.prepend Low::Redefiner.redefine(method_proxies: class_proxy.instance_methods, class_proxy:)
-      klass.singleton_class.prepend Low::Redefiner.redefine(method_proxies: class_proxy.class_methods, class_proxy:)
+      result = Low::Redefiner.redefine(method_proxies: class_proxy.instance_methods, class_proxy:, klass:)
+      klass.prepend result if result.is_a?(Module)
+
+      singleton_result = Low::Redefiner.redefine(method_proxies: class_proxy.class_methods, class_proxy:, klass: klass.singleton_class)
+      klass.singleton_class.prepend singleton_result if singleton_result.is_a?(Module)
 
       Low::Adapter::Loader.load(klass:, class_proxy:)
 

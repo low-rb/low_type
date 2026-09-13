@@ -2,9 +2,9 @@
 
 require_relative '../../lib/low_type'
 
-LowType.configure { |c| c.type_checking = false }
+LowType.configure { |c| c.type_checking = :rewrite }
 
-class TypeCheckingDisabled
+class TypeCheckingRewrite
   include LowType
 
   def typed_arg(greeting = String)
