@@ -66,17 +66,18 @@ module LowType
     tp.enable
   end
 
+  Config = Struct.new(
+    :type_checking,
+    :error_mode,
+    :output_mode,
+    :output_size,
+    :deep_type_check,
+    :union_type_expressions
+  )
+
   class << self
     def config
-      config = Struct.new(
-        :type_checking,
-        :error_mode,
-        :output_mode,
-        :output_size,
-        :deep_type_check,
-        :union_type_expressions
-      )
-      @config ||= config.new(true, :error, :type, 100, true, true)
+      @config ||= Config.new(true, :error, :type, 100, true, true)
     end
 
     def configure

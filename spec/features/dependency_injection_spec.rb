@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require_relative '../../lib/types/error_types'
-require_relative '../fixtures/dependencies'
+require_relative '../fixtures/dependency_injection'
 
-RSpec.describe Dependencies do
+RSpec.describe DependencyInjection do
   subject { described_class.new }
 
   describe '#dependency' do

@@ -15,6 +15,13 @@ class MyClass
 end
 ```
 
+**✨ Features:**
+- Inline types
+- Enable/disable per environment
+- Integrates with [Sinatra](#sinatra) and [Raindeer](http://raindeer.dev) frameworks
+- Exports to RBS [UNRELEASED]
+- Uninstall easily: `lowtype uninstall`, that's it! [UNRELEASED]
+
 ## Default values
 
 Place `|` after the type definition to provide a default value when the argument is `nil`:
@@ -128,6 +135,12 @@ age = 'old' # => Raises ArgumentTypeError
 age # => 33
 ```
 
+ℹ️ To use the `Array[]`/`Hash[]` enumerable syntax with type accessors you must add `using LowType::Syntax`:
+```ruby
+include LowType
+using LowType::Syntax
+```
+
 ## Local variables
 
 ### `type()`
@@ -154,8 +167,7 @@ my_var = type String | (say_goodbye || 'Hello Again')
 
 `Array[T]` and `Hash[T]` class methods represent enumerables in the context of type expressions. If you need to create a new `Array`/`Hash` then use `Array.new()`/`Hash.new()` or Array and Hash literals `[]` and `{}`. This is the same syntax that [RBS](https://github.com/ruby/rbs) uses and we need to get use to these class methods returning type expressions if we're ever going to have inline types in Ruby. [RuboCop](https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/HashConversion) also suggests `{}` over `Hash[]` syntax for creating hashes.
 
-ℹ️ **Note:** To use the `Array[]`/`Hash[]` enumerable syntax with `type()` you must add `using LowType::Syntax` when including LowType:
-
+ℹ️ To use the `Array[]`/`Hash[]` enumerable syntax with `type()` you must add `using LowType::Syntax`:
 ```ruby
 include LowType
 using LowType::Syntax
@@ -168,13 +180,18 @@ The pipe symbol (`|`) is used in the context of type expressions to define multi
 - To allow multiple types separate them between pipes: `my_var = TypeOne | TypeTwo`
 - The last _value_/`nil` defined becomes the default value: `my_var = TypeOne | TypeTwo | nil`
 
-ℹ️ **Note:** If no default value is defined then the argument will be required.
+ℹ️ If no default value is defined then the argument will be required.
+
+### Nilable values
+
+- Represent a nilable value with `T | nil`
+- Represent an empty hash with `Hash | {}`
 
 ### `-> { T }` Return Type
 
 The `-> { T }` syntax is a lambda without an assignment to a local variable. This is valid Ruby that can be placed immediately after a method definition and on the same line as the method definition, to visually look like the output of that method. It's inert and doesn't run when the method is called, similar to how default values are never called if the argument is managed by LowType. Pretty cool stuff yeah? Your type expressions won't keep re-evaluating in the wild 🐴, only on class load.
 
-ℹ️ **Note:** A method that takes no arguments must include empty parameters `()` for the `-> { T }` syntax to be valid; `def method() -> { T }`.
+ℹ️ A method that takes no arguments must include empty parameters `()` for the `-> { T }` syntax to be valid; `def method() -> { T }`.
 
 ### `value(T)` Value Expression
 
@@ -188,8 +205,9 @@ def my_method(my_arg: String | MyType | value(MyType)) # => MyType is the defaul
 
 ## Performance
 
-LowType evaluates type expressions on _class load_ (just once) to be efficient and thread-safe. Then the defined types are checked per method call.  
-However, `type()` type expressions are evaluated when they are called at _runtime_ on an instance, and this may impact performance.
+LowType evaluates type expressions on *class load* (just once) to be efficient and thread-safe. Then the defined types are checked per method call.
+
+However, `type()` type expressions are evaluated as they are called at *runtime* on an instance, and this may impact performance.
 
 |                         | **Evaluation** | **Validation** | ℹ️ _Example_             |
 | ----------------------- | -------------- | -------------- | ------------------------ |
@@ -200,7 +218,7 @@ However, `type()` type expressions are evaluated when they are called at _runtim
 
 ## Scope
 
-LowType only affects the class that it's `include`d into. Class methods `Array[]`/`Hash[]` are modified for the type expression enumerable syntax (`[]`) to work, but only for LowType's internals (using refinements) and not the `include`d class. The `type()` method requires `using LowType::Syntax` if you want to use the enumerable syntax and will affect all `Array[]`/`Hash[]` class methods of the `include`d class.
+LowType only affects the class that it's `include`d into. Class methods `Array[]`/`Hash[]` are modified for the type expression enumerable syntax (`[]`) to work, but only for LowType's internals (using refinements) and not the `include`d class. The `type()` method requires `using LowType::Syntax` *ONLY* if you want to use the enumerable syntax and will affect *ONLY* the `[]` class method of every `Array[]`/`Hash[]` in the class it's `include`d into.
 
 ## Config
 
@@ -248,8 +266,6 @@ end
 - `Hash`
 - `nil` represents an optional value
 
-ℹ️ **Note:** Any class/type that's available to Ruby is available to LowType, `require` it and specify its full namespace.
-
 ### Complex types
 
 - `Boolean` - Accepts `true`/`false`) [UNRELEASED]
@@ -260,6 +276,12 @@ end
 - `HTML` (subclass of `String`) - TODO: Check that string is HTML
 - `JSON` (subclass of `String`) - TODO: Check that string is JSON
 - `XML` (subclass of `String`) - TODO: Check that string is XML
+
+### Custom types
+
+Any class/type that's available to Ruby is available to LowType. 
+
+ℹ️ LowType evaluates parameter types in both the binding of LowType and the binding of the class that did the `include`.
 
 ## Integrations
 
@@ -282,22 +304,21 @@ class MyApp < Sinatra::Base
     'body'
   end
 
-  # Standard types Sinatra uses.
+  # Generic return type for Sinatra.
   get '/' do -> { Array[Integer, Hash, String] }
     [200, {}, '<h1>Hello!</h1>']
   end
 
-  # Specific types for Sinatra.
+  # Specific return type for Sinatra.
   get '/' do -> { Tuple[Status, Headers, HTML] }
     [200, {}, '<h1>Hello!</h1>']
   end
 end
 ```
 
-### LowDependency
+### Providers
 
-With [LowDependency](https://github.com/low-rb/low_dependency) you can inject your dependencies automatically via the constructor:
-
+With [Providers](https://github.com/low-rb/providers) you can inject your dependencies automatically via the constructor:
 ```ruby
 class MyClass
   include LowType
@@ -307,6 +328,12 @@ class MyClass
   end
 end
 ```
+
+### Raindeer
+
+LowType is supported out of the box by the [Raindeer](https://github.com/raindeer-rb/raindeer) framework. In fact, Raindeer is built on many other Low [gems](https://github.com/orgs/low-rb/repositories).
+
+<p align="center"><a href="https://github.com/raindeer-rb/raindeer"><img src="https://github.com/raindeer-rb/raindeer/raw/main/assets/logo.png" alt="Raindeer logo" height="400"/></a></p>
 
 ### Rubocop
 
@@ -356,6 +383,8 @@ class Child < Parent
   # LowType available here.
 end
 ```
+
+ℹ️ [In the future](https://github.com/low-rb/low_type/issues/43) you will be able to add a `# type_expressions: true` magic comment to the top of your file.
 
 ## Architecture
 

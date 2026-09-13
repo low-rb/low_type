@@ -35,7 +35,7 @@ module Low
     include Types
     using LowType::Syntax
 
-    def instance_evaluate(proxy:)
+    def low_evaluate(proxy:)
       # Not a security risk because the code comes from a trusted source; the file that included lowtype.
       eval(proxy.value, binding, proxy.file_path, proxy.start_line) # rubocop:disable Security/Eval
     end
@@ -59,12 +59,13 @@ module Low
         begin # rubocop:disable Style/RedundantBegin
           method_proxy.tagged_params(:value).each do |param_proxy|
             expression = begin
-              new.instance_evaluate(proxy: param_proxy)
+              new.low_evaluate(proxy: param_proxy)
             rescue NameError
               raise unless class_binding
+
               new.class_evaluate(proxy: param_proxy, class_binding:)
             end
-            param_proxy.expression = cast_type_expression(expression:, method_proxy:)
+            param_proxy.expression = cast_type_expression(expression:, param_proxy:)
           end
         rescue NameError => e
           mp = method_proxy
@@ -74,7 +75,7 @@ module Low
 
       def evaluate_return_proxy_expression(return_proxy:)
         begin
-          expression = new.instance_evaluate(proxy: return_proxy)
+          expression = new.low_evaluate(proxy: return_proxy)
         rescue NameError
           rp = return_proxy
           raise NameError, "Unknown return type '#{rp.value}' for #{rp.scope} at #{rp.file_path}:#{rp.start_line}"
@@ -87,11 +88,11 @@ module Low
 
       private
 
-      def cast_type_expression(expression:, method_proxy:)
+      def cast_type_expression(expression:, param_proxy:)
         if expression.is_a?(::Expressions::Expression)
           return expression
         elsif expression.instance_of?(Class) && expression.name == 'Low::Dependency'
-          return expression.new(provider_key: method_proxy.name)
+          return expression.new(provider_key: param_proxy.name)
         elsif TypeQuery.type?(expression)
           return TypeExpression.new(type: expression)
         end

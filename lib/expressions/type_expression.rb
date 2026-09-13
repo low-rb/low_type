@@ -2,6 +2,7 @@
 
 require 'expressions'
 
+require_relative 'value_expression'
 require_relative '../proxies/param_proxy'
 require_relative '../queries/type_query'
 
@@ -123,6 +124,10 @@ module Low
     end
 
     def hash_types_match_values?(types:, values:)
+      return true if values.empty? && empty_hash_default_value?
+      return values.empty? if types.empty?
+      return false if values.empty?
+
       # TODO: Shallow validation of hash could be made deeper with user config.
       types.keys[0] == values.keys[0].class && types.values[0] == values.values[0].class
     end
@@ -130,9 +135,10 @@ module Low
     def type_matches_value?(type:, value:, proxy:)
       if type.instance_of?(Class)
         return type.match?(value:) if Low::TypeQuery.complex_type?(expression: type)
+        return value.value <= type if value.instance_of?(ValueExpression)
 
-        return type == value.class
-      elsif type.instance_of?(::Low::TypeExpression)
+        return value.is_a?(type)
+      elsif type.instance_of?(Low::TypeExpression)
         type.validate!(value:, proxy:)
         return true
       end
@@ -144,6 +150,10 @@ module Low
       return @deep_type_check unless @deep_type_check.nil?
 
       LowType.config.deep_type_check
+    end
+
+    def empty_hash_default_value?
+      @default_value.is_a?(Hash) && @default_value.empty?
     end
   end
 end

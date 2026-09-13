@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
-require 'pry-nav'
 require_relative '../../lib/types/complex_types'
 
 # Access types in tests without requiring them.

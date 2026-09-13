@@ -2,6 +2,6 @@
 
 module Low
   module Type
-    VERSION = '1.1.13'
+    VERSION = '1.3.2'
   end
 end

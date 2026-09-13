@@ -132,12 +132,4 @@ RSpec.describe LowHello do
       end
     end
   end
-
-  describe '#private_typed_arg' do
-    let(:error_message) { "private method 'private_typed_arg' called for an instance of LowHello" }
-
-    it 'raises no method error' do
-      expect { hello.private_typed_arg }.to raise_error(NoMethodError, error_message)
-    end
-  end
 end

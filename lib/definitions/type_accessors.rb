@@ -5,6 +5,17 @@ require_relative '../proxies/return_proxy'
 require_relative '../queries/type_query'
 
 module Low
+  # Usage:
+  #
+  # type_accessor name: String # => @name getter and @name=() setter
+  # type_accessor name: String | 'Cher'
+  #
+  # type_reader name: String
+  # type_reader name: String | 'Cher' # defaults to 'Cher' if nil
+  #
+  # type_writer name: String
+  # type_writer name: String | nil # accepts String or nil
+  #
   module TypeAccessors
     def type_reader(named_expressions)
       named_expressions.each do |name, exp|

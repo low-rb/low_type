@@ -15,6 +15,6 @@ class App < Sinatra::Base
     123 # Responds with 500 status and "Invalid return value..." body.
   end
 
-  # start the server if ruby file executed directly
+  # Start the server if ruby file executed directly.
   run! if app_file == $PROGRAM_NAME
 end

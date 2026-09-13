@@ -86,6 +86,30 @@ RSpec.describe Hashes do
     end
   end
 
+  describe '#typed_hash_arg_and_hash_empty_value' do
+    it 'accepts empty hash argument as default value' do
+      expect(subject.typed_hash_arg_and_hash_empty_value({})).to eq({})
+    end
+
+    context 'when no arg provided' do
+      it 'provides the default value' do
+        expect(subject.typed_hash_arg_and_hash_empty_value).to eq({})
+      end
+    end
+  end
+
+  describe '#typed_hash_arg_and_key_value_hash_empty_value' do
+    it 'accepts empty hash argument as default value' do
+      expect(subject.typed_hash_arg_and_key_value_hash_empty_value({})).to eq({})
+    end
+
+    context 'when no arg provided' do
+      it 'provides the default value' do
+        expect(subject.typed_hash_arg_and_key_value_hash_empty_value).to eq({})
+      end
+    end
+  end
+
   describe '#typed_hash_kwarg' do
     it 'passes through the argument' do
       expect(subject.typed_hash_kwarg(greetings: { 'Hello' => 'Goodbye' })).to eq({ 'Hello' => 'Goodbye' })
@@ -108,6 +132,50 @@ RSpec.describe Hashes do
 
       it 'raises an argument error' do
         expect { subject.typed_hash_kwarg }.to raise_error(Low::ArgumentTypeError, error_message)
+      end
+    end
+  end
+
+  describe '#type_accessor with Hash[String => Integer] | {}' do
+    subject(:hash) { HashWithTypeAccessor.new(value:) }
+
+    context 'with empty arg' do
+      let(:value) { {} }
+
+      it 'sets empty value' do
+        expect(hash.value = {}).to eq({})
+      end
+    end
+
+    context 'with valid types' do
+      let(:value) { { 'valid' => 123 } }
+
+      it 'sets valid value' do
+        expect(hash.value = value).to eq(value)
+      end
+    end
+
+    context 'with invalid types' do
+      let(:value) { { 123 => 'invalid' } }
+
+      context 'when getting' do
+        let(:error_message) do
+          "Invalid argument type 'Hash' for parameter 'value'. Valid types: '{String => Integer}'"
+        end
+
+        it 'raises an argument type error' do
+          expect { hash.value = value }.to raise_error(Low::ArgumentTypeError, error_message)
+        end
+      end
+
+      context 'when setting' do
+        let(:error_message) do
+          "Invalid return type 'Hash' for method 'value'. Valid types: '{String => Integer}'"
+        end
+
+        it 'raises a return type error' do
+          expect { hash.value }.to raise_error(Low::ReturnTypeError, error_message)
+        end
       end
     end
   end

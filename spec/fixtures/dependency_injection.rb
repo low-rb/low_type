@@ -1,22 +1,21 @@
 # frozen_string_literal: true
 
-require 'low_dependency'
-
+require 'providers'
 require_relative '../../lib/low_type'
 
-LowDependency.provide(:dependency) do
+Providers.define(:dependency) do
   'mock dependency'
 end
 
-LowDependency.provide(:symbol) do
+Providers.define(:symbol) do
   'mock symbol dependency'
 end
 
-LowDependency.provide('string') do
+Providers.define('string') do
   'mock string dependency'
 end
 
-class Dependencies
+class DependencyInjection
   include LowType
 
   def dependency(dependency: Dependency)
