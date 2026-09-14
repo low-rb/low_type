@@ -27,13 +27,13 @@ module Low
   class Redefiner
     class << self
       def redefine(method_proxies:, class_proxy:, klass: nil)
-        case LowType.config.type_checking
-        when true
-          typed_methods(method_proxies:, class_proxy:)
-        when :rewrite
-          rewrite_methods(method_proxies:, class_proxy:, klass:)
-        else
-          untyped_methods(method_proxies:, class_proxy:)
+        return typed_methods(method_proxies:, class_proxy:) if LowType.config.type_checking
+
+        case LowType.config.disable_mode
+        when :shim
+          shimmed_methods(method_proxies:, class_proxy:)
+        when :strip
+          stripped_methods(method_proxies:, class_proxy:, klass:)
         end
       end
 
@@ -54,20 +54,6 @@ module Low
       end
 
       private
-
-      def rewrite_methods(method_proxies:, class_proxy:, klass:)
-        method_proxies.values.filter(&:expressions?).each do |method_proxy|
-          method_proxy.rewrite_signature
-
-          klass.class_eval(method_proxy.export, method_proxy.file_path, method_proxy.start_line)
-
-          if class_proxy.private_start_line && method_proxy.start_line > class_proxy.private_start_line
-            klass.send(:private, method_proxy.name)
-          end
-        end
-
-        nil
-      end
 
       def typed_methods(method_proxies:, class_proxy:) # rubocop:disable Metrics
         Module.new do
@@ -99,7 +85,7 @@ module Low
         end
       end
 
-      def untyped_methods(method_proxies:, class_proxy:)
+      def shimmed_methods(method_proxies:, class_proxy:)
         Module.new do
           method_proxies.values.filter(&:expressions?).each do |method_proxy|
             # You are now in the binding of the includer class.
@@ -112,6 +98,20 @@ module Low
             private method_proxy.name if class_proxy.private_start_line && method_proxy.start_line > class_proxy.private_start_line
           end
         end
+      end
+
+      def stripped_methods(method_proxies:, class_proxy:, klass:)
+        method_proxies.values.filter(&:expressions?).each do |method_proxy|
+          method_proxy.rewrite_signature
+
+          klass.class_eval(method_proxy.export, method_proxy.file_path, method_proxy.start_line)
+
+          if class_proxy.private_start_line && method_proxy.start_line > class_proxy.private_start_line
+            klass.send(:private, method_proxy.name)
+          end
+        end
+
+        nil
       end
     end
   end
