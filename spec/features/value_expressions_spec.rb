@@ -27,7 +27,7 @@ RSpec.describe ValueExpressions do
         "Invalid argument type 'Integer' for parameter 'greeting'. Valid types: 'String | [Symbol]'"
       end
 
-      it 'raises an argument type error' do
+      it 'raises an argument type error', type_checking: true do
         # => raises Low::ArgumentTypeError. A default value(type) that is not nil still has to be an allowed type.
         expect do
           subject.typed_arg_and_invalid_default_typed_value

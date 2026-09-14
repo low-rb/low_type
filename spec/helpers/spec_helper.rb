@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
+require_relative '../../lib/lowtype'
 require_relative '../../lib/types/complex_types'
 
 # Access types in tests without requiring them.
 include Low::Types # rubocop:disable Style/MixinUsage
+
+TYPE_CHECKING = ENV['TYPE_CHECKING'] != 'false'
+LowType.configure { |config| config.type_checking = TYPE_CHECKING }
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -18,6 +22,7 @@ RSpec.configure do |config|
     expectations.max_formatted_output_length = 10_000
   end
 
-  # Reset type_checking to true after each example to prevent config leaking between specs
-  config.after(:each) { LowType.configure { |c| c.type_checking = true } }
+  # Specs with no explicit `:type_checking` tag run in both processes (see Rakefile).
+  # This configuration is a double negative; it essentially activates the flag.
+  config.filter_run_excluding type_checking: !TYPE_CHECKING
 end

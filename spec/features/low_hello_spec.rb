@@ -18,7 +18,7 @@ RSpec.describe LowHello do
       let(:greeting) { 123 }
       let(:error_message) { "Invalid argument type 'Integer' for parameter 'greeting'. Valid types: 'String'" }
 
-      it 'raises an invalid type error' do
+      it 'raises an invalid type error', type_checking: true do
         expect { hello }.to raise_error(Low::ArgumentTypeError, error_message)
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe LowHello do
     context 'when no arg provided' do
       let(:error_message) { "Invalid argument type 'Integer' for parameter 'greeting'. Valid types: 'String'" }
 
-      it 'raises an argument type error' do
+      it 'raises an argument type error', type_checking: true do
         # => raises Low::ArgumentTypeError. A default value that is not nil still has to be an allowed type.
         expect { hello.typed_arg_and_invalid_default_value }.to raise_error(Low::ArgumentTypeError, error_message)
       end
@@ -92,7 +92,7 @@ RSpec.describe LowHello do
         "Invalid argument type 'TrueClass' for parameter 'greeting'. Valid types: 'String | Integer'"
       end
 
-      it 'raises an invalid type error' do
+      it 'raises an invalid type error', type_checking: true do
         expect { hello.multiple_typed_args(true) }.to raise_error(Low::ArgumentTypeError, error_message)
       end
     end
@@ -119,7 +119,7 @@ RSpec.describe LowHello do
         "Invalid argument type 'TrueClass' for parameter 'greeting'. Valid types: 'String | Integer'"
       end
 
-      it 'raises an argument type error' do
+      it 'raises an argument type error', type_checking: true do
         expect do
           hello.multiple_typed_args_and_default_value(true)
         end.to raise_error(Low::ArgumentTypeError, error_message)

@@ -40,7 +40,7 @@ RSpec.describe ReturnTypes do
     context 'when the return value is nil' do
       let(:error_message) { "Invalid return type 'NilClass' for method 'arg_and_return_type'. Valid types: 'String'" }
 
-      it 'raises a return type error' do
+      it 'raises a return type error', type_checking: true do
         expect { subject.arg_and_return_type(nil) }.to raise_error(Low::ReturnTypeError, error_message)
       end
     end
@@ -48,7 +48,7 @@ RSpec.describe ReturnTypes do
     context 'when the return value does not validate the return type expression' do
       let(:error_message) { "Invalid return type 'Integer' for method 'arg_and_return_type'. Valid types: 'String'" }
 
-      it 'raises a return type error' do
+      it 'raises a return type error', type_checking: true do
         expect { subject.arg_and_return_type(123) }.to raise_error(Low::ReturnTypeError, error_message)
       end
     end
@@ -65,7 +65,7 @@ RSpec.describe ReturnTypes do
         "Invalid return type 'Integer' for method 'arg_and_nilable_return_value'. Valid types: 'String | nil'"
       end
 
-      it 'raises a return type error' do
+      it 'raises a return type error', type_checking: true do
         expect { subject.arg_and_nilable_return_value(123) }.to raise_error(Low::ReturnTypeError, error_message)
       end
     end

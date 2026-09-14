@@ -45,7 +45,7 @@ RSpec.describe 'Subclass type inheritance' do
       expect { store.save(value: 3.14) }.not_to raise_error
     end
 
-    it 'rejects a non-Numeric value' do
+    it 'rejects a non-Numeric value', type_checking: true do
       expect { store.save(value: 'not a number') }.to raise_error(Low::ArgumentTypeError)
     end
   end
@@ -61,7 +61,7 @@ RSpec.describe 'Subclass type inheritance' do
   end
 
   # Test plan item 4: No regressions — wrong type still raises
-  context 'regression: unrelated type still raises' do
+  context 'regression: unrelated type still raises', type_checking: true do
     subject(:kennel) { Kennel.new }
 
     it 'raises Low::ArgumentTypeError for a completely unrelated type' do
