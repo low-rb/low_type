@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/low_type'
+require_relative '../../lib/lowtype'
 require_relative '../../lib/types/error_types'
 require_relative '../fixtures/arrays'
 
@@ -33,7 +33,7 @@ RSpec.describe Arrays do
         end
       end
 
-      context 'with deep type check' do
+      context 'with deep type check', type_checking: true do
         before { LowType.configure { |config| config.deep_type_check = true } }
         after { LowType.configure { |config| config.deep_type_check = false } }
 

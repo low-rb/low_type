@@ -30,6 +30,18 @@ RSpec.describe ClassMethods do
         expect { described_class.class_typed_arg }.to raise_error(Low::ArgumentTypeError, error_message)
       end
     end
+
+    context 'with type checking disabled', type_checking: false do
+      it 'accepts wrong type' do
+        expect { described_class.class_typed_arg(123) }.not_to raise_error
+      end
+    end
+
+    context 'with type checking enabled', type_checking: true do
+      it 'rejects wrong type' do
+        expect { described_class.class_typed_arg(123) }.to raise_error
+      end
+    end
   end
 
   describe '.class_typed_arg_and_default_value' do

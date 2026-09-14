@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'providers'
-require_relative '../../lib/low_type'
+require_relative '../../lib/lowtype'
 
 Providers.define(:dependency) do
   'mock dependency'

@@ -2,7 +2,7 @@
 
 source 'https://gem.coop'
 
-# Specify your gem's dependencies in low_type.gemspec
+# Specify your gem's dependencies in lowtype.gemspec
 gemspec
 
 group :development do
