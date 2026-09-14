@@ -12,5 +12,9 @@ RSpec.describe PrivateMethod do
     it 'raises no method error' do
       expect { private_method.private_typed_arg }.to raise_error(NoMethodError, error_message)
     end
+
+    it 'is still callable internally' do
+      expect(private_method.send(:private_typed_arg, 'secret')).to eq('secret')
+    end
   end
 end

@@ -2,7 +2,7 @@
 
 require_relative '../../lib/lowtype'
 
-class Hello
+class DuckTypes
   include LowType
 
   def initialize(greeting, name)

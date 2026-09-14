@@ -2,7 +2,7 @@
 
 require_relative '../fixtures/hashes'
 
-RSpec.describe Hashes do
+RSpec.describe Hashes, type_checking: true do
   subject { Hashes.new(hash:) }
 
   let(:hash) { { 'Hello' => 'Goodbye' } }

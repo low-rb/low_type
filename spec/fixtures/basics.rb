@@ -2,7 +2,7 @@
 
 require_relative '../../lib/lowtype'
 
-class LowHello
+class Basics
   include LowType
 
   def initialize(greeting = String, name = String)
@@ -23,7 +23,6 @@ class LowHello
   end
 
   def typed_arg_and_invalid_default_value(greeting = String | 123)
-    # => raises TypeError. A default value that is not nil still has to be a valid type.
     greeting
   end
 
