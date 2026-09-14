@@ -65,8 +65,8 @@ Minor features that don't break backwards compatibility are released as patches.
 
 ### Fixed
 
-- [Add prefix to lambda locals to avoid name conflicts](https://github.com/low-rb/low_type/pull/2)
-- [Improved error message with unknown return type](https://github.com/low-rb/low_type/pull/1)
+- [Add prefix to lambda locals to avoid name conflicts](https://github.com/low-rb/lowtype/pull/2)
+- [Improved error message with unknown return type](https://github.com/low-rb/lowtype/pull/1)
 
 ## 1.1.2
 

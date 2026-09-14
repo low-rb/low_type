@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/low_type'
+require_relative '../../lib/lowtype'
 
 # Be very careful when doing this in a big app as it will include LowType on every class!
 include LowType # rubocop:disable Style/MixinUsage

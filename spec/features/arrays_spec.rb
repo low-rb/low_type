@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/low_type'
+require_relative '../../lib/lowtype'
 require_relative '../../lib/types/error_types'
 require_relative '../fixtures/arrays'
 

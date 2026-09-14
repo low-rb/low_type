@@ -1,7 +1,7 @@
 PATH
   remote: ../..
   specs:
-    low_type (1.1.13)
+    lowtype (1.1.13)
       expressions (~> 0.1)
       lowkey (~> 0.4)
 
@@ -124,7 +124,7 @@ PLATFORMS
 
 DEPENDENCIES
   falcon
-  low_type!
+  lowtype!
   puma
   rackup
   sinatra

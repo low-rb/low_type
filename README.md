@@ -1,4 +1,4 @@
-<a href="https://rubygems.org/gems/low_type" title="Install gem"><img src="https://badge.fury.io/rb/low_type.svg" alt="Gem version" height="18"></a> <a href="https://github.com/low-rb/low_type" title="GitHub"><img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="GitHub repo" height="18"></a> <a href="https://codeberg.org/Iow/type" title="Codeberg"><img src="https://img.shields.io/badge/Codeberg-2185D0?style=for-the-badge&logo=Codeberg&logoColor=white" alt="Codeberg repo" height="18"></a>
+<a href="https://rubygems.org/gems/lowtype" title="Install gem"><img src="https://badge.fury.io/rb/lowtype.svg" alt="Gem version" height="18"></a> <a href="https://github.com/low-rb/lowtype" title="GitHub"><img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white" alt="GitHub repo" height="18"></a> <a href="https://codeberg.org/Iow/type" title="Codeberg"><img src="https://img.shields.io/badge/Codeberg-2185D0?style=for-the-badge&logo=Codeberg&logoColor=white" alt="Codeberg repo" height="18"></a>
 
 # LowType
 
@@ -228,13 +228,10 @@ Copy and paste the following and change the defaults to configure LowType:
 # This configuration should be set before the class that includes LowType is required.
 LowType.configure do |config|
   # Set to "false" to disable type checking, which you may like to do in a production environment for example.
-  # When disabled, methods are rewritten directly via class_eval to strip type annotations from signatures.
-  # Performance is near plain Ruby.
-  # Valid values:
-  #   true     -- type checking on (default)
-  #   false    -- type checking off, untyped shim (define_method + super)
-  #   :rewrite -- type checking off, methods rewritten directly via class_eval
   config.type_checking = true
+
+  # Set to :strip to strip types on class load. Near native-performance.
+  config.disable_mode = :shim
 
   # Set to :log to log instead of raising of an exception when a type is invalid. [UNRELEASED]
   config.error_mode = :error
@@ -269,7 +266,7 @@ end
 ### Complex types
 
 - `Boolean` - Accepts `true`/`false`) [UNRELEASED]
-- `Enum` - Usage: `Enum[1, 2, 3]` [[CONCEPT STAGE](https://github.com/low-rb/low_type/issues/6)]
+- `Enum` - Usage: `Enum[1, 2, 3]` [[CONCEPT STAGE](https://github.com/low-rb/lowtype/issues/6)]
 - `Tuple` (subclass of `Array`)
 - `Status` (subclass of `Integer`)
 - `Headers` (subclass of `Hash`)
@@ -294,7 +291,7 @@ LowType will automatically add the necessary `content_type` [UNRELEASED] and typ
 
 ```ruby
 require 'sinatra/base'
-require 'low_type'
+require 'lowtype'
 
 class MyApp < Sinatra::Base
   include LowType
@@ -359,8 +356,7 @@ Style/RedundantArrayConstructor:
 
 ## Installation
 
-Add `gem 'low_type'` to your Gemfile then:
-
+Add `gem 'lowtype'` to your Gemfile then:
 ```
 bundle install
 ```
@@ -384,7 +380,7 @@ class Child < Parent
 end
 ```
 
-ℹ️ [In the future](https://github.com/low-rb/low_type/issues/43) you will be able to add a `# type_expressions: true` magic comment to the top of your file.
+ℹ️ [In the future](https://github.com/low-rb/lowtype/issues/43) you will be able to add a `# type_expressions: true` magic comment to the top of your file.
 
 ## Architecture
 

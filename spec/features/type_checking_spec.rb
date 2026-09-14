@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/low_type'
+require_relative '../../lib/lowtype'
 
 RSpec.describe 'LowType.config.type_checking' do
   context 'when type_checking: true (typed methods)' do

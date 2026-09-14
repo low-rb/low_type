@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'sinatra/base'
-require 'low_type'
+require 'lowtype'
 
 class App < Sinatra::Base
   include LowType
