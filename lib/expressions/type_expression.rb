@@ -18,7 +18,7 @@ module Low
     attr_reader :types, :default_value
 
     # @param type - A literal type or an instance representation of a typed structure.
-    def initialize(type: nil, default_value: :LOW_TYPE_UNDEFINED)
+    def initialize(type: nil, default_value: :LOWTYPE_UNDEFINED)
       @types = []
       @types << type unless type.nil?
       @default_value = default_value
@@ -27,7 +27,7 @@ module Low
     end
 
     def required?
-      @default_value == :LOW_TYPE_UNDEFINED
+      @default_value == :LOWTYPE_UNDEFINED
     end
 
     def validate!(value:, proxy:) # rubocop:disable Metrics
