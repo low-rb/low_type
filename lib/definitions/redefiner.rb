@@ -37,7 +37,7 @@ module Low
         end
       end
 
-      def untyped_args(args:, kwargs:, method_proxy:) # rubocop:disable Metrics/AbcSize
+      def untyped_shimmed_args(args:, kwargs:, method_proxy:) # rubocop:disable Metrics/AbcSize
         method_proxy.params_with_expressions.each do |param_proxy|
           positional = %i[pos_req pos_opt].include?(param_proxy.type)
           value = positional ? args[param_proxy.position] : kwargs[param_proxy.name]
@@ -88,10 +88,10 @@ module Low
       def shimmed_methods(method_proxies:, class_proxy:)
         Module.new do
           method_proxies.values.filter(&:expressions?).each do |method_proxy|
-            # You are now in the binding of the includer class.
+            # You are now in the binding of both LowType and the includer class.
             define_method(method_proxy.name) do |*args, **kwargs|
-              # NOTE: Type checking is currently disabled. See 'config.type_checking'.
-              args, kwargs = Low::Redefiner.untyped_args(args:, kwargs:, method_proxy:)
+              # NOTE: Type checking is currently disabled via shim. See 'config.type_checking'.
+              args, kwargs = Low::Redefiner.untyped_shimmed_args(args:, kwargs:, method_proxy:)
               super(*args, **kwargs)
             end
 
